@@ -2,6 +2,13 @@ import { memo, onActivate, onDeactivate, writable } from 'spred';
 import { h } from './h';
 
 describe('h function', () => {
+  it('creates document fragment', () => {
+    const fragment = h([null, '1', 2, h('span', [3])]);
+
+    expect(fragment).toBeInstanceOf(DocumentFragment);
+    expect(fragment.textContent).toBe('123');
+  });
+
   it('creates an empty html element', () => {
     const div = h('div');
 
@@ -165,8 +172,24 @@ describe('h function', () => {
       expect(div.childNodes[1]).toBe(span);
     });
 
+    it('can render document fragments', () => {
+      const fragment = document.createDocumentFragment();
+      const span = h('span', ['span']);
+
+      fragment.appendChild(span);
+
+      const div = h('div', [fragment]);
+
+      expect(div.querySelector('span')).toBe(span);
+    });
+
     it('can render signals', () => {
       const node = writable<any>();
+
+      const fragment = document.createDocumentFragment();
+
+      fragment.appendChild(h('span', ['a']));
+      fragment.appendChild(h('span', ['b']));
 
       const div = h('div', [
         h('span', ['1']),
@@ -176,19 +199,27 @@ describe('h function', () => {
       ]);
 
       expect(div.childNodes[1]).toBeInstanceOf(Comment);
+      expect(div.textContent).toBe('123');
 
       node('text');
       expect(div.childNodes[1]).toBeInstanceOf(Text);
-      expect(div.childNodes[1].textContent).toBe('text');
+      expect(div.textContent).toBe('1text23');
 
       node('text text');
       expect(div.childNodes[1]).toBeInstanceOf(Text);
-      expect(div.childNodes[1].textContent).toBe('text text');
+      expect(div.textContent).toBe('1text text23');
+
+      node(fragment);
+      expect(div.textContent).toBe('1ab23');
+
+      node(h(['a', 'b', h('span', ['c']), null, 'd']));
+      expect(div.textContent).toBe('1abcd23');
 
       node(h('div', ['div']));
       expect(div.childNodes[1]).toBeInstanceOf(Element);
       expect((div.childNodes[1] as any).tagName).toBe('DIV');
       expect(div.childNodes[1].textContent).toBe('div');
+      expect(div.textContent).toBe('1div23');
     });
 
     it('cleanup used signals after removal from document', () => {
