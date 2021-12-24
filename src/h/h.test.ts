@@ -1,0 +1,232 @@
+import { memo, onActivate, onDeactivate, writable } from 'spred';
+import { h } from './h';
+
+describe('h function', () => {
+  it('creates an empty html element', () => {
+    const div = h('div');
+
+    expect(div).toBeInstanceOf(Element);
+    expect(div.tagName).toBe('DIV');
+    expect(div.childNodes.length).toBe(0);
+
+    const a = h('a');
+
+    expect(a).toBeInstanceOf(Element);
+    expect(a.tagName).toBe('A');
+    expect(a.childNodes.length).toBe(0);
+  });
+
+  it('creates a html element with props', () => {
+    const a = h('a', {
+      href: 'https://example.com/',
+      target: '_blank',
+    });
+
+    expect(a).toBeInstanceOf(Element);
+    expect(a.tagName).toBe('A');
+    expect(a.href).toBe('https://example.com/');
+    expect(a.target).toBe('_blank');
+  });
+
+  it('creates a html element with attrs', () => {
+    const a = h('a', {
+      attrs: {
+        href: 'https://example.com/',
+        target: '_blank',
+        dataTest: 123,
+      },
+    });
+
+    expect(a).toBeInstanceOf(Element);
+    expect(a.tagName).toBe('A');
+    expect(a.href).toBe('https://example.com/');
+    expect(a.target).toBe('_blank');
+    expect(a.getAttribute('data-test')).toBe('123');
+  });
+
+  it('creates a html element with props and children', () => {
+    const a = h(
+      'a',
+      {
+        attrs: {
+          dataTest: 123,
+        },
+        href: 'https://example.com/',
+        target: '_blank',
+      },
+      [h('span', ['test'])]
+    );
+
+    expect(a).toBeInstanceOf(Element);
+    expect(a.tagName).toBe('A');
+    expect(a.href).toBe('https://example.com/');
+    expect(a.target).toBe('_blank');
+    expect(a.getAttribute('data-test')).toBe('123');
+    expect((a.childNodes[0] as any).tagName).toBe('SPAN');
+    expect(a.textContent).toBe('test');
+  });
+
+  describe('props', () => {
+    it('can use a signal as a value', () => {
+      const checked = writable(false);
+
+      const input = h('input', {
+        type: 'checkbox',
+        checked,
+      });
+
+      expect(input.checked).toBe(false);
+
+      checked(true);
+      expect(input.checked).toBe(true);
+
+      checked(false);
+      expect(input.checked).toBe(false);
+    });
+  });
+
+  describe('attrs', () => {
+    it('renders true as empty string', () => {
+      const div = h('div', {
+        attrs: {
+          dataValue: true,
+        },
+      });
+
+      expect(div.getAttribute('data-value')).toBe('');
+    });
+
+    it('removes attr if the value is false, null or undefined', () => {
+      const div = h('div', {
+        attrs: {
+          dataFalse: false,
+          dataNull: null,
+          dataUndefined: undefined,
+        },
+      });
+
+      expect(div.getAttribute('data-false')).toBe(null);
+      expect(div.getAttribute('data-null')).toBe(null);
+      expect(div.getAttribute('data-undefined')).toBe(null);
+    });
+
+    it('can use a signal as a value', () => {
+      const dataValue = writable<any>();
+
+      const div = h('div', {
+        attrs: {
+          dataValue,
+        },
+      });
+
+      expect(div.getAttribute('data-value')).toBe(null);
+
+      dataValue('value');
+      expect(div.getAttribute('data-value')).toBe('value');
+
+      dataValue(true);
+      expect(div.getAttribute('data-value')).toBe('');
+
+      dataValue(false);
+      expect(div.getAttribute('data-value')).toBe(null);
+
+      dataValue(null);
+      expect(div.getAttribute('data-value')).toBe(null);
+    });
+  });
+
+  describe('children', () => {
+    it('can be empty', () => {
+      const div = h('div', []);
+
+      expect(div.childNodes.length).toBe(0);
+    });
+
+    it('does not render falsy values as elements', () => {
+      const div = h('div', [undefined, false, null]);
+
+      expect(div.querySelectorAll('*').length).toBe(0);
+    });
+
+    it('can render text nodes', () => {
+      const div = h('div', ['one', ' two', ' three', ' four']);
+
+      expect(div.childNodes.length).toBe(4);
+      expect(div.textContent).toBe('one two three four');
+    });
+
+    it('can render element nodes', () => {
+      const a = document.createElement('a');
+      const span = h('span');
+
+      const div = h('div', [a, span]);
+
+      expect(div.childNodes[0]).toBe(a);
+      expect(div.childNodes[1]).toBe(span);
+    });
+
+    it('can render signals', () => {
+      const node = writable<any>();
+
+      const div = h('div', [
+        h('span', ['1']),
+        node,
+        h('span', ['2']),
+        h('span', ['3']),
+      ]);
+
+      expect(div.childNodes[1]).toBeInstanceOf(Comment);
+
+      node('text');
+      expect(div.childNodes[1]).toBeInstanceOf(Text);
+      expect(div.childNodes[1].textContent).toBe('text');
+
+      node('text text');
+      expect(div.childNodes[1]).toBeInstanceOf(Text);
+      expect(div.childNodes[1].textContent).toBe('text text');
+
+      node(h('div', ['div']));
+      expect(div.childNodes[1]).toBeInstanceOf(Element);
+      expect((div.childNodes[1] as any).tagName).toBe('DIV');
+      expect(div.childNodes[1].textContent).toBe('div');
+    });
+
+    it('cleanup used signals after removal from document', () => {
+      let valueCounter = 0;
+      let anotherValueCounter = 0;
+
+      const toggle = writable(true);
+      const value = writable('true');
+      const anotherValue = writable(' 1');
+
+      onActivate(value, () => valueCounter++);
+      onDeactivate(value, () => valueCounter++);
+
+      onActivate(anotherValue, () => anotherValueCounter++);
+      onDeactivate(anotherValue, () => anotherValueCounter++);
+
+      const div = h('div', [
+        memo(() =>
+          toggle()
+            ? h(
+                'div',
+                {
+                  textContent: value,
+                },
+                [h('div', [anotherValue])]
+              )
+            : 'false'
+        ),
+      ]);
+
+      expect(valueCounter).toBe(1);
+      expect(anotherValueCounter).toBe(1);
+      expect(div.textContent).toBe('true 1');
+
+      toggle(false);
+      expect(valueCounter).toBe(2);
+      expect(anotherValueCounter).toBe(2);
+      expect(div.textContent).toBe('false');
+    });
+  });
+});

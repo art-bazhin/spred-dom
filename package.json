@@ -1,0 +1,56 @@
+{
+  "name": "spred-ui",
+  "description": "Lib description",
+  "homepage": "https://github.com/art-bazhin/spred-ui",
+  "repository": "git@github.com/art-bazhin/spred-ui.git",
+  "bugs": "https://github.com/art-bazhin/spred-ui/issues",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "esm": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "peerDependencies": {
+    "spred": ">=0.13.3"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.16.5",
+    "@babel/preset-env": "^7.16.5",
+    "@babel/preset-typescript": "^7.16.5",
+    "@size-limit/preset-small-lib": "^7.0.4",
+    "@types/jest": "^27.0.3",
+    "babel-jest": "^27.4.5",
+    "cz-conventional-changelog": "^3.3.0",
+    "jest": "^27.4.5",
+    "prettier": "^2.5.1",
+    "rollup": "^2.61.1",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-ts": "^2.0.4",
+    "size-limit": "^7.0.4",
+    "standard-version": "^9.3.2",
+    "tslib": "^2.3.1",
+    "typescript": "^4.5.4"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "jest",
+    "test:dev": "jest --watchAll",
+    "commit": "git-cz",
+    "size": "size-limit",
+    "release": "standard-version",
+    "bench": "npx http-server"
+  },
+  "files": [
+    "dist"
+  ],
+  "size-limit": [
+    {
+      "path": "dist/index.js"
+    }
+  ],
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
