@@ -1,3 +1,3 @@
-# spred-ui
+# spred-dom
 
 Library template repository

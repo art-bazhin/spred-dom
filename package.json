@@ -1,9 +1,9 @@
 {
-  "name": "spred-ui",
+  "name": "spred-dom",
   "description": "Lib description",
-  "homepage": "https://github.com/art-bazhin/spred-ui",
-  "repository": "git@github.com/art-bazhin/spred-ui.git",
-  "bugs": "https://github.com/art-bazhin/spred-ui/issues",
+  "homepage": "https://github.com/art-bazhin/spred-dom",
+  "repository": "git@github.com/art-bazhin/spred-dom.git",
+  "bugs": "https://github.com/art-bazhin/spred-dom/issues",
   "version": "0.0.1",
   "main": "dist/index.js",
   "esm": "dist/index.mjs",
