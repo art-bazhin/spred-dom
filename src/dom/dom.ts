@@ -13,8 +13,7 @@ export const TEXT = 1;
 export const FALSY = 2;
 export const NODE = 3;
 
-export type ChildValue = string | number | boolean | null | undefined | Node;
-export type Child = ChildValue | Signal<ChildValue>;
+export type Child = string | number | boolean | null | undefined | Node;
 
 export function isFragment(el: any): el is DocumentFragment {
   return el.nodeType === 11;
@@ -22,10 +21,6 @@ export function isFragment(el: any): el is DocumentFragment {
 
 export function isFragmentStartMark(el: any) {
   return el._end as Comment | undefined;
-}
-
-export function isMarkedFragment(el: any): el is DocumentFragment {
-  return el._marked;
 }
 
 export function markFragment(fragment: DocumentFragment) {
@@ -44,7 +39,7 @@ export function markFragment(fragment: DocumentFragment) {
   return start;
 }
 
-export function createNode(child: ChildValue, type?: number) {
+export function createNode(child: Child, type?: number) {
   const t = type || getChildValueType(child);
 
   switch (t) {
@@ -57,7 +52,7 @@ export function createNode(child: ChildValue, type?: number) {
   return child as Node;
 }
 
-export function removeChild(parent: Node, child: Node) {
+export function replaceChild(parent: Node, child: Node, refNode?: Node) {
   let current = child;
 
   if (isFragmentStartMark(child)) {
@@ -66,15 +61,19 @@ export function removeChild(parent: Node, child: Node) {
 
     while (current !== end) {
       next = current.nextSibling!;
-      parent.removeChild(current);
+
+      if (refNode) parent.insertBefore(current, refNode);
+      else parent.removeChild(current);
+
       current = next;
     }
   }
 
-  parent.removeChild(current);
+  if (refNode) parent.insertBefore(current, refNode);
+  else parent.removeChild(current);
 }
 
-export function processChild(child: ChildValue | Signal<ChildValue>) {
+export function processChild(child: Child | Signal<Child>) {
   let res: Node;
 
   if (child && (child as any).subscribe) {
@@ -113,7 +112,7 @@ export function processProp(
   }
 }
 
-function getChildValueType(child: ChildValue) {
+function getChildValueType(child: Child) {
   const t = typeof child;
 
   if (t === 'string' || t === 'number' || child === true) {
@@ -187,7 +186,7 @@ function processValueProp(
   if (isFalsy) delete obj[key];
 }
 
-function processAtomChild(signal: Signal<ChildValue>) {
+function processAtomChild(signal: Signal<Child>) {
   let node: Node;
 
   const cleanup = signal.subscribe((value, prevValue, firstRun) => {
@@ -212,7 +211,7 @@ function processAtomChild(signal: Signal<ChildValue>) {
         node.childNodes.forEach(cleanupNode);
 
         parent.insertBefore(newNode, node);
-        removeChild(parent, node);
+        replaceChild(parent, node);
 
         node = markNode;
         (node as any)._cleanup = cleanup;
@@ -232,7 +231,7 @@ function processAtomChild(signal: Signal<ChildValue>) {
   return node!;
 }
 
-function cleanupNode(node: Node) {
+export function cleanupNode(node: Node) {
   const cleanup = (node as any)._cleanup;
   if (cleanup) cleanup();
 
@@ -241,7 +240,7 @@ function cleanupNode(node: Node) {
   node.childNodes.forEach(cleanupNode);
 }
 
-function cleanupFragment(startNode: Node) {
+export function cleanupFragment(startNode: Node) {
   const end = isFragmentStartMark(startNode);
 
   if (!end) return;

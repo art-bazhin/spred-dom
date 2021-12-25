@@ -45,7 +45,7 @@ export function h<
 
 export function h<T extends string, E extends TagElement<T>>(
   tagName: T,
-  children: Child[]
+  children: (Child | Signal<Child>)[]
 ): E;
 
 export function h<
@@ -53,9 +53,9 @@ export function h<
   E extends TagElement<T>,
   K extends keyof E,
   V extends E[K]
->(tagName: T, props: Props<E>, children: Child[]): E;
+>(tagName: T, props: Props<E>, children: (Child | Signal<Child>)[]): E;
 
-export function h(children: Child[]): DocumentFragment;
+export function h(children: (Child | Signal<Child>)[]): DocumentFragment;
 
 export function h<
   T extends string,
@@ -80,7 +80,7 @@ export function h<
   const tagName: T = first;
 
   let props: { [key in K]?: Prop<V> } = {};
-  let children: Child[] = [];
+  let children: (Child | Signal<Child>)[] = [];
 
   if (Array.isArray(second)) {
     children = second;
