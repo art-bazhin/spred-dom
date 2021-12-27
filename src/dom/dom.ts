@@ -233,6 +233,11 @@ function processAtomChild(signal: Signal<ChildValue>) {
   return node!;
 }
 
+export function clearElement(element: Element) {
+  cleanupNode(element);
+  element.innerHTML = '';
+}
+
 export function cleanupNode(node: Node) {
   const cleanup = (node as any)._cleanup;
   if (cleanup) cleanup();

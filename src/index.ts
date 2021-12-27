@@ -1,5 +1,5 @@
 import { h } from './h/h';
 import { list } from './list/list';
-import { Children, Child, ChildValue } from './dom/dom';
+import { clearElement, Children, Child, ChildValue } from './dom/dom';
 
-export { h, list, Children, Child, ChildValue };
+export { h, list, clearElement, Children, Child, ChildValue };
