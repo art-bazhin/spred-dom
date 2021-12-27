@@ -1,7 +1,7 @@
 import { computed, memo, Signal, watch, writable, WritableSignal } from 'spred';
 
 import {
-  Child,
+  ChildValue,
   cleanupNode,
   createNode,
   isFragment,
@@ -31,7 +31,7 @@ function addEl(
 
 export function list<T>(
   source: Signal<T[]>,
-  mapFn: (signal: Signal<T>, i: number) => Child,
+  mapFn: (signal: Signal<T>, i: number) => ChildValue,
   keyFn?: (el: T, i: number) => any,
   isEqual?: (value: T, prevValue: T) => boolean
 ) {

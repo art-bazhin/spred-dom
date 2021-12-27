@@ -13,7 +13,9 @@ export const TEXT = 1;
 export const FALSY = 2;
 export const NODE = 3;
 
-export type Child = string | number | boolean | null | undefined | Node;
+export type ChildValue = string | number | boolean | null | undefined | Node;
+export type Child = ChildValue | Signal<ChildValue>;
+export type Children = Child[];
 
 export function isFragment(el: any): el is DocumentFragment {
   return el.nodeType === 11;
@@ -39,7 +41,7 @@ export function markFragment(fragment: DocumentFragment) {
   return start;
 }
 
-export function createNode(child: Child, type?: number) {
+export function createNode(child: ChildValue, type?: number) {
   const t = type || getChildValueType(child);
 
   switch (t) {
@@ -73,7 +75,7 @@ export function replaceChild(parent: Node, child: Node, refNode?: Node) {
   else parent.removeChild(current);
 }
 
-export function processChild(child: Child | Signal<Child>) {
+export function processChild(child: Child) {
   let res: Node;
 
   if (child && (child as any).subscribe) {
@@ -112,7 +114,7 @@ export function processProp(
   }
 }
 
-function getChildValueType(child: Child) {
+function getChildValueType(child: ChildValue) {
   const t = typeof child;
 
   if (t === 'string' || t === 'number' || child === true) {
@@ -186,7 +188,7 @@ function processValueProp(
   if (isFalsy) delete obj[key];
 }
 
-function processAtomChild(signal: Signal<Child>) {
+function processAtomChild(signal: Signal<ChildValue>) {
   let node: Node;
 
   const cleanup = signal.subscribe((value, prevValue, firstRun) => {

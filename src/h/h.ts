@@ -1,5 +1,5 @@
 import { Signal } from 'spred';
-import { Child, markFragment, processChild, processProp } from '../dom/dom';
+import { Children, markFragment, processChild, processProp } from '../dom/dom';
 
 type TagName = keyof HTMLElementTagNameMap;
 
@@ -45,7 +45,7 @@ export function h<
 
 export function h<T extends string, E extends TagElement<T>>(
   tagName: T,
-  children: (Child | Signal<Child>)[]
+  children: Children
 ): E;
 
 export function h<
@@ -53,9 +53,9 @@ export function h<
   E extends TagElement<T>,
   K extends keyof E,
   V extends E[K]
->(tagName: T, props: Props<E>, children: (Child | Signal<Child>)[]): E;
+>(tagName: T, props: Props<E>, children: Children): E;
 
-export function h(children: (Child | Signal<Child>)[]): DocumentFragment;
+export function h(children: Children): DocumentFragment;
 
 export function h<
   T extends string,
@@ -80,7 +80,7 @@ export function h<
   const tagName: T = first;
 
   let props: { [key in K]?: Prop<V> } = {};
-  let children: (Child | Signal<Child>)[] = [];
+  let children: Children = [];
 
   if (Array.isArray(second)) {
     children = second;
