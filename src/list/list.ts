@@ -4,7 +4,7 @@ import {
   ChildValue,
   cleanupNode,
   createNode,
-  isFragment,
+  isFragmentNode,
   markFragment,
   replaceChild,
 } from '../dom/dom';
@@ -21,7 +21,7 @@ function addEl(
   const w = writable(value);
   const r = memo(w, isEqual);
   const node = createNode(mapFn(r, i));
-  const n = isFragment(node) ? markFragment(node) : node;
+  const n = isFragmentNode(node) ? markFragment(node) : node;
   const el = { w, r, n, i, t };
 
   map.set(key, el);

@@ -6,7 +6,7 @@ export default [
   {
     input: 'src/index.ts',
     output: {
-      name: 'lib',
+      name: 'spredDOM',
       file: `dist/${pkg.name}.min.js`,
       format: 'umd',
     },
