@@ -26,6 +26,8 @@ const attrRegEx = new RegExp(
 
 const templatesMap = new Map<TemplateStringsArray, Template>();
 
+console.log(templatesMap);
+
 export interface Template {
   fragment: DocumentFragment;
   parts: TemplatePart[];
@@ -107,7 +109,7 @@ export function getTemplate(
   return template;
 }
 
-function createMarkNode() {
+export function createMarkNode() {
   if ((document as any).documentMode) return document.createComment(''); // IE
   return document.createTextNode('');
 }

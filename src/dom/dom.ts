@@ -1,4 +1,6 @@
 import { Signal } from 'spred';
+import { processNodePart } from '../create-template-instance/create-template-instance';
+import { createMarkNode } from '../template/template';
 import { toCamelCase } from '../utils/to-camel-case';
 
 const ATTR_MAP: {
@@ -12,6 +14,7 @@ const ATTR_MAP: {
 export const TEXT = 1;
 export const FALSY = 2;
 export const NODE = 3;
+export const ARRAY = 4;
 
 export type ChildValue = string | number | boolean | null | undefined | Node;
 export type Child = ChildValue | Signal<ChildValue>;
@@ -53,14 +56,26 @@ export function markFragment(fragment: DocumentFragment) {
   return start;
 }
 
-export function createNode(child: ChildValue, type?: number) {
+export function createNode(child: any /* ChildValue */, type?: number) {
   const t = type || getChildValueType(child);
 
   switch (t) {
     case TEXT:
       return document.createTextNode(child + '');
+
     case FALSY:
       return document.createComment(child + '');
+
+    case ARRAY:
+      const arr = child as any;
+      const fragment = document.createDocumentFragment();
+      const mark = createMarkNode();
+
+      fragment.appendChild(mark);
+
+      arr.forEach((el: any) => processNodePart(el, mark));
+
+      return fragment;
   }
 
   return child as Node;
@@ -134,6 +149,8 @@ export function getChildValueType(child: unknown) {
   }
 
   if (!child) return FALSY;
+
+  if (Array.isArray(child)) return ARRAY;
 
   return NODE;
 }

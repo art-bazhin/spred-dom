@@ -1,6 +1,13 @@
 import { isSignal } from 'spred';
 import { ATTR_PART, EVENT_PART, PROP_PART } from '../constants/constants';
-import { createNode, getChildValueType, isDOMNode, NODE } from '../dom/dom';
+import {
+  ARRAY,
+  createNode,
+  getChildValueType,
+  isDOMNode,
+  isFragmentNode,
+  NODE,
+} from '../dom/dom';
 import { getTemplate } from '../template/template';
 
 export function html(strings: TemplateStringsArray, ...values: unknown[]) {
@@ -45,16 +52,18 @@ function createTemplateInstance(
   return fragment;
 }
 
-function processNodePart(signalOrValue: unknown, mark: Node) {
+export function processNodePart(signalOrValue: unknown, mark: Node) {
   if (!isSignal(signalOrValue))
     return processNodePartValue(signalOrValue, mark);
 
   const cleanup = getCleanupArray(mark);
 
+  let start: any;
+
   cleanup.push(
     signalOrValue.subscribe((value, prevValue, isFirst) => {
       if (isFirst) {
-        processNodePartValue(value, mark);
+        start = processNodePartValue(value, mark);
         return;
       }
 
@@ -67,6 +76,8 @@ function processNodePart(signalOrValue: unknown, mark: Node) {
       switch (t) {
         case NODE:
           return;
+        case ARRAY:
+          return;
         default:
           mark.previousSibling!.textContent = value as any;
           return;
@@ -76,12 +87,13 @@ function processNodePart(signalOrValue: unknown, mark: Node) {
 }
 
 function processNodePartValue(value: unknown, mark: Node) {
-  const arr = Array.isArray(value) ? value : [value];
   const parent = mark.parentNode!;
+  const node = createNode(value);
+  const start = isFragmentNode(node) ? node.firstChild : node;
 
-  for (let v of arr) {
-    parent.insertBefore(createNode(v), mark);
-  }
+  parent.insertBefore(createNode(value), mark);
+
+  return start;
 }
 
 function getNodeFromPosition(

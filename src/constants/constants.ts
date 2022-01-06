@@ -13,7 +13,3 @@ export const PROP_PART = 4;
 export const REF_PART = 5;
 
 export const REF_ATTR_NAME = 'ref';
-
-export const TEXT_CHILD = 1;
-export const COMMENT_CHILD = 2;
-export const ELEMENT_CHILD = 3;
