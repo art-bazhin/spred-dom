@@ -8,22 +8,23 @@ import {
   isFragmentNode,
   NODE,
 } from '../dom/dom';
+import { createTemplateNode } from '../template-node/template-node';
 import { getTemplate } from '../template/template';
 
-export function html(strings: TemplateStringsArray, ...values: unknown[]) {
-  return createTemplateInstance(strings, values, false);
+export function html(templateFn: (t: typeof createTemplateNode) => any) {
+  // return createTemplateInstance(strings, values, false);
 }
 
 export function svg(strings: TemplateStringsArray, ...values: unknown[]) {
-  return createTemplateInstance(strings, values, true);
+  // return createTemplateInstance(strings, values, true);
 }
 
 function createTemplateInstance(
-  strings: TemplateStringsArray,
+  html: string,
   values: unknown[],
   isSVG: boolean
 ) {
-  const template = getTemplate(strings, isSVG);
+  const template = getTemplate(html, isSVG);
 
   const parts = template.parts;
   const fragment = template.fragment.cloneNode(true);

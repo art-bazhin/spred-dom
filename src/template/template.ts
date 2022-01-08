@@ -24,7 +24,9 @@ const attrRegEx = new RegExp(
   'gm'
 );
 
-const templatesMap = new Map<TemplateStringsArray, Template>();
+const templatesMap: {
+  [html: string]: Template;
+} = {};
 
 console.log(templatesMap);
 
@@ -33,16 +35,12 @@ export interface Template {
   parts: TemplatePart[];
 }
 
-export function getTemplate(
-  strings: TemplateStringsArray,
-  isSVG: boolean
-): Template {
-  const cached = templatesMap.get(strings);
+export function getTemplate(html: string, isSVG: boolean): Template {
+  const cached = templatesMap[html];
 
   if (cached) return cached;
 
   const templateElement = document.createElement('template');
-  let html = getTemplateHTML(strings);
 
   if (isSVG) html = '<svg>' + html + '</svg>';
   templateElement.innerHTML = html;
@@ -104,7 +102,7 @@ export function getTemplate(
     parts,
   };
 
-  templatesMap.set(strings, template);
+  templatesMap[html] = template;
 
   return template;
 }

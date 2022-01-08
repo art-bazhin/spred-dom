@@ -1,5 +1,5 @@
 import { Signal } from 'spred';
-import { processNodePart } from '../create-template-instance/create-template-instance';
+import { processNodePart } from '../template-instance/template-instance';
 import { createMarkNode } from '../template/template';
 import { toCamelCase } from '../utils/to-camel-case';
 
