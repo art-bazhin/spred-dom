@@ -35,7 +35,7 @@ export interface Template {
   parts: TemplatePart[];
 }
 
-export function getTemplate(html: string, isSVG: boolean): Template {
+export function getTemplate(html: string, isSVG?: boolean): Template {
   const cached = templatesMap[html];
 
   if (cached) return cached;

@@ -8,24 +8,38 @@ import {
   isFragmentNode,
   NODE,
 } from '../dom/dom';
-import { createTemplateNode } from '../template-node/template-node';
+import {
+  createSVGTemplateNode,
+  createTemplateNode,
+  TemplateNode,
+} from '../template-node/template-node';
+import {
+  createTemplateResult,
+  TemplateResult,
+} from '../template-result/template-result';
 import { getTemplate } from '../template/template';
 
-export function html(templateFn: (t: typeof createTemplateNode) => any) {
-  // return createTemplateInstance(strings, values, false);
-}
-
-export function svg(strings: TemplateStringsArray, ...values: unknown[]) {
-  // return createTemplateInstance(strings, values, true);
-}
-
-function createTemplateInstance(
-  html: string,
-  values: unknown[],
-  isSVG: boolean
+export function html(
+  templateFn: (t: typeof createTemplateNode) => TemplateNode
 ) {
-  const template = getTemplate(html, isSVG);
+  const node = templateFn(createTemplateNode);
+  const result = createTemplateResult(node);
 
+  return createTemplateInstance(result);
+}
+
+export function svg(
+  templateFn: (t: typeof createSVGTemplateNode) => TemplateNode
+) {
+  const node = templateFn(createSVGTemplateNode);
+  const result = createTemplateResult(node, true);
+
+  return createTemplateInstance(result);
+}
+
+function createTemplateInstance(result: TemplateResult) {
+  const { str, values, isSVG } = result;
+  const template = getTemplate(str, isSVG);
   const parts = template.parts;
   const fragment = template.fragment.cloneNode(true);
   const nodes = parts.map((part) =>

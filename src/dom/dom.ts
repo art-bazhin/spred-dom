@@ -20,7 +20,7 @@ export type ChildValue = string | number | boolean | null | undefined | Node;
 export type Child = ChildValue | Signal<ChildValue>;
 export type Children = Child[];
 
-export function isDOMNode(value: any): value is HTMLElement | Text {
+export function isDOMNode(value: any): value is Node {
   return value.nodeType;
 }
 
