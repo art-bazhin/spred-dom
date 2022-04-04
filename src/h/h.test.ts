@@ -1,4 +1,4 @@
-import { memo, onActivate, onDeactivate, writable } from 'spred';
+import { createMemo, onActivate, onDeactivate, createWritable } from 'spred';
 import { h } from './h';
 
 describe('h function', () => {
@@ -75,7 +75,7 @@ describe('h function', () => {
 
   describe('props', () => {
     it('can use a signal as a value', () => {
-      const checked = writable(false);
+      const checked = createWritable(false);
 
       const input = h('input', {
         type: 'checkbox',
@@ -118,7 +118,7 @@ describe('h function', () => {
     });
 
     it('can use a signal as a value', () => {
-      const dataValue = writable<any>();
+      const dataValue = createWritable<any>();
 
       const div = h('div', {
         attrs: {
@@ -184,7 +184,7 @@ describe('h function', () => {
     });
 
     it('can render signals', () => {
-      const node = writable<any>();
+      const node = createWritable<any>();
 
       const fragment = document.createDocumentFragment();
 
@@ -226,9 +226,9 @@ describe('h function', () => {
       let valueCounter = 0;
       let anotherValueCounter = 0;
 
-      const toggle = writable(true);
-      const value = writable('true');
-      const anotherValue = writable(' 1');
+      const toggle = createWritable(true);
+      const value = createWritable('true');
+      const anotherValue = createWritable(' 1');
 
       onActivate(value, () => valueCounter++);
       onDeactivate(value, () => valueCounter++);
@@ -237,7 +237,7 @@ describe('h function', () => {
       onDeactivate(anotherValue, () => anotherValueCounter++);
 
       const div = h('div', [
-        memo(() =>
+        createMemo(() =>
           toggle()
             ? h(
                 'div',

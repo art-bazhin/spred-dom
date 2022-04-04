@@ -1,9 +1,9 @@
-import { memo, writable } from 'spred';
+import { createMemo, createWritable } from 'spred';
 import { h } from '..';
 import { list } from './list';
 
 describe('list', () => {
-  const items = writable([
+  const items = createWritable([
     {
       id: 1,
       value: '1',
@@ -32,8 +32,8 @@ describe('list', () => {
 
   let div = h('div', [
     list(items, (item) => {
-      const id = memo(() => 'item_' + item().id);
-      const value = memo(() => item().value);
+      const id = createMemo(() => 'item_' + item().id);
+      const value = createMemo(() => item().value);
 
       return h(
         'span',
@@ -121,8 +121,8 @@ describe('list', () => {
       list(
         items,
         (item) => {
-          const id = memo(() => 'item_' + item().id);
-          const value = memo(() => item().value);
+          const id = createMemo(() => 'item_' + item().id);
+          const value = createMemo(() => item().value);
 
           return h(
             'span',
@@ -184,8 +184,8 @@ describe('list', () => {
 
     div = h('div', [
       list(items, (item) => {
-        const id = memo(() => '' + item().id);
-        const value = memo(() => item().value);
+        const id = createMemo(() => '' + item().id);
+        const value = createMemo(() => item().value);
 
         return h([
           h('span', [id]), //

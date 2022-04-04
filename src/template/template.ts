@@ -28,8 +28,6 @@ const templatesMap: {
   [html: string]: Template;
 } = {};
 
-console.log(templatesMap);
-
 export interface Template {
   fragment: DocumentFragment;
   parts: TemplatePart[];
