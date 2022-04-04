@@ -1,7 +1,6 @@
 import { isSignal } from 'spred';
 import { ATTR_PART, EVENT_PART, PROP_PART } from '../constants/constants';
 import {
-  ARRAY,
   createNode,
   getChildValueType,
   isDOMNode,
@@ -68,8 +67,11 @@ function createTemplateInstance(result: TemplateResult) {
 }
 
 export function processNodePart(signalOrValue: unknown, mark: Node) {
-  if (!isSignal(signalOrValue))
-    return processNodePartValue(signalOrValue, mark);
+  if (!isSignal(signalOrValue)) {
+    const value =
+      typeof signalOrValue === 'function' ? signalOrValue() : signalOrValue;
+    return processNodePartValue(value, mark);
+  }
 
   const cleanup = getCleanupArray(mark);
 
@@ -86,27 +88,23 @@ export function processNodePart(signalOrValue: unknown, mark: Node) {
       const prevType = getChildValueType(prevValue);
       const isTypeChanged = type !== prevType;
 
-      const t = isTypeChanged ? NODE : type;
-
-      switch (t) {
-        case NODE:
-          return;
-        case ARRAY:
-          return;
-        default:
-          mark.previousSibling!.textContent = value as any;
-          return;
+      if (type !== NODE && !isTypeChanged) {
+        mark.previousSibling!.textContent = value as any;
+        return;
       }
+
+      removeNodes(start, mark);
+      start = processNodePartValue(value, mark);
     })
   );
 }
 
 function processNodePartValue(value: unknown, mark: Node) {
-  const parent = mark.parentNode!;
   const node = createNode(value);
+  const parent = mark.parentNode!;
   const start = isFragmentNode(node) ? node.firstChild : node;
 
-  parent.insertBefore(createNode(value), mark);
+  parent.insertBefore(node, mark);
 
   return start;
 }
@@ -125,15 +123,22 @@ function getNodeFromPosition(
 function processPropOrAttr(
   isProp: boolean,
   name: string,
-  value: any,
+  value: unknown,
   node: Element
 ) {
   const fn = isProp ? processPropValue : processAttrValue;
 
-  if (!isSignal(value)) return fn(name, value, node);
+  if (isSignal(value)) {
+    const cleanup = getCleanupArray(node);
+    cleanup.push(value.subscribe((v) => fn(name, v, node)));
+    return;
+  }
 
-  const cleanup = getCleanupArray(node);
-  cleanup.push(value.subscribe((v) => fn(name, v, node)));
+  if (!isProp && typeof value === 'function') {
+    return fn(name, value(), node);
+  }
+
+  return fn(name, value, node);
 }
 
 function processPropValue(name: string, value: any, node: Element) {
@@ -159,4 +164,25 @@ function getCleanupArray(node: Node): (() => any)[] {
   }
 
   return (node as any)._cleanup;
+}
+
+function cleanupNode(node: Node) {
+  const arr = (node as any)._cleanup;
+
+  if (arr) for (let fn of arr) fn();
+  node.childNodes.forEach(cleanupNode);
+}
+
+function removeNodes(start: Node, end: Node) {
+  const parent = start.parentNode!;
+
+  let current = start;
+  let next = start;
+
+  while (current !== end) {
+    cleanupNode(current);
+    next = current.nextSibling!;
+    parent.removeChild(current);
+    current = next;
+  }
 }
