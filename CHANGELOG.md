@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.3](https://github.com/art-bazhin/spred-dom/compare/v0.0.2...v0.0.3) (2022-04-04)
+
+
+### Features
+
+* add html and svg templates ([74c78c6](https://github.com/art-bazhin/spred-dom/commit/74c78c6c239e50d036310c31e5f91d57e964e376))
+* add html function ([dcddc0f](https://github.com/art-bazhin/spred-dom/commit/dcddc0f69c69e8787708518624a2404560576ef9))
+* add html method ([3a21677](https://github.com/art-bazhin/spred-dom/commit/3a216774c242d320eb2b2c9fe80e6eef025c83ec))
+* add template node creation function ([6c6feb2](https://github.com/art-bazhin/spred-dom/commit/6c6feb211ec54c21617c805f70d4a784f76c15fc))
+
+
+### Others
+
+* html WIP ([6ac3a45](https://github.com/art-bazhin/spred-dom/commit/6ac3a455cf662de1d3d12141f7c37fb1ed4b17b0))
+
+
+### Build System
+
+* update dependencies ([a731901](https://github.com/art-bazhin/spred-dom/commit/a731901d60667b9ca65770c374592848c45a79b9))
+
 ### 0.0.2 (2021-12-27)
 
 
