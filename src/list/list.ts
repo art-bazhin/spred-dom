@@ -1,10 +1,17 @@
-import { computed, memo, Signal, watch, writable, WritableSignal } from 'spred';
+import {
+  createComputed,
+  createMemo,
+  Signal,
+  watch,
+  createWritable,
+  WritableSignal,
+} from 'spred';
 
 import {
   ChildValue,
   cleanupNode,
   createNode,
-  isFragment,
+  isFragmentNode,
   markFragment,
   replaceChild,
 } from '../dom/dom';
@@ -18,10 +25,10 @@ function addEl(
   t: boolean,
   isEqual: any
 ) {
-  const w = writable(value);
-  const r = memo(w, isEqual);
+  const w = createWritable(value);
+  const r = createMemo(w, isEqual);
   const node = createNode(mapFn(r, i));
-  const n = isFragment(node) ? markFragment(node) : node;
+  const n = isFragmentNode(node) ? markFragment(node) : node;
   const el = { w, r, n, i, t };
 
   map.set(key, el);
@@ -35,7 +42,7 @@ export function list<T>(
   keyFn?: (el: T, i: number) => any,
   isEqual?: (value: T, prevValue: T) => boolean
 ) {
-  const $keys = computed(() => {
+  const $keys = createComputed(() => {
     const arr = source();
     if (!keyFn) return arr.slice();
     return arr.map(keyFn);

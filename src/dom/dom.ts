@@ -1,4 +1,6 @@
 import { Signal } from 'spred';
+import { processNodePart } from '../template-instance/template-instance';
+import { createMarkNode } from '../template/template';
 import { toCamelCase } from '../utils/to-camel-case';
 
 const ATTR_MAP: {
@@ -17,8 +19,20 @@ export type ChildValue = string | number | boolean | null | undefined | Node;
 export type Child = ChildValue | Signal<ChildValue>;
 export type Children = Child[];
 
-export function isFragment(el: any): el is DocumentFragment {
-  return el.nodeType === 11;
+export function isDOMNode(value: any): value is Node {
+  return value.nodeType;
+}
+
+export function isElementNode(node: any): node is HTMLElement {
+  return node.nodeType === Node.ELEMENT_NODE;
+}
+
+export function isCommentNode(node: any): node is Comment {
+  return node.nodeType === Node.COMMENT_NODE;
+}
+
+export function isFragmentNode(el: any): el is DocumentFragment {
+  return el.nodeType === Node.DOCUMENT_FRAGMENT_NODE;
 }
 
 export function isFragmentStartMark(el: any) {
@@ -41,12 +55,13 @@ export function markFragment(fragment: DocumentFragment) {
   return start;
 }
 
-export function createNode(child: ChildValue, type?: number) {
+export function createNode(child: any /* ChildValue */, type?: number) {
   const t = type || getChildValueType(child);
 
   switch (t) {
     case TEXT:
       return document.createTextNode(child + '');
+
     case FALSY:
       return document.createComment(child + '');
   }
@@ -114,7 +129,7 @@ export function processProp(
   }
 }
 
-function getChildValueType(child: ChildValue) {
+export function getChildValueType(child: unknown) {
   const t = typeof child;
 
   if (t === 'string' || t === 'number' || child === true) {
@@ -205,7 +220,9 @@ function processAtomChild(signal: Signal<ChildValue>) {
     switch (t) {
       case NODE: {
         const newNode = createNode(value, type);
-        const markNode = isFragment(newNode) ? markFragment(newNode) : newNode;
+        const markNode = isFragmentNode(newNode)
+          ? markFragment(newNode)
+          : newNode;
         const parent = node.parentNode!;
 
         cleanupNodeProps(node);
