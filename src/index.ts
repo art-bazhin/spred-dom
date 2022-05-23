@@ -8,7 +8,6 @@ import {
   createComponent,
   attr,
   listener,
-  node,
   mount,
 } from './component/component';
 
@@ -26,6 +25,5 @@ export {
   text,
   attr,
   listener,
-  node,
   mount,
 };

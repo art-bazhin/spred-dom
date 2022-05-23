@@ -18,7 +18,7 @@ export default [
           strict: true,
         },
       }),
-      terser(),
+      //terser(),
     ],
   },
 

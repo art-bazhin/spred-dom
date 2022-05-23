@@ -108,7 +108,17 @@ export function attr(key: string, value: string | (() => string)) {
   }
 
   if (isCreating) {
+    const node = root;
+
     path += 'b';
+
+    if (isSignal(value)) {
+      value.subscribe((v) => (node as HTMLElement).setAttribute(key, v));
+      return;
+    }
+
+    (node as HTMLElement).setAttribute(key, value());
+
     return;
   }
 
@@ -153,14 +163,18 @@ function delegate(event: string) {
 export function listener(event: string, listener: (...args: any) => any) {
   if (isCreating) {
     path += 'b';
+
+    (root as any)['$$' + event] = listener;
+    delegate(event);
+
     return;
   }
 
   next();
 
-  const root = pathStack[0].node;
+  const node = pathStack[0].node;
 
-  root['$$' + event] = listener;
+  node['$$' + event] = listener;
 
   delegate(event);
 }
@@ -171,10 +185,24 @@ export function text(str: string | (() => string)) {
   const isFn = typeof str === 'function';
 
   if (isCreating) {
-    if (isFn) path += 'fbp';
-    else path += 'fp';
+    const node = document.createTextNode('_');
 
-    root!.appendChild(document.createTextNode(isFn ? '_' : str));
+    root!.appendChild(node);
+
+    if (isFn) {
+      path += 'fbp';
+
+      if (isSignal(str)) {
+        str.subscribe((v) => (node.textContent = v));
+        return;
+      }
+
+      node.textContent = str();
+    } else {
+      path += 'fp';
+      node.textContent = str;
+    }
+
     return;
   }
 
@@ -195,50 +223,8 @@ export function text(str: string | (() => string)) {
   }
 }
 
-export function textContent(str: string | (() => string)) {
-  if (isCreating && !root) return;
-
-  const isFn = typeof str === 'function';
-
-  if (isCreating) {
-    if (isFn) path += 'b';
-    root!.textContent = isFn ? '_' : str;
-    return;
-  }
-
-  if (isFn) {
-    next();
-
-    const node = pathStack[0].node;
-
-    if (isSignal(str)) {
-      str.subscribe((v) => ((node as any).textContent = v));
-      return;
-    }
-
-    (node as any).textContent = str();
-
-    return;
-  }
-}
-
-export function node(fn: () => Node) {
-  if (!root) return;
-
-  if (isCreating) {
-    path += 'b';
-    root.appendChild(document.createComment(''));
-    return;
-  }
-
-  // const ref = next()!;
-  // const parent = ref.parentNode!;
-
-  // parent.insertBefore(fn(), ref);
-}
-
 export function createComponent<P>(fn: (props?: P) => any) {
-  let fragment: Node | undefined;
+  let template: Node | undefined;
   let pathString = '';
 
   return function (props: P) {
@@ -255,11 +241,11 @@ export function createComponent<P>(fn: (props?: P) => any) {
       return;
     }
 
-    if (!fragment) {
+    if (!template) {
       path = pathString;
 
       const tempRoot = root;
-      fragment = document.createDocumentFragment();
+      let fragment: Node = document.createDocumentFragment();
 
       isCreating = true;
       push(fragment);
@@ -315,6 +301,26 @@ export function createComponent<P>(fn: (props?: P) => any) {
         if (pathString[0] === 'f') pathString = '_' + pathString.substring(1);
         // console.log(pathString.split(''));
       }
+
+      template = fragment.cloneNode(true);
+
+      // const container: any = mountedNode;
+
+      // if (mountedNode) {
+      //   mountedNode = null;
+      // } else {
+      //   next();
+      // }
+
+      // if (!container && node) {
+      //   const parent = node!.parentNode!;
+      //   parent.insertBefore(fragment, node);
+      //   return;
+      // }
+
+      // container.appendChild(fragment);
+
+      // return;
     }
 
     const container: any = mountedNode;
@@ -325,7 +331,7 @@ export function createComponent<P>(fn: (props?: P) => any) {
       next();
     }
 
-    const clone = fragment.cloneNode(true);
+    const clone = template.cloneNode(true);
 
     pathStack.unshift({
       path: pathString,
@@ -333,7 +339,7 @@ export function createComponent<P>(fn: (props?: P) => any) {
       node: clone,
     });
 
-    fn(props);
+    // fn(props);
 
     pathStack.shift();
 
