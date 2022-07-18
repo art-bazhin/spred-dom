@@ -223,29 +223,43 @@ export function text(str: string | (() => string)) {
   }
 }
 
-export function createComponent<P>(fn: (props?: P) => any) {
+const setupQueue: any[] = [];
+
+type Props = {
+  [key: string]: () => unknown;
+};
+
+export function createComponent<P extends Props>(fn: (props: P) => any) {
   let template: Node | undefined;
+  let fragment: Node | undefined;
   let pathString = '';
 
-  return function (props: P) {
+  const component = function (props: P) {
     next();
 
     const state = pathStack[0];
     const node = state && state.node;
 
+    let isFirst = false;
+
     if (!node && !mountedNode) return;
 
     if (isCreating && root) {
       path += 'fbp';
-      root.appendChild(document.createComment(''));
+
+      const mark = document.createComment('');
+      setupQueue.push({ mark, component, props });
+
+      root.appendChild(mark);
       return;
     }
 
     if (!template) {
+      isFirst = true;
       path = pathString;
 
       const tempRoot = root;
-      let fragment: Node = document.createDocumentFragment();
+      fragment = document.createDocumentFragment();
 
       isCreating = true;
       push(fragment);
@@ -264,8 +278,6 @@ export function createComponent<P>(fn: (props?: P) => any) {
 
       let temp = '' as any;
       pathString = pathString;
-      // .replace(/^([^b]*)$/g, '')
-      // .replace(/s([^b]*)e/g, '');
 
       while (temp !== pathString) {
         temp = pathString;
@@ -284,16 +296,6 @@ export function createComponent<P>(fn: (props?: P) => any) {
         .replace(/x/g, 'p')
         .replace(/([rp]+)$/g, '');
 
-      // pathString = pathString.replace(/x/g, 'p').replace(/(p+)$/g, '');
-
-      // .replace(/f(n*)p/g, '')
-      // .replace(/(p+)$/g, '');
-      // .replace(/f(n*)p/g, 'f');
-      // .replace(/f(r+)/g, 'f')
-      // .replace(/(p+)$/g, '');
-
-      // console.log(pathString.split(''));
-
       path = null;
 
       if (fragment.childNodes.length === 1) {
@@ -303,24 +305,6 @@ export function createComponent<P>(fn: (props?: P) => any) {
       }
 
       template = fragment.cloneNode(true);
-
-      // const container: any = mountedNode;
-
-      // if (mountedNode) {
-      //   mountedNode = null;
-      // } else {
-      //   next();
-      // }
-
-      // if (!container && node) {
-      //   const parent = node!.parentNode!;
-      //   parent.insertBefore(fragment, node);
-      //   return;
-      // }
-
-      // container.appendChild(fragment);
-
-      // return;
     }
 
     const container: any = mountedNode;
@@ -331,7 +315,7 @@ export function createComponent<P>(fn: (props?: P) => any) {
       next();
     }
 
-    const clone = template.cloneNode(true);
+    const clone = isFirst ? fragment : template.cloneNode(true);
 
     pathStack.unshift({
       path: pathString,
@@ -339,9 +323,25 @@ export function createComponent<P>(fn: (props?: P) => any) {
       node: clone,
     });
 
-    // fn(props);
+    if (!isFirst) fn(props);
 
     pathStack.shift();
+
+    isFirst = false;
+
+    while (setupQueue.length) {
+      const item = setupQueue.shift();
+
+      pathStack.unshift({
+        path: '',
+        i: 0,
+        node: item.mark,
+      });
+
+      item.component(item.props);
+
+      pathStack.shift();
+    }
 
     if (!container && node) {
       const parent = node!.parentNode!;
@@ -349,11 +349,25 @@ export function createComponent<P>(fn: (props?: P) => any) {
       return;
     }
 
-    container.appendChild(clone);
+    if (container) container.appendChild(clone);
+
+    return;
   };
+
+  return component;
 }
 
 export function mount(el: HTMLElement, fn: () => any) {
   mountedNode = el;
   fn();
 }
+
+export function prop<T>(val: T | Signal<T>) {
+  return isSignal(val) ? val : () => val;
+}
+
+const Test = createComponent<{
+  test: () => number;
+}>((props) => {
+  props.test();
+});
