@@ -335,26 +335,14 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
 
     isFirstRender = false;
 
-    const content = document.createDocumentFragment();
-
     while (setupQueue.length) {
       const { mark, binding } = setupQueue.shift();
 
       if (isSignal(binding)) {
-        let start: Node | null = null;
-        let end: Node | null = null;
-
-        binding.subscribe((res: any) => {
-          if (start && end) removeNodes(start, end);
-
-          mount(content, res);
-
-          start = content.firstChild;
-          end = content.lastChild;
-
-          insertBefore(mark, content);
-        });
+        setupBinding(binding as any, mark);
       } else {
+        const content = document.createDocumentFragment();
+
         mount(content, binding);
         insertBefore(mark, content);
       }
@@ -376,24 +364,42 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
   return component as Component<P>;
 }
 
-export function bind(child: Signal<() => any>) {
+export function bind(binding: Signal<Component<void>>) {
   next();
-
-  const state = pathStack[0];
-  const node = state && state.node;
-
-  if (!node && !mountedNode[0]) return;
 
   if (isCreating && root) {
     path += 'fbp';
 
     const mark = document.createComment('');
 
-    setupQueue.push({ mark, binding: child });
+    setupQueue.push({ mark, binding });
 
     root.appendChild(mark);
     return;
   }
+
+  const state = pathStack[0];
+  const mark = state && state.node;
+
+  setupBinding(binding, mark);
+}
+
+function setupBinding(binding: Signal<Component<void>>, mark: Node) {
+  const content = document.createDocumentFragment();
+
+  let start: Node | null = null;
+  let end: Node | null = null;
+
+  binding.subscribe((res: any) => {
+    if (start && end) removeNodes(start, end);
+
+    mount(content, res);
+
+    start = content.firstChild;
+    end = content.lastChild;
+
+    insertBefore(mark, content);
+  });
 }
 
 export function mount(el: Node, component: Component<void>) {
