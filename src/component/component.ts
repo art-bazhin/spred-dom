@@ -240,7 +240,7 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
     const state = pathStack[0];
     const node = state && state.node;
 
-    let isFirst = false;
+    let isFirstRender = false;
 
     if (!node && !mountedNode) return;
 
@@ -255,7 +255,7 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
     }
 
     if (!template) {
-      isFirst = true;
+      isFirstRender = true;
       path = pathString;
 
       const tempRoot = root;
@@ -315,19 +315,21 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
       next();
     }
 
-    const clone = isFirst ? fragment : template.cloneNode(true);
+    const clone = isFirstRender ? fragment : template.cloneNode(true);
 
-    pathStack.unshift({
-      path: pathString,
-      i: 0,
-      node: clone,
-    });
+    if (!isFirstRender) {
+      pathStack.unshift({
+        path: pathString,
+        i: 0,
+        node: clone,
+      });
 
-    if (!isFirst) fn(props);
+      fn(props);
 
-    pathStack.shift();
+      pathStack.shift();
+    }
 
-    isFirst = false;
+    isFirstRender = false;
 
     while (setupQueue.length) {
       const item = setupQueue.shift();
@@ -360,6 +362,39 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
 export function mount(el: HTMLElement, fn: () => any) {
   mountedNode = el;
   fn();
+}
+
+function mountBefore(el: Node, fn: () => any) {
+  const fragment = document.createDocumentFragment();
+
+  mountedNode = fragment;
+  fn();
+
+  insertBefore(el, fragment);
+}
+
+function insertBefore(mark: Node, child: Node) {
+  const parent = mark.parentNode;
+
+  if (!parent) return;
+  parent.insertBefore(child, mark);
+}
+
+function removeNodes(start: Node, end: Node) {
+  if (!start || !end) return;
+
+  const parent = start.parentNode!;
+
+  let current: Node | null = start;
+  let next: Node | null = null;
+
+  while (current && current !== end) {
+    next = current.nextSibling;
+    parent.removeChild(current);
+    current = next;
+  }
+
+  if (current) parent.removeChild(current);
 }
 
 export function prop<T>(val: T | Signal<T>) {
