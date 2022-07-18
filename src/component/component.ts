@@ -2,7 +2,7 @@ import { isSignal, Signal } from 'spred';
 
 let root: Node | null = null;
 let isCreating = false;
-let mountedNode: Node | null = null;
+let mountedNode: Node[] = [];
 
 let path: string | null = null;
 let pathStack: any[] = [];
@@ -227,6 +227,10 @@ const setupQueue: any[] = [];
 
 type Props = {
   [key: string]: () => unknown;
+} | void;
+
+export type Component<P extends Props> = ((props: P) => void) & {
+  $$isComponent: true;
 };
 
 export function createComponent<P extends Props>(fn: (props: P) => any) {
@@ -234,7 +238,7 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
   let fragment: Node | undefined;
   let pathString = '';
 
-  const component = function (props: P) {
+  const component: any = function (props: P) {
     next();
 
     const state = pathStack[0];
@@ -242,13 +246,13 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
 
     let isFirstRender = false;
 
-    if (!node && !mountedNode) return;
+    if (!node && !mountedNode[0]) return;
 
     if (isCreating && root) {
       path += 'fbp';
 
       const mark = document.createComment('');
-      setupQueue.push({ mark, component, props });
+      setupQueue.push({ mark, binding: () => component(props) });
 
       root.appendChild(mark);
       return;
@@ -307,10 +311,10 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
       template = fragment.cloneNode(true);
     }
 
-    const container: any = mountedNode;
+    const container: any = mountedNode[0];
 
-    if (mountedNode) {
-      mountedNode = null;
+    if (mountedNode[0]) {
+      mountedNode.shift();
     } else {
       next();
     }
@@ -331,18 +335,29 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
 
     isFirstRender = false;
 
+    const content = document.createDocumentFragment();
+
     while (setupQueue.length) {
-      const item = setupQueue.shift();
+      const { mark, binding } = setupQueue.shift();
 
-      pathStack.unshift({
-        path: '',
-        i: 0,
-        node: item.mark,
-      });
+      if (isSignal(binding)) {
+        let start: Node | null = null;
+        let end: Node | null = null;
 
-      item.component(item.props);
+        binding.subscribe((res: any) => {
+          if (start && end) removeNodes(start, end);
 
-      pathStack.shift();
+          mount(content, res);
+
+          start = content.firstChild;
+          end = content.lastChild;
+
+          insertBefore(mark, content);
+        });
+      } else {
+        mount(content, binding);
+        insertBefore(mark, content);
+      }
     }
 
     if (!container && node) {
@@ -356,18 +371,40 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
     return;
   };
 
-  return component;
+  component.$$isComponent = true;
+
+  return component as Component<P>;
 }
 
-export function mount(el: HTMLElement, fn: () => any) {
-  mountedNode = el;
-  fn();
+export function bind(child: Signal<() => any>) {
+  next();
+
+  const state = pathStack[0];
+  const node = state && state.node;
+
+  if (!node && !mountedNode[0]) return;
+
+  if (isCreating && root) {
+    path += 'fbp';
+
+    const mark = document.createComment('');
+
+    setupQueue.push({ mark, binding: child });
+
+    root.appendChild(mark);
+    return;
+  }
+}
+
+export function mount(el: Node, component: Component<void>) {
+  mountedNode.unshift(el);
+  component();
 }
 
 function mountBefore(el: Node, fn: () => any) {
   const fragment = document.createDocumentFragment();
 
-  mountedNode = fragment;
+  mountedNode.unshift(fragment);
   fn();
 
   insertBefore(el, fragment);
@@ -406,3 +443,5 @@ const Test = createComponent<{
 }>((props) => {
   props.test();
 });
+
+// mount(document.getElementById('123')!, Test);

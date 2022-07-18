@@ -10,6 +10,7 @@ import {
   listener,
   mount,
   prop,
+  bind,
 } from './component/component';
 
 export {
@@ -28,4 +29,5 @@ export {
   listener,
   mount,
   prop,
+  bind,
 };
