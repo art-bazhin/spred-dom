@@ -1,31 +1,9 @@
-import { h } from './h/h';
-import { list } from './list/list';
-import { clearElement, Children, Child, ChildValue } from './dom/dom';
-import { html, svg } from './template-instance/template-instance';
-import {
-  tag,
-  text,
-  createComponent,
-  attr,
-  listener,
-  mount,
-  bind,
-} from './component/component';
+import { createComponent } from './component/component';
+import { tag } from './tag/tag';
+import { attr } from './attr/attr';
+import { listener } from './listener/listener';
+import { text } from './text/text';
+import { mount } from './mount/mount';
+import { bind } from './bind/bind';
 
-export {
-  h,
-  list,
-  clearElement,
-  Children,
-  Child,
-  ChildValue,
-  html,
-  svg,
-  tag,
-  createComponent,
-  text,
-  attr,
-  listener,
-  mount,
-  bind,
-};
+export { tag, createComponent, text, attr, listener, mount, bind };
