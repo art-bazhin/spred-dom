@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0](https://github.com/art-bazhin/spred-dom/compare/v0.0.4...v0.1.0) (2022-07-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* rewrite all
+
+### Features
+
+* total rewrite ([5fef314](https://github.com/art-bazhin/spred-dom/commit/5fef3141bb194a02dfc8d60db824838c30912029))
+
 ### [0.0.4](https://github.com/art-bazhin/spred-dom/compare/v0.0.3...v0.0.4) (2022-04-04)
 
 
