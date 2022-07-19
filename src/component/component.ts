@@ -440,10 +440,6 @@ function removeNodes(start: Node, end: Node) {
   if (current) parent.removeChild(current);
 }
 
-export function prop<T>(val: T | Signal<T>) {
-  return isSignal(val) ? val : () => val;
-}
-
 const Test = createComponent<{
   test: () => number;
 }>((props) => {
