@@ -1,4 +1,4 @@
-import { setupBinding } from '../node/node';
+import { node, setupBinding } from '../node/node';
 import { state } from '../state/state';
 
 type Props = {
@@ -34,6 +34,12 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
 
     return rootNode;
   };
+}
+
+export function createComponentFn<P extends Props>(
+  component: (props: P) => Node
+) {
+  return (props: P) => node(component(props));
 }
 
 function setupComponent<P>(
