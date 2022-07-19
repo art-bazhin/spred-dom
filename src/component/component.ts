@@ -4,8 +4,6 @@ import { insertBefore } from '../dom/dom';
 import { mount } from '../mount/mount';
 import { push, next, state } from '../state/state';
 
-const setupQueue: any[] = [];
-
 type Props = {
   [key: string]: () => unknown;
 } | void;
@@ -30,10 +28,10 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
     if (!node && !state.mountedNode[0]) return;
 
     if (state.isCreating && state.root) {
-      pathState.path += 'fbp';
+      state.path += 'fbp';
 
       const mark = document.createComment('');
-      setupQueue.push({ mark, binding: () => component(props) });
+      state.setupQueue.push({ mark, binding: () => component(props) });
 
       state.root.appendChild(mark);
       return;
@@ -41,7 +39,7 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
 
     if (!template) {
       isFirstRender = true;
-      pathState.path = pathString;
+      state.path = pathString;
 
       const tempRoot = state.root;
       fragment = document.createDocumentFragment();
@@ -54,7 +52,7 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
       state.isCreating = false;
       push(tempRoot);
 
-      pathString = pathState.path
+      pathString = state.path
         .replace(/pf/g, 'n')
         .replace(/p(b+)f/g, (_, str) => {
           return 'p' + str + 'l';
@@ -81,7 +79,7 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
         .replace(/x/g, 'p')
         .replace(/([rp]+)$/g, '');
 
-      pathState.path = '';
+      state.path = '';
 
       if (fragment.childNodes.length === 1) {
         fragment = fragment.firstChild!;
@@ -115,8 +113,8 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
 
     isFirstRender = false;
 
-    while (setupQueue.length) {
-      const { mark, binding } = setupQueue.shift();
+    while (state.setupQueue.length) {
+      const { mark, binding } = state.setupQueue.shift()!;
 
       if (isSignal(binding)) {
         setupBinding(binding as any, mark);
