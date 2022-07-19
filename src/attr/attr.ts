@@ -29,7 +29,7 @@ export function attr(key: string, value: string | (() => string)) {
 
   next();
 
-  const node = state.pathStack[0].node;
+  const node = state.pathState.node;
 
   if (isSignal(value)) {
     value.subscribe((v) => (node as HTMLElement).setAttribute(key, v));

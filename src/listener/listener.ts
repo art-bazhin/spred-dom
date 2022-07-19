@@ -38,7 +38,7 @@ export function listener(event: string, listener: (...args: any) => any) {
 
   next();
 
-  const node = state.pathStack[0].node;
+  const node = state.pathState.node;
 
   (node as any)['$$' + event] = listener;
 

@@ -1,4 +1,4 @@
-import { pop, push, next, state } from '../state/state';
+import { next, state } from '../state/state';
 
 export function tag(tag: string, fn?: () => any) {
   if (state.isCreating) {
@@ -8,7 +8,7 @@ export function tag(tag: string, fn?: () => any) {
 
     state.root.appendChild(child);
 
-    push(child);
+    state.root = child;
     state.path += 'f';
 
     if (fn) {
@@ -18,7 +18,7 @@ export function tag(tag: string, fn?: () => any) {
     }
 
     state.path += 'p';
-    pop();
+    state.root = state.root!.parentNode;
 
     return;
   }

@@ -4,12 +4,12 @@ interface State {
   root: Node | null;
   isCreating: boolean;
   mountedNode: Node[];
-  path: string | null;
-  pathStack: {
+  path: string;
+  pathState: {
     path: string;
     i: number;
     node: Node | null;
-  }[];
+  };
   lastChild: Node | null;
   setupQueue: {
     mark: Node;
@@ -21,24 +21,42 @@ export const state: State = {
   root: null,
   isCreating: false,
   mountedNode: [],
-  path: null,
-  pathStack: [],
+  path: '',
+  pathState: {
+    path: '',
+    i: 0,
+    node: null,
+  },
   lastChild: null,
   setupQueue: [],
 };
 
-export function push(el: any) {
-  state.root = el;
-  return state.root;
+export function storeStateValues() {
+  const root = state.root;
+  const path = state.path;
+  const isCreating = state.isCreating;
+
+  return () => {
+    state.root = root;
+    state.path = path;
+    state.isCreating = isCreating;
+  };
 }
 
-export function pop() {
-  state.root = state.root!.parentNode;
-  return state.root;
+export function startCreating(container: Node) {
+  state.root = container;
+  state.path = '';
+  state.isCreating = true;
+}
+
+export function getPathString() {}
+
+export function startComponentCreating() {
+  const fragment = document;
 }
 
 export function next(fn?: () => any) {
-  const pathState = state.pathStack[0];
+  const pathState = state.pathState;
 
   if (!pathState) return;
 

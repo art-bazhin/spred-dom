@@ -1,10 +1,9 @@
 import { Signal } from 'spred';
 import { Component } from '../component/component';
 import { insertBefore, removeNodes } from '../dom/dom';
-import { mount } from '../mount/mount';
 import { next, state } from '../state/state';
 
-export function bind(binding: Signal<Component<void>>) {
+export function node(binding: Signal<Component<void>>) {
   next();
 
   if (state.isCreating && state.root) {
@@ -18,7 +17,7 @@ export function bind(binding: Signal<Component<void>>) {
     return;
   }
 
-  const pathState = state.pathStack[0];
+  const pathState = state.pathState;
   const mark = pathState && pathState.node;
 
   setupBinding(binding, mark);
@@ -38,7 +37,7 @@ export function setupBinding(
   binding.subscribe((res: any) => {
     if (start && end) removeNodes(start, end);
 
-    mount(res, fragment);
+    fragment.appendChild(res());
 
     start = fragment.firstChild;
     end = fragment.lastChild;

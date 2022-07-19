@@ -31,7 +31,7 @@ export function text(str: string | (() => string)) {
   next();
 
   if (isFn) {
-    const node = state.pathStack[0].node;
+    const node = state.pathState.node;
     next();
 
     if (isSignal(str)) {
