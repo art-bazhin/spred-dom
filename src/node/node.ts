@@ -1,47 +1,46 @@
-import { Signal } from 'spred';
-import { Component } from '../component/component';
-import { insertBefore, removeNodes } from '../dom/dom';
+import { isSignal, Signal } from 'spred';
+import { insertBefore, isFragment, removeNodes } from '../dom/dom';
 import { next, state } from '../state/state';
 
-export function node(binding: Signal<Component<void>>) {
-  next();
-
+export function node(binding: Node | Signal<Node>) {
   if (state.isCreating && state.root) {
     state.path += 'fbp';
 
     const mark = document.createComment('');
 
-    state.setupQueue.push({ mark, binding });
-
+    state.bindingQueue.push({ mark, binding });
     state.root.appendChild(mark);
+
     return;
   }
+
+  next();
 
   const pathState = state.pathState;
   const mark = pathState && pathState.node;
 
   setupBinding(binding, mark);
+
+  next();
 }
 
-export function setupBinding(
-  binding: Signal<Component<void>>,
-  mark: Node | null
-) {
+export function setupBinding(binding: Node | Signal<Node>, mark: Node | null) {
   if (!mark) return;
 
-  const fragment = document.createDocumentFragment();
+  if (isSignal(binding)) {
+    let start: Node | null = null;
 
-  let start: Node | null = null;
-  let end: Node | null = null;
+    binding.subscribe((node) => {
+      if (start) removeNodes(start, mark);
 
-  binding.subscribe((res: any) => {
-    if (start && end) removeNodes(start, end);
+      if (isFragment(node)) start = node.firstChild;
+      else start = node;
 
-    fragment.appendChild(res());
+      insertBefore(node, mark);
+    });
 
-    start = fragment.firstChild;
-    end = fragment.lastChild;
+    return;
+  }
 
-    insertBefore(fragment, mark);
-  });
+  insertBefore(binding, mark);
 }

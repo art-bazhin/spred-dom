@@ -1,9 +1,8 @@
-import { Component } from '../component/component';
+import { Signal } from 'spred';
 
 interface State {
   root: Node | null;
   isCreating: boolean;
-  mountedNode: Node[];
   path: string;
   pathState: {
     path: string;
@@ -11,16 +10,15 @@ interface State {
     node: Node | null;
   };
   lastChild: Node | null;
-  setupQueue: {
+  bindingQueue: {
     mark: Node;
-    binding: () => Component<any>;
+    binding: Node | Signal<Node>;
   }[];
 }
 
 export const state: State = {
   root: null,
   isCreating: false,
-  mountedNode: [],
   path: '',
   pathState: {
     path: '',
@@ -28,32 +26,8 @@ export const state: State = {
     node: null,
   },
   lastChild: null,
-  setupQueue: [],
+  bindingQueue: [],
 };
-
-export function storeStateValues() {
-  const root = state.root;
-  const path = state.path;
-  const isCreating = state.isCreating;
-
-  return () => {
-    state.root = root;
-    state.path = path;
-    state.isCreating = isCreating;
-  };
-}
-
-export function startCreating(container: Node) {
-  state.root = container;
-  state.path = '';
-  state.isCreating = true;
-}
-
-export function getPathString() {}
-
-export function startComponentCreating() {
-  const fragment = document;
-}
 
 export function next(fn?: () => any) {
   const pathState = state.pathState;

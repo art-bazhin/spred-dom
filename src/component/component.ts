@@ -1,30 +1,18 @@
+import { setupBinding } from '../node/node';
 import { state } from '../state/state';
 
 type Props = {
   [key: string]: () => unknown;
 } | void;
 
-export type Component<P extends Props> = ((props: P) => Node) & {
-  $$isComponent: true;
-};
-
-const EMPTY_FRAGMENT = document.createDocumentFragment();
-
 export function createComponent<P extends Props>(fn: (props: P) => any) {
-  let rootNode: Node | null = null;
   let template: Node | null = null;
   let pathString = '';
 
-  const component: any = function (props: P) {
-    // if (state.isCreating && state.root) {
-    //   state.path += 'fbp';
-
-    //   const mark = document.createComment('');
-    //   state.setupQueue.push({ mark, binding: () => component(props) });
-
-    //   state.root.appendChild(mark);
-    //   return EMPTY_FRAGMENT;
-    // }
+  return function (props: P) {
+    let rootNode: Node | null = null;
+    const tempBindingQueue = state.bindingQueue;
+    state.bindingQueue = [];
 
     if (!template) {
       const data = createComponentData(fn, props);
@@ -33,36 +21,19 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
       template = data.rootNode.cloneNode(true);
       rootNode = data.rootNode;
 
-      console.log(1, pathString);
+      while (state.bindingQueue.length) {
+        const { mark, binding } = state.bindingQueue.shift()!;
+        setupBinding(binding, mark);
+      }
     } else {
       rootNode = template.cloneNode(true);
       setupComponent(fn, props, rootNode, pathString);
-
-      console.log(2, pathString);
     }
 
-    // while (state.setupQueue.length) {
-    //   const { mark, binding } = state.setupQueue.shift()!;
-
-    //   if (isSignal(binding)) {
-    //     setupBinding(binding as any, mark);
-    //   } else {
-    //     insertBefore((binding as any)()(), mark);
-    //   }
-    // }
-
-    // if (node && clone) {
-    //   const parent = node!.parentNode!;
-    //   parent.insertBefore(clone, node);
-    //   return EMPTY_FRAGMENT;
-    // }
+    state.bindingQueue = tempBindingQueue;
 
     return rootNode;
   };
-
-  component.$$isComponent = true;
-
-  return component as Component<P>;
 }
 
 function setupComponent<P>(
@@ -77,6 +48,9 @@ function setupComponent<P>(
   const tempRoot = state.root!;
   state.root = container;
 
+  const tempIsCreating = state.isCreating;
+  state.isCreating = false;
+
   const tempPathState = state.pathState;
   state.pathState = {
     path: pathString,
@@ -87,8 +61,9 @@ function setupComponent<P>(
   fn(props);
 
   state.pathState = tempPathState;
-  state.root = tempRoot;
+  state.isCreating = tempIsCreating;
   state.path = tempPath;
+  state.root = tempRoot;
 }
 
 function createComponentData<P>(fn: (props: P) => any, props: P) {

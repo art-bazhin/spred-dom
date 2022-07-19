@@ -18,6 +18,8 @@ export function removeNodes(start: Node, end: Node) {
     parent.removeChild(current);
     current = next;
   }
+}
 
-  if (current) parent.removeChild(current);
+export function isFragment(node: Node): node is DocumentFragment {
+  return node.nodeType === Node.DOCUMENT_FRAGMENT_NODE;
 }
