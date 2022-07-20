@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/art-bazhin/spred-dom/compare/v0.1.1...v0.2.0) (2022-07-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* text -> textNode, text sets node textContent
+
+### Features
+
+* add func to store subs ([b4bb985](https://github.com/art-bazhin/spred-dom/commit/b4bb9858e506ecc74779674388b454fb16398814))
+* add prop function ([a547c97](https://github.com/art-bazhin/spred-dom/commit/a547c97ea043a7d8cb8e5f60faac6b5a2a93a545))
+* add shorthand functions ([93b21ee](https://github.com/art-bazhin/spred-dom/commit/93b21eef94538d10a0a32cd8c62a61a22a59c6a5))
+* cleanup subs on node removal ([751d4dc](https://github.com/art-bazhin/spred-dom/commit/751d4dce655d207b929e410116bb962bfb6cead0))
+* store node subs ([836df3b](https://github.com/art-bazhin/spred-dom/commit/836df3b986a54ffc2119f37b6d95c52fa8677ca9))
+
+
+### Bug Fixes
+
+* remove props constraint ([d1d0e12](https://github.com/art-bazhin/spred-dom/commit/d1d0e12e69e8a06059aedd92f6887efdb49b012b))
+
+
+### Code Refactoring
+
+* refactor attr function ([eb80485](https://github.com/art-bazhin/spred-dom/commit/eb80485c966fca8abe4e5d5c8a86273874b6f8c1))
+
 ### [0.1.1](https://github.com/art-bazhin/spred-dom/compare/v0.1.0...v0.1.1) (2022-07-19)
 
 
