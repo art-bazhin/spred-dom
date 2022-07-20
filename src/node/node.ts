@@ -1,5 +1,5 @@
 import { isSignal, Signal } from 'spred';
-import { insertBefore, isFragment, removeNodes } from '../dom/dom';
+import { addSub, insertBefore, isFragment, removeNodes } from '../dom/dom';
 import { next, state } from '../state/state';
 
 export function node(binding: Node | Signal<Node>) {
@@ -30,14 +30,17 @@ export function setupBinding(binding: Node | Signal<Node>, mark: Node | null) {
   if (isSignal(binding)) {
     let start: Node | null = null;
 
-    binding.subscribe((node) => {
-      if (start) removeNodes(start, mark);
+    addSub(
+      mark,
+      binding.subscribe((node) => {
+        if (start) removeNodes(start, mark);
 
-      if (isFragment(node)) start = node.firstChild;
-      else start = node;
+        if (isFragment(node)) start = node.firstChild;
+        else start = node;
 
-      insertBefore(node, mark);
-    });
+        insertBefore(node, mark);
+      })
+    );
 
     return;
   }
