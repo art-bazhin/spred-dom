@@ -1,5 +1,7 @@
 const SUBS_KEY = '$subs';
 
+let cleanupQueue: (() => any)[][] = [];
+
 export function insertBefore(child: Node, mark: Node) {
   const parent = mark.parentNode;
 
@@ -16,11 +18,13 @@ export function removeNodes(start: Node, end: Node) {
   let next: Node | null = null;
 
   while (current && current !== end) {
-    cleanupSubs(current);
+    addSubsToQueue(current);
     next = current.nextSibling;
     parent.removeChild(current);
     current = next;
   }
+
+  cleanup();
 }
 
 export function isFragment(node: Node): node is DocumentFragment {
@@ -38,16 +42,26 @@ export function addSub(node: Node, sub: () => any) {
   subs.push(sub);
 }
 
-function cleanupSubs(node: Node) {
+function addSubsToQueue(node: Node) {
   const subs: (() => void)[] = (node as any)[SUBS_KEY];
 
   let child = node.firstChild;
 
   while (child) {
-    cleanupSubs(child);
+    addSubsToQueue(child);
     child = child.nextSibling;
   }
 
   if (!subs) return;
-  for (let sub of subs) sub();
+  cleanupQueue.push(subs);
+}
+
+function cleanup() {
+  setTimeout(() => {
+    for (let arr of cleanupQueue) {
+      for (let unsub of arr) unsub();
+    }
+
+    cleanupQueue = [];
+  });
 }
