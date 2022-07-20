@@ -16,6 +16,7 @@ export function removeNodes(start: Node, end: Node) {
   let next: Node | null = null;
 
   while (current && current !== end) {
+    cleanupSubs(current);
     next = current.nextSibling;
     parent.removeChild(current);
     current = next;
@@ -37,8 +38,15 @@ export function addSub(node: Node, sub: () => any) {
   subs.push(sub);
 }
 
-export function cleanupSubs(node: Node) {
+function cleanupSubs(node: Node) {
   const subs: (() => void)[] = (node as any)[SUBS_KEY];
+
+  let child = node.firstChild;
+
+  while (child) {
+    cleanupSubs(child);
+    child = child.nextSibling;
+  }
 
   if (!subs) return;
   for (let sub of subs) sub();
