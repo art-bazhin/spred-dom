@@ -1,4 +1,5 @@
 import { isSignal } from 'spred';
+import { addSub } from '../dom/dom';
 import { next, state } from '../state/state';
 
 export function attr(key: string, value: string | (() => string)) {
@@ -12,29 +13,23 @@ export function attr(key: string, value: string | (() => string)) {
     return;
   }
 
+  let node: HTMLElement;
+
   if (state.isCreating) {
-    const node = state.root;
-
+    node = state.root! as HTMLElement;
     state.path += 'b';
-
-    if (isSignal(value)) {
-      value.subscribe((v) => (node as HTMLElement).setAttribute(key, v));
-      return;
-    }
-
-    (node as HTMLElement).setAttribute(key, value());
-
-    return;
+  } else {
+    next();
+    node = state.pathState.node! as HTMLElement;
   }
-
-  next();
-
-  const node = state.pathState.node;
 
   if (isSignal(value)) {
-    value.subscribe((v) => (node as HTMLElement).setAttribute(key, v));
+    addSub(
+      node,
+      value.subscribe((v) => node.setAttribute(key, v))
+    );
     return;
   }
 
-  (node as HTMLElement).setAttribute(key, value());
+  node.setAttribute(key, value());
 }
