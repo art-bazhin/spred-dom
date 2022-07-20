@@ -1,11 +1,7 @@
 import { node, setupBinding } from '../node/node';
 import { state } from '../state/state';
 
-type Props = {
-  [key: string]: () => unknown;
-} | void;
-
-export function createComponent<P extends Props>(fn: (props: P) => any) {
+export function createComponent<P>(fn: (props: P) => any) {
   let template: Node | null = null;
   let pathString = '';
 
@@ -36,9 +32,7 @@ export function createComponent<P extends Props>(fn: (props: P) => any) {
   };
 }
 
-export function createComponentFn<P extends Props>(
-  component: (props: P) => Node
-) {
+export function createComponentFn<P>(component: (props: P) => Node) {
   return (props: P) => node(component(props));
 }
 
