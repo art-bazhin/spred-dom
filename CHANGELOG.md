@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.2](https://github.com/art-bazhin/spred-dom/compare/v0.2.1...v0.2.2) (2022-07-26)
+
+
+### Features
+
+* add basic list support ([a2573c2](https://github.com/art-bazhin/spred-dom/commit/a2573c2caa28047cc026549f232dc5f179b18f3f))
+
+
+### Code Refactoring
+
+* remove deferred cleanup ([d191ddb](https://github.com/art-bazhin/spred-dom/commit/d191ddb6164f89b54cb7d4d277020de4f80c2f07))
+
+
+### Build System
+
+* update package.json ([d5b8bff](https://github.com/art-bazhin/spred-dom/commit/d5b8bff2ed90cf59893fe2a4f28a5a3d39e094f0))
+
 ### [0.2.1](https://github.com/art-bazhin/spred-dom/compare/v0.2.0...v0.2.1) (2022-07-20)
 
 
