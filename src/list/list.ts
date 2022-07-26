@@ -2,12 +2,14 @@ import { isSignal, Signal } from 'spred';
 import { addSub, createMark, insertBefore, removeNodes } from '../dom/dom';
 import { next, state } from '../state/state';
 
-export function node(binding: Node | Signal<Node>) {
+let counter = 0;
+
+export function list<T>(binding: Signal<T[]> | T[], mapFn: (el: T) => Node) {
   if (state.isCreating && state.root) {
     const mark = createMark();
 
     state.path += 'fbp';
-    state.setupQueue.push(() => setupNode(binding, mark));
+    state.setupQueue.push(() => setupList(binding, mapFn, mark));
     state.root.appendChild(mark);
 
     return;
@@ -18,12 +20,16 @@ export function node(binding: Node | Signal<Node>) {
   const pathState = state.pathState;
   const mark = pathState && pathState.node;
 
-  setupNode(binding, mark);
+  setupList(binding, mapFn, mark);
 
   next();
 }
 
-function setupNode(binding: Node | Signal<Node>, mark: Node | null) {
+function setupList<T>(
+  binding: Signal<T[]> | T[],
+  mapFn: (el: T) => Node,
+  mark: Node | null
+) {
   if (!mark) return;
 
   if (isSignal(binding)) {
@@ -36,14 +42,20 @@ function setupNode(binding: Node | Signal<Node>, mark: Node | null) {
 
     addSub(
       mark,
-      binding.subscribe((node) => {
+      binding.subscribe((arr) => {
         removeNodes(start!.nextSibling, mark);
-        insertBefore(node, mark);
+
+        for (let el of arr) {
+          const node = mapFn(el);
+          insertBefore(node, mark);
+        }
       })
     );
 
     return;
   }
 
-  insertBefore(binding, mark);
+  for (let el of binding) {
+    insertBefore(mapFn(el), mark);
+  }
 }

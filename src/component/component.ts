@@ -1,4 +1,5 @@
-import { node, setupBinding } from '../node/node';
+import { isMark } from '../dom/dom';
+import { node } from '../node/node';
 import { state } from '../state/state';
 
 export function createComponent<P>(fn: (props: P) => any) {
@@ -7,26 +8,24 @@ export function createComponent<P>(fn: (props: P) => any) {
 
   return function (props: P) {
     let rootNode: Node | null = null;
-    const tempBindingQueue = state.bindingQueue;
-    state.bindingQueue = [];
 
     if (!template) {
+      const prevSetupQueue = state.setupQueue;
+      state.setupQueue = [];
+
       const data = createComponentData(fn, props);
 
       pathString = data.pathString;
       template = data.rootNode.cloneNode(true);
       rootNode = data.rootNode;
 
-      while (state.bindingQueue.length) {
-        const { mark, binding } = state.bindingQueue.shift()!;
-        setupBinding(binding, mark);
-      }
+      for (let fn of state.setupQueue) fn();
+
+      state.setupQueue = prevSetupQueue;
     } else {
       rootNode = template.cloneNode(true);
       setupComponent(fn, props, rootNode, pathString);
     }
-
-    state.bindingQueue = tempBindingQueue;
 
     return rootNode;
   };
@@ -85,7 +84,7 @@ function createComponentData<P>(fn: (props: P) => any, props: P) {
   state.path = tempPath;
   state.root = tempRoot;
 
-  if (rootNode.childNodes.length === 1) {
+  if (rootNode.childNodes.length === 1 && !isMark(rootNode.firstChild)) {
     rootNode = rootNode.firstChild!;
     if (pathString[0] === 'f') pathString = '_' + pathString.substring(1);
   }

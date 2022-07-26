@@ -7,6 +7,7 @@ import { textNode } from './text-node/text-node';
 import { node } from './node/node';
 import { text } from './text/text';
 import { html } from './html/html';
+import { list } from './list/list';
 
 export {
   tag,
@@ -19,4 +20,5 @@ export {
   node,
   text,
   html,
+  list,
 };

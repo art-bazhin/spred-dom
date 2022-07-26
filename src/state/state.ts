@@ -10,10 +10,7 @@ interface State {
     node: Node | null;
   };
   lastChild: Node | null;
-  bindingQueue: {
-    mark: Node;
-    binding: Node | Signal<Node>;
-  }[];
+  setupQueue: (() => any)[];
 }
 
 export const state: State = {
@@ -26,7 +23,7 @@ export const state: State = {
     node: null,
   },
   lastChild: null,
-  bindingQueue: [],
+  setupQueue: [],
 };
 
 export function next(fn?: () => any) {

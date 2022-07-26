@@ -7,7 +7,7 @@ export function insertBefore(child: Node, mark: Node) {
   parent.insertBefore(child, mark);
 }
 
-export function removeNodes(start: Node, end: Node) {
+export function removeNodes(start: Node | null, end: Node | null) {
   if (!start || !end) return;
 
   const parent = start.parentNode!;
@@ -25,6 +25,14 @@ export function removeNodes(start: Node, end: Node) {
 
 export function isFragment(node: Node): node is DocumentFragment {
   return node.nodeType === Node.DOCUMENT_FRAGMENT_NODE;
+}
+
+export function createMark() {
+  return document.createTextNode('');
+}
+
+export function isMark(node: Node | null) {
+  return node && node.textContent === '';
 }
 
 export function addSub(node: Node, sub: () => any) {
