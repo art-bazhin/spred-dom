@@ -2,18 +2,18 @@ import { isMark } from '../dom/dom';
 import { node } from '../node/node';
 import { state } from '../state/state';
 
-export function createComponent<P>(fn: (props: P) => any) {
+export function createComponent<A extends unknown[]>(fn: (...args: A) => any) {
   let template: Node | null = null;
   let pathString = '';
 
-  return function (props: P) {
+  return function (...args: A) {
     let rootNode: Node | null = null;
 
     if (!template) {
       const prevSetupQueue = state.setupQueue;
       state.setupQueue = [];
 
-      const data = createComponentData(fn, props);
+      const data = createComponentData(fn, args);
 
       pathString = data.pathString;
       template = data.rootNode.cloneNode(true);
@@ -24,20 +24,22 @@ export function createComponent<P>(fn: (props: P) => any) {
       state.setupQueue = prevSetupQueue;
     } else {
       rootNode = template.cloneNode(true);
-      setupComponent(fn, props, rootNode, pathString);
+      setupComponent(fn, args, rootNode, pathString);
     }
 
     return rootNode;
   };
 }
 
-export function createComponentFn<P>(component: (props: P) => Node) {
-  return (props: P) => node(component(props));
+export function createComponentFn<A extends unknown[]>(
+  component: (...args: A) => Node
+) {
+  return (...args: A) => node(component(...args));
 }
 
-function setupComponent<P>(
-  fn: (props: P) => any,
-  props: P,
+function setupComponent<A extends unknown[]>(
+  fn: (...args: A) => any,
+  args: A,
   container: Node,
   pathString: string
 ) {
@@ -57,7 +59,7 @@ function setupComponent<P>(
     node: container,
   };
 
-  fn(props);
+  fn(...args);
 
   state.pathState = tempPathState;
   state.isCreating = tempIsCreating;
@@ -65,7 +67,10 @@ function setupComponent<P>(
   state.root = tempRoot;
 }
 
-function createComponentData<P>(fn: (props: P) => any, props: P) {
+function createComponentData<A extends unknown[]>(
+  fn: (...args: A) => any,
+  args: A
+) {
   const tempPath = state.path;
   state.path = '';
 
@@ -76,7 +81,7 @@ function createComponentData<P>(fn: (props: P) => any, props: P) {
   const tempIsCreating = state.isCreating;
   state.isCreating = true;
 
-  fn(props);
+  fn(...args);
 
   let pathString = getPathString(state.path);
 
