@@ -1,6 +1,6 @@
 import { next, state } from '../state/state';
 
-const EVENTS = {} as any;
+export const EVENTS = {} as any;
 
 function eventListener(e: Event) {
   const key = '$$' + e.type;

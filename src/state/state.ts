@@ -1,4 +1,4 @@
-import { Signal } from 'spred';
+import { spec } from '../spec/spec';
 
 interface State {
   root: Node | null;
@@ -26,7 +26,7 @@ export const state: State = {
   setupQueue: [],
 };
 
-export function next(fn?: () => any) {
+export function next(fn?: (specFn: typeof spec) => any) {
   const pathState = state.pathState;
 
   if (!pathState) return;
@@ -39,7 +39,7 @@ export function next(fn?: () => any) {
     case '_':
       if (goDeeper) {
         ++pathState.i;
-        fn && fn();
+        fn && fn(spec);
       }
       break;
 
@@ -47,7 +47,7 @@ export function next(fn?: () => any) {
       pathState.node = pathState.node!.firstChild;
       if (goDeeper) {
         ++pathState.i;
-        fn && fn();
+        fn && fn(spec);
       }
       break;
 
@@ -55,7 +55,7 @@ export function next(fn?: () => any) {
       pathState.node = pathState.node!.nextSibling;
       if (goDeeper) {
         ++pathState.i;
-        fn && fn();
+        fn && fn(spec);
       }
       break;
 
@@ -63,7 +63,7 @@ export function next(fn?: () => any) {
       pathState.node = state.lastChild!.nextSibling;
       if (goDeeper) {
         ++pathState.i;
-        fn && fn();
+        fn && fn(spec);
       }
       break;
 

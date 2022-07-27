@@ -1,6 +1,10 @@
 import { next, state } from '../state/state';
+import { spec } from '../spec/spec';
 
-export function tag(tag: string, fn?: () => any) {
+export function tag<TagName extends keyof HTMLElementTagNameMap>(
+  tag: TagName,
+  fn?: (specFn: typeof spec<HTMLElementTagNameMap[TagName]>) => any
+) {
   if (state.isCreating) {
     if (!state.root) return;
 
@@ -13,7 +17,7 @@ export function tag(tag: string, fn?: () => any) {
 
     if (fn) {
       state.path += 's';
-      fn && fn();
+      fn && fn(spec);
       state.path += 'e';
     }
 
