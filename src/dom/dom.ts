@@ -51,7 +51,6 @@ function cleanupSubs(node: Node) {
 
   if (subs) {
     for (let unsub of subs) unsub();
-    delete (node as any)[SUBS_KEY];
   }
 
   let child = node.firstChild;

@@ -2,7 +2,7 @@ import { isSignal, Signal } from 'spred';
 import { addSub, createMark, insertBefore, removeNodes } from '../dom/dom';
 import { next, state } from '../state/state';
 
-export function node(binding: Node | Signal<Node>) {
+export function node(binding: Node | null | Signal<Node | null>) {
   if (state.isCreating && state.root) {
     const mark = createMark();
 
@@ -23,8 +23,11 @@ export function node(binding: Node | Signal<Node>) {
   next();
 }
 
-function setupNode(binding: Node | Signal<Node>, mark: Node | null) {
-  if (!mark) return;
+function setupNode(
+  binding: Node | null | Signal<Node | null>,
+  mark: Node | null
+) {
+  if (!mark || !binding) return;
 
   if (isSignal(binding)) {
     let start = mark.previousSibling;
@@ -38,7 +41,7 @@ function setupNode(binding: Node | Signal<Node>, mark: Node | null) {
       mark,
       binding.subscribe((node) => {
         removeNodes(start!.nextSibling, mark);
-        insertBefore(node, mark);
+        if (node) insertBefore(node, mark);
       })
     );
 
