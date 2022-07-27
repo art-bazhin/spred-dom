@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.4](https://github.com/art-bazhin/spred-dom/compare/v0.2.3...v0.2.4) (2022-07-27)
+
+
+### Features
+
+* pass spec fn inside tag callback ([995a3d0](https://github.com/art-bazhin/spred-dom/commit/995a3d0ff441f99d7c8f332e2521b60a99ccbdf3))
+
 ### [0.2.3](https://github.com/art-bazhin/spred-dom/compare/v0.2.2...v0.2.3) (2022-07-27)
 
 
