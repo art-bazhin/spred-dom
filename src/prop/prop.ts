@@ -1,6 +1,6 @@
 import { isSignal } from 'spred';
 import { addSub } from '../dom/dom';
-import { next, state } from '../state/state';
+import { BINDING, next, state } from '../state/state';
 
 export function prop(key: string, value: unknown | (() => unknown)) {
   if ((state.isCreating && !state.root) || (key[0] === 'o' && key[1] === 'n'))
@@ -18,7 +18,7 @@ export function prop(key: string, value: unknown | (() => unknown)) {
 
   if (state.isCreating) {
     node = state.root!;
-    state.path += 'b';
+    state.path += BINDING;
   } else {
     next();
     node = state.pathState.node!;

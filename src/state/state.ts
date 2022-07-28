@@ -1,5 +1,3 @@
-import { spec } from '../spec/spec';
-
 interface State {
   root: Node | null;
   isCreating: boolean;
@@ -26,51 +24,41 @@ export const state: State = {
   setupQueue: [],
 };
 
-export function next(fn?: (specFn: typeof spec) => any) {
+export const FIRST_CHILD = 'F';
+export const NEXT_SIBLING = 'N';
+export const PARENT_NODE = 'P';
+export const BINDING = 'B';
+export const START_CHILDREN = '>';
+export const END_CHILDREN = '<';
+
+export function next(fn?: () => any) {
   const pathState = state.pathState;
 
   if (!pathState) return;
 
   const current = pathState.path[pathState.i];
   const nextValue = pathState.path[++pathState.i];
-  const goDeeper = nextValue === 's';
+  const goDeeper = nextValue === START_CHILDREN;
 
   switch (current) {
-    case '_':
-      if (goDeeper) {
-        ++pathState.i;
-        fn && fn(spec);
-      }
-      break;
-
-    case 'f':
+    case FIRST_CHILD:
       pathState.node = pathState.node!.firstChild;
-      if (goDeeper) {
-        ++pathState.i;
-        fn && fn(spec);
-      }
       break;
 
-    case 'n':
+    case NEXT_SIBLING:
       pathState.node = pathState.node!.nextSibling;
-      if (goDeeper) {
-        ++pathState.i;
-        fn && fn(spec);
-      }
       break;
 
-    case 'l':
-      pathState.node = state.lastChild!.nextSibling;
-      if (goDeeper) {
-        ++pathState.i;
-        fn && fn(spec);
-      }
-      break;
-
-    case 'p':
-      state.lastChild = pathState.node;
+    case PARENT_NODE:
       pathState.node = pathState.node!.parentNode;
       next(fn);
       break;
   }
+
+  if (goDeeper) {
+    ++pathState.i;
+    fn && fn();
+  }
+
+  return nextValue;
 }

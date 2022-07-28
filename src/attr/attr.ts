@@ -1,6 +1,6 @@
 import { isSignal } from 'spred';
 import { addSub } from '../dom/dom';
-import { next, state } from '../state/state';
+import { BINDING, next, state } from '../state/state';
 
 export function attr(key: string, value: string | (() => string)) {
   if (state.isCreating && !state.root) return;
@@ -17,7 +17,7 @@ export function attr(key: string, value: string | (() => string)) {
 
   if (state.isCreating) {
     node = state.root! as HTMLElement;
-    state.path += 'b';
+    state.path += BINDING;
   } else {
     next();
     node = state.pathState.node! as HTMLElement;

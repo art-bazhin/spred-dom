@@ -1,14 +1,12 @@
 import { isSignal, Signal } from 'spred';
 import { addSub, createMark, insertBefore, removeNodes } from '../dom/dom';
-import { next, state } from '../state/state';
-
-let counter = 0;
+import { BINDING, FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
 
 export function list<T>(binding: Signal<T[]> | T[], mapFn: (el: T) => Node) {
   if (state.isCreating && state.root) {
     const mark = createMark();
 
-    state.path += 'fbp';
+    state.path += FIRST_CHILD + BINDING + PARENT_NODE;
     state.setupQueue.push(() => setupList(binding, mapFn, mark));
     state.root.appendChild(mark);
 

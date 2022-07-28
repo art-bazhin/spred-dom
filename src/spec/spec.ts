@@ -1,6 +1,6 @@
 import { isSignal } from 'spred';
 import { addSub } from '../dom/dom';
-import { next, state } from '../state/state';
+import { BINDING, next, state } from '../state/state';
 import { EVENTS } from '../listener/listener';
 
 type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
@@ -25,14 +25,14 @@ type Props<Element extends HTMLElement> = {
   [key in WritableKeys<Element>]?: Element[key] | (() => Element[key]);
 };
 
-type PropsWithAttrs<Element extends HTMLElement> = Props<Element> & {
+export type PropsWithAttrs<Element extends HTMLElement> = Props<Element> & {
   attrs?: Attrs;
 };
 
 export function spec<Element extends HTMLElement>(
-  props: PropsWithAttrs<Element>
+  props?: PropsWithAttrs<Element>
 ) {
-  if (state.isCreating && !state.root) return;
+  if (!props || (state.isCreating && !state.root)) return;
 
   let node: Element;
   let key: keyof PropsWithAttrs<Element>;
@@ -41,7 +41,7 @@ export function spec<Element extends HTMLElement>(
   if (state.isCreating) {
     node = state.root! as Element;
   } else {
-    next();
+    if (next() !== BINDING) return;
     node = state.pathState.node! as Element;
   }
 
@@ -77,8 +77,8 @@ export function spec<Element extends HTMLElement>(
     if (state.isCreating) node[key] = value;
   }
 
-  if (state.isCreating && hasBindings) {
-    state.path += 'b';
+  if (hasBindings && state.isCreating) {
+    state.path += BINDING;
   }
 }
 

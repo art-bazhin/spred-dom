@@ -1,4 +1,4 @@
-import { next, state } from '../state/state';
+import { BINDING, next, state } from '../state/state';
 
 export const EVENTS = {} as any;
 
@@ -28,7 +28,7 @@ function delegate(event: string) {
 
 export function listener(event: string, listener: (...args: any) => any) {
   if (state.isCreating) {
-    state.path += 'b';
+    state.path += BINDING;
 
     (state.root as any)['$$' + event] = listener;
     delegate(event);

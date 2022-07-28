@@ -1,6 +1,6 @@
 import { isSignal } from 'spred';
 import { addSub } from '../dom/dom';
-import { next, state } from '../state/state';
+import { BINDING, FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
 
 export function textNode(str: string | (() => string)) {
   if (state.isCreating && !state.root) return;
@@ -13,7 +13,7 @@ export function textNode(str: string | (() => string)) {
     state.root!.appendChild(node);
 
     if (isFn) {
-      state.path += 'fbp';
+      state.path += FIRST_CHILD + BINDING + PARENT_NODE;
 
       if (isSignal(str)) {
         addSub(
@@ -25,7 +25,7 @@ export function textNode(str: string | (() => string)) {
 
       node.textContent = str();
     } else {
-      state.path += 'fp';
+      state.path += FIRST_CHILD + PARENT_NODE;
       node.textContent = str;
     }
 

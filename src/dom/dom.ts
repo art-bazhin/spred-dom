@@ -32,7 +32,7 @@ export function createMark() {
 }
 
 export function isMark(node: Node | null) {
-  return node && node.textContent === '';
+  return node && node.nodeType === Node.TEXT_NODE && !node.textContent;
 }
 
 export function addSub(node: Node, sub: () => any) {

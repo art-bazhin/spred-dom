@@ -1,10 +1,52 @@
-import { next, state } from '../state/state';
-import { spec } from '../spec/spec';
+import {
+  START_CHILDREN,
+  END_CHILDREN,
+  next,
+  state,
+  PARENT_NODE,
+  FIRST_CHILD,
+} from '../state/state';
+import { PropsWithAttrs, spec } from '../spec/spec';
+
+export function tag<TagName extends keyof HTMLElementTagNameMap>(
+  tag: TagName
+): void;
 
 export function tag<TagName extends keyof HTMLElementTagNameMap>(
   tag: TagName,
-  fn?: (specFn: typeof spec<HTMLElementTagNameMap[TagName]>) => any
+  props: PropsWithAttrs<HTMLElementTagNameMap[TagName]>
+): void;
+
+export function tag<TagName extends keyof HTMLElementTagNameMap>(
+  tag: TagName,
+  fn: () => any
+): void;
+
+export function tag<TagName extends keyof HTMLElementTagNameMap>(
+  tag: TagName,
+  props: PropsWithAttrs<HTMLElementTagNameMap[TagName]>,
+  fn: () => any
+): void;
+
+export function tag<TagName extends keyof HTMLElementTagNameMap>(
+  tag: TagName,
+  second?: any,
+  third?: any
 ) {
+  let props: PropsWithAttrs<HTMLElementTagNameMap[TagName]> | undefined;
+  let fn: (() => any) | undefined;
+
+  switch (arguments.length) {
+    case 2:
+      if (typeof second === 'function') fn = second;
+      else props = second;
+      break;
+    case 3:
+      props = second;
+      fn = third;
+      break;
+  }
+
   if (state.isCreating) {
     if (!state.root) return;
 
@@ -13,20 +55,23 @@ export function tag<TagName extends keyof HTMLElementTagNameMap>(
     state.root.appendChild(child);
 
     state.root = child;
-    state.path += 'f';
+    state.path += FIRST_CHILD;
+
+    spec(props);
 
     if (fn) {
-      state.path += 's';
-      fn && fn(spec);
-      state.path += 'e';
+      state.path += START_CHILDREN;
+      fn && fn();
+      state.path += END_CHILDREN;
     }
 
-    state.path += 'p';
+    state.path += PARENT_NODE;
     state.root = state.root!.parentNode;
 
     return;
   }
 
+  spec(props);
   next(fn);
 
   return;

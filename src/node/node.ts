@@ -1,12 +1,12 @@
 import { isSignal, Signal } from 'spred';
 import { addSub, createMark, insertBefore, removeNodes } from '../dom/dom';
-import { next, state } from '../state/state';
+import { BINDING, FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
 
 export function node(binding: Node | null | Signal<Node | null>) {
   if (state.isCreating && state.root) {
     const mark = createMark();
 
-    state.path += 'fbp';
+    state.path += FIRST_CHILD + BINDING + PARENT_NODE;
     state.setupQueue.push(() => setupNode(binding, mark));
     state.root.appendChild(mark);
 

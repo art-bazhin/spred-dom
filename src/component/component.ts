@@ -1,6 +1,14 @@
 import { isMark } from '../dom/dom';
 import { node } from '../node/node';
-import { state } from '../state/state';
+import {
+  BINDING,
+  START_CHILDREN,
+  END_CHILDREN,
+  FIRST_CHILD,
+  NEXT_SIBLING,
+  PARENT_NODE,
+  state,
+} from '../state/state';
 
 export function createComponent<A extends unknown[]>(fn: (...args: A) => any) {
   let template: Node | null = null;
@@ -91,39 +99,35 @@ function createComponentData<A extends unknown[]>(
 
   if (rootNode.childNodes.length === 1 && !isMark(rootNode.firstChild)) {
     rootNode = rootNode.firstChild!;
-    if (pathString[0] === 'f') pathString = '_' + pathString.substring(1);
+    if (pathString[0] === FIRST_CHILD)
+      pathString = '_' + pathString.substring(1);
   }
 
   return { rootNode, pathString };
 }
+const NEXT_SIBLING_REGEX = new RegExp(PARENT_NODE + FIRST_CHILD, 'g');
+const EMPTY_NESTING_REGEX = new RegExp(
+  `${START_CHILDREN}[^${BINDING}${START_CHILDREN}${END_CHILDREN}]*${END_CHILDREN}`,
+  'g'
+);
+const END_CHILDREN_REGEX = new RegExp(END_CHILDREN, 'g');
+const EMPTY_TAIL = new RegExp(`[^${BINDING}]+$`, 'g');
+const PARENT_NODE_REGEX = new RegExp(`${NEXT_SIBLING}+${PARENT_NODE}`, 'g');
 
 function getPathString(str: string) {
-  let pathString = str
-    .replace(/pf/g, 'n')
-    .replace(/p(b+)f/g, (_, str) => {
-      return 'p' + str + 'l';
-    })
-    .replace(/pb/g, 'xb');
+  str = str.replace(NEXT_SIBLING_REGEX, NEXT_SIBLING);
 
   let temp = '';
 
-  while (temp !== pathString) {
-    temp = pathString;
-    pathString = pathString
-      .replace(/^([^bse]*)$/g, '')
-      .replace(/s([^bse]*)e/g, '');
+  while (temp !== str) {
+    temp = str;
+    str = str.replace(EMPTY_NESTING_REGEX, '');
   }
 
-  pathString = pathString
-    .replace(/f(n*)p/g, (str) => {
-      return 'r'.repeat(str.length - 1);
-    })
-    .replace(/(n+)p/g, (str) => {
-      return 'r'.repeat(str.length - 1) + 'p';
-    })
-    .replace(/e/g, '')
-    .replace(/x/g, 'p')
-    .replace(/([rp]+)$/g, '');
+  str = str
+    .replace(EMPTY_TAIL, '')
+    .replace(END_CHILDREN_REGEX, '')
+    .replace(PARENT_NODE_REGEX, PARENT_NODE);
 
-  return pathString;
+  return str;
 }
