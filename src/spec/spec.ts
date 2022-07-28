@@ -1,4 +1,4 @@
-import { isSignal, Signal } from 'spred';
+import { isSignal } from 'spred';
 import { addSub } from '../dom/dom';
 import { next, state } from '../state/state';
 import { EVENTS } from '../listener/listener';
@@ -18,11 +18,11 @@ type WritableKeys<T> = {
 }[keyof T];
 
 interface Attrs {
-  [attr: string]: string | boolean | Signal<string | boolean>;
+  [attr: string]: string | boolean | (() => string | boolean);
 }
 
 type Props<Element extends HTMLElement> = {
-  [key in WritableKeys<Element>]?: Element[key] | Signal<Element[key]>;
+  [key in WritableKeys<Element>]?: Element[key] | (() => Element[key]);
 };
 
 type PropsWithAttrs<Element extends HTMLElement> = Props<Element> & {
@@ -36,10 +36,10 @@ export function spec<Element extends HTMLElement>(
 
   let node: Element;
   let key: keyof PropsWithAttrs<Element>;
+  let hasBindings = false;
 
   if (state.isCreating) {
     node = state.root! as Element;
-    state.path += 'b';
   } else {
     next();
     node = state.pathState.node! as Element;
@@ -53,29 +53,49 @@ export function spec<Element extends HTMLElement>(
       continue;
     }
 
-    if (isSignal(value)) {
-      addSub(
-        node,
-        value.subscribe((v) => setupProp(node, key, v))
-      );
+    if (typeof value === 'function') {
+      hasBindings = true;
+
+      if (key.substring(0, 2) == 'on') {
+        setupEvent(node, key.substring(2), value);
+        continue;
+      }
+
+      if (isSignal(value)) {
+        addSub(
+          node,
+          value.subscribe((v) => ((node as any)[key] = v))
+        );
+        continue;
+      }
+
+      node[key] = value();
+
       continue;
     }
 
-    setupProp(node, key, value);
+    if (state.isCreating) node[key] = value;
+  }
+
+  if (state.isCreating && hasBindings) {
+    state.path += 'b';
   }
 }
 
-function setupProp(node: any, key: any, value: any) {
-  if (key.substring(0, 2) == 'on') {
-    const event = key.substring(2);
-
-    (node as any)['$$' + event] = value;
+function setupEvent(node: any, event: string, listener: () => any) {
+  if (isSignal(listener)) {
+    addSub(
+      node,
+      listener.subscribe((v) => {
+        (node as any)['$$' + event] = v;
+      })
+    );
     delegate(event);
-
     return;
   }
 
-  node[key] = value;
+  (node as any)['$$' + event] = listener;
+  delegate(event);
 }
 
 function setupAttrs(node: Node, attrs: Attrs) {
