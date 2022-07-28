@@ -8,27 +8,27 @@ import {
 } from '../state/state';
 import { PropsWithAttrs, spec } from '../spec/spec';
 
-export function tag<TagName extends keyof HTMLElementTagNameMap>(
+export function h<TagName extends keyof HTMLElementTagNameMap>(
   tag: TagName
 ): void;
 
-export function tag<TagName extends keyof HTMLElementTagNameMap>(
+export function h<TagName extends keyof HTMLElementTagNameMap>(
   tag: TagName,
   props: PropsWithAttrs<HTMLElementTagNameMap[TagName]>
 ): void;
 
-export function tag<TagName extends keyof HTMLElementTagNameMap>(
+export function h<TagName extends keyof HTMLElementTagNameMap>(
   tag: TagName,
   fn: () => any
 ): void;
 
-export function tag<TagName extends keyof HTMLElementTagNameMap>(
+export function h<TagName extends keyof HTMLElementTagNameMap>(
   tag: TagName,
   props: PropsWithAttrs<HTMLElementTagNameMap[TagName]>,
   fn: () => any
 ): void;
 
-export function tag<TagName extends keyof HTMLElementTagNameMap>(
+export function h<TagName extends keyof HTMLElementTagNameMap>(
   tag: TagName,
   second?: any,
   third?: any

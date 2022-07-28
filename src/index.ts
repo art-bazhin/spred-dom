@@ -1,7 +1,7 @@
 import { createComponent, createComponentFn } from './component/component';
-import { tag } from './tag/tag';
+import { h } from './h/h';
 import { text } from './text/text';
 import { node } from './node/node';
 import { list } from './list/list';
 
-export { tag, createComponent, createComponentFn, text, node, list };
+export { h, createComponent, createComponentFn, text, node, list };
