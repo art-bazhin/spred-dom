@@ -1,24 +1,7 @@
 import { createComponent, createComponentFn } from './component/component';
 import { tag } from './tag/tag';
-import { attr } from './attr/attr';
-import { prop } from './prop/prop';
-import { listener } from './listener/listener';
-import { textNode } from './text-node/text-node';
-import { node } from './node/node';
 import { text } from './text/text';
-import { html } from './html/html';
+import { node } from './node/node';
 import { list } from './list/list';
 
-export {
-  tag,
-  createComponent,
-  createComponentFn,
-  textNode,
-  attr,
-  prop,
-  listener,
-  node,
-  text,
-  html,
-  list,
-};
+export { tag, createComponent, createComponentFn, text, node, list };

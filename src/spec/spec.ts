@@ -1,7 +1,6 @@
 import { isSignal } from 'spred';
 import { addSub } from '../dom/dom';
 import { BINDING, next, state } from '../state/state';
-import { EVENTS } from '../listener/listener';
 
 type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
   T
@@ -126,3 +125,5 @@ function delegate(event: string) {
 
   document.addEventListener(event, eventListener);
 }
+
+const EVENTS = {} as any;
