@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/art-bazhin/spred-dom/compare/v0.2.4...v0.3.0) (2022-07-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* tag -> h
+* remove attr, prop, listener, html methods
+
+### Features
+
+* pass dom node props as second argument ([8f596bc](https://github.com/art-bazhin/spred-dom/commit/8f596bc62213bbcf937d720a020c43f0fee97824))
+* remove redundant API methods ([e50e2a0](https://github.com/art-bazhin/spred-dom/commit/e50e2a02797c4a1cf94b6fc732abdbabce4f6162))
+* rename tag to h ([349f2ee](https://github.com/art-bazhin/spred-dom/commit/349f2ee2d8dc2fcc3bc4d1f3ad5566e906faa5e6))
+
+
+### Bug Fixes
+
+* bind only functions in spec ([5f1b100](https://github.com/art-bazhin/spred-dom/commit/5f1b1009de400628ee08fb06b7a8f4e40a67a1eb))
+
+
+### Code Refactoring
+
+* refactor text fn ([4f00ac3](https://github.com/art-bazhin/spred-dom/commit/4f00ac30dccb590dfd1f8242b11369222c77212e))
+
+
+### Build System
+
+* update terser config ([1b988fd](https://github.com/art-bazhin/spred-dom/commit/1b988fd974c5526d1cb3b6f6057471eb1b0a7a00))
+
 ### [0.2.4](https://github.com/art-bazhin/spred-dom/compare/v0.2.3...v0.2.4) (2022-07-27)
 
 
