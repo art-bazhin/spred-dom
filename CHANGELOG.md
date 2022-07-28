@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.2](https://github.com/art-bazhin/spred-dom/compare/v0.3.1...v0.3.2) (2022-07-28)
+
+
+### Bug Fixes
+
+* fix props setup ([4c31360](https://github.com/art-bazhin/spred-dom/commit/4c313600d9e9aa9440eb6a33556c2cf396bad542))
+
 ### [0.3.1](https://github.com/art-bazhin/spred-dom/compare/v0.3.0...v0.3.1) (2022-07-28)
 
 
