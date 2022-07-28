@@ -40,7 +40,11 @@ export function spec<Element extends HTMLElement>(
   if (state.isCreating) {
     node = state.root! as Element;
   } else {
-    if (next() !== BINDING) return;
+    const s = state.pathState;
+
+    if (s.path[s.i + 1] !== BINDING) return;
+
+    next();
     node = state.pathState.node! as Element;
   }
 

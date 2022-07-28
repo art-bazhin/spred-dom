@@ -59,6 +59,4 @@ export function next(fn?: () => any) {
     ++pathState.i;
     fn && fn();
   }
-
-  return nextValue;
 }
