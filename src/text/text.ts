@@ -6,42 +6,25 @@ export function text(str: string | (() => string)) {
   if (state.isCreating && !state.root) return;
 
   const isFn = typeof str === 'function';
+  let node: Node | undefined;
 
   if (state.isCreating) {
-    const node = document.createTextNode('_');
-
+    node = document.createTextNode('_');
     state.root!.appendChild(node);
-
-    if (isFn) {
-      state.path += FIRST_CHILD + BINDING + PARENT_NODE;
-
-      if (isSignal(str)) {
-        addSub(
-          node,
-          str.subscribe((v) => (node.textContent = v))
-        );
-        return;
-      }
-
-      node.textContent = str();
-    } else {
-      state.path += FIRST_CHILD + PARENT_NODE;
-      node.textContent = str;
-    }
-
-    return;
+  } else {
+    next();
+    node = state.pathState.node!;
   }
 
-  next();
-
   if (isFn) {
-    const node = state.pathState.node as Text;
-    next();
+    if (state.isCreating) {
+      state.path += FIRST_CHILD + BINDING + PARENT_NODE;
+    } else next();
 
     if (isSignal(str)) {
       addSub(
         node,
-        str.subscribe((v) => (node.textContent = v))
+        str.subscribe((v) => (node!.textContent = v))
       );
       return;
     }
@@ -49,5 +32,10 @@ export function text(str: string | (() => string)) {
     node.textContent = str();
 
     return;
+  }
+
+  if (state.isCreating) {
+    state.path += FIRST_CHILD + PARENT_NODE;
+    node.textContent = str;
   }
 }
