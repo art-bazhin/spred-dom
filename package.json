@@ -10,7 +10,7 @@
   "types": "dist/index.d.ts",
   "license": "MIT",
   "peerDependencies": {
-    "spred": ">=0.16.4"
+    "spred": ">=0.16.5"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.17.7",

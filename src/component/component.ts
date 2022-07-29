@@ -68,7 +68,7 @@ function setupComponent<A extends unknown[]>(
     node: container,
   };
 
-  isolate(() => fn(...args));
+  isolate(fn, args);
 
   state.pathState = tempPathState;
   state.isCreating = tempIsCreating;
@@ -90,7 +90,7 @@ function createComponentData<A extends unknown[]>(
   const tempIsCreating = state.isCreating;
   state.isCreating = true;
 
-  isolate(() => fn(...args));
+  isolate(fn, args);
 
   let pathString = getPathString(state.path);
 
