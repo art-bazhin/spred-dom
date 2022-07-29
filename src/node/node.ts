@@ -1,6 +1,7 @@
 import { createMemo, isSignal, Signal } from 'spred';
+import { createBinding } from '../create-binding/create-binding';
 import { addSub, createMark, insertBefore, removeNodes } from '../dom/dom';
-import { BINDING, FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
+import { state } from '../state/state';
 
 type EmptyNode = null | false | undefined;
 
@@ -11,24 +12,14 @@ export function node(
     | Signal<Node | EmptyNode>
     | (() => Node | EmptyNode)
 ) {
-  if (state.isCreating && state.root) {
-    const mark = createMark();
+  createBinding((mark) => {
+    if (state.isCreating) {
+      state.setupQueue.push(() => setupNode(binding, mark));
+      return;
+    }
 
-    state.path += FIRST_CHILD + BINDING + PARENT_NODE;
-    state.setupQueue.push(() => setupNode(binding, mark));
-    state.root.appendChild(mark);
-
-    return;
-  }
-
-  next();
-
-  const pathState = state.pathState;
-  const mark = pathState && pathState.node;
-
-  setupNode(binding, mark);
-
-  next();
+    setupNode(binding, mark);
+  });
 }
 
 function setupNode(
