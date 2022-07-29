@@ -1,5 +1,5 @@
 import { isSignal, Signal } from 'spred';
-import { addSub, createMark, insertBefore, removeNodes } from '../dom/dom';
+import { addCleanup, createMark, insertBefore, removeNodes } from '../dom/dom';
 import { BINDING, FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
 
 export function list<T>(binding: Signal<T[]> | T[], mapFn: (el: T) => Node) {
@@ -38,7 +38,7 @@ function setupList<T>(
       insertBefore(start, mark);
     }
 
-    addSub(
+    addCleanup(
       mark,
       binding.subscribe((arr) => {
         removeNodes(start!.nextSibling, mark);

@@ -1,5 +1,5 @@
 import { isSignal } from 'spred';
-import { addSub } from '../dom/dom';
+import { addCleanup } from '../dom/dom';
 import { BINDING, FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
 
 export function text(str: string | (() => string)) {
@@ -22,7 +22,7 @@ export function text(str: string | (() => string)) {
     } else next();
 
     if (isSignal(str)) {
-      addSub(
+      addCleanup(
         node,
         str.subscribe((v) => (node!.textContent = v))
       );

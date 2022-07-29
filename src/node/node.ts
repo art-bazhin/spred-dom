@@ -1,6 +1,6 @@
 import { createMemo, isSignal, Signal } from 'spred';
 import { createBinding } from '../create-binding/create-binding';
-import { addSub, createMark, insertBefore, removeNodes } from '../dom/dom';
+import { addCleanup, createMark, insertBefore, removeNodes } from '../dom/dom';
 import { state } from '../state/state';
 
 type EmptyNode = null | false | undefined;
@@ -53,7 +53,7 @@ function setupSignalNode(binding: Signal<Node | EmptyNode>, mark: Node) {
     insertBefore(start, mark);
   }
 
-  addSub(
+  addCleanup(
     mark,
     binding.subscribe((node) => {
       removeNodes(start!.nextSibling, mark);

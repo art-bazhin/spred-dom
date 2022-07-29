@@ -1,5 +1,5 @@
 import { isSignal } from 'spred';
-import { addSub } from '../dom/dom';
+import { addCleanup } from '../dom/dom';
 import { BINDING, next, state } from '../state/state';
 
 type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
@@ -48,6 +48,8 @@ export function spec<Element extends HTMLElement>(
     node = state.pathState.node! as Element;
   }
 
+  const subs: (() => any)[] = [];
+
   for (key in props) {
     const value = props[key] as any;
 
@@ -60,15 +62,12 @@ export function spec<Element extends HTMLElement>(
       hasBindings = true;
 
       if (key.substring(0, 2) == 'on') {
-        setupEvent(node, key.substring(2), value);
+        setupEvent(node, key.substring(2), value, subs);
         continue;
       }
 
       if (isSignal(value)) {
-        addSub(
-          node,
-          value.subscribe((v) => ((node as any)[key] = v))
-        );
+        subs.push(value.subscribe((v) => ((node as any)[key] = v)));
         continue;
       }
 
@@ -83,12 +82,22 @@ export function spec<Element extends HTMLElement>(
   if (hasBindings && state.isCreating) {
     state.path += BINDING;
   }
+
+  if (subs.length) {
+    addCleanup(node, () => {
+      for (let unsub of subs) unsub();
+    });
+  }
 }
 
-function setupEvent(node: any, event: string, listener: () => any) {
+function setupEvent(
+  node: any,
+  event: string,
+  listener: () => any,
+  subs: any[]
+) {
   if (isSignal(listener)) {
-    addSub(
-      node,
+    subs.push(
       listener.subscribe((v) => {
         (node as any)['$$' + event] = v;
       })

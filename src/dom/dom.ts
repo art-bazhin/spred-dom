@@ -1,5 +1,3 @@
-const SUBS_KEY = '$subs';
-
 export function insertBefore(child: Node, mark: Node) {
   const parent = mark.parentNode;
 
@@ -35,23 +33,12 @@ export function isMark(node: Node | null) {
   return node && node.nodeType === Node.TEXT_NODE && !node.textContent;
 }
 
-export function addSub(node: Node, sub: () => any) {
-  let subs = (node as any)[SUBS_KEY];
-
-  if (!subs) {
-    subs = [];
-    (node as any)[SUBS_KEY] = subs;
-  }
-
-  subs.push(sub);
+export function addCleanup(node: Node, cleanupFn: () => any) {
+  (node as any).$cleanup = cleanupFn;
 }
 
-function cleanupSubs(node: Node) {
-  const subs: (() => void)[] = (node as any)[SUBS_KEY];
-
-  if (subs) {
-    for (let unsub of subs) unsub();
-  }
+function cleanupSubs(node: any) {
+  node.$cleanup && node.$cleanup();
 
   let child = node.firstChild;
 
