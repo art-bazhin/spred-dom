@@ -1,8 +1,16 @@
-import { isSignal, Signal } from 'spred';
+import { createMemo, isSignal, Signal } from 'spred';
 import { addSub, createMark, insertBefore, removeNodes } from '../dom/dom';
 import { BINDING, FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
 
-export function node(binding: Node | null | Signal<Node | null>) {
+type EmptyNode = null | false | undefined;
+
+export function node(
+  binding:
+    | Node
+    | EmptyNode
+    | Signal<Node | EmptyNode>
+    | (() => Node | EmptyNode)
+) {
   if (state.isCreating && state.root) {
     const mark = createMark();
 
@@ -24,29 +32,41 @@ export function node(binding: Node | null | Signal<Node | null>) {
 }
 
 function setupNode(
-  binding: Node | null | Signal<Node | null>,
+  binding:
+    | Node
+    | EmptyNode
+    | Signal<Node | EmptyNode>
+    | (() => Node | EmptyNode),
   mark: Node | null
 ) {
   if (!mark || !binding) return;
 
-  if (isSignal(binding)) {
-    let start = mark.previousSibling;
-
-    if (!start) {
-      start = createMark();
-      insertBefore(start, mark);
+  if (typeof binding === 'function') {
+    if (isSignal(binding)) {
+      setupSignalNode(binding, mark);
+      return;
     }
 
-    addSub(
-      mark,
-      binding.subscribe((node) => {
-        removeNodes(start!.nextSibling, mark);
-        if (node) insertBefore(node, mark);
-      })
-    );
-
+    setupSignalNode(createMemo(binding), mark);
     return;
   }
 
   insertBefore(binding, mark);
+}
+
+function setupSignalNode(binding: Signal<Node | EmptyNode>, mark: Node) {
+  let start = mark.previousSibling;
+
+  if (!start) {
+    start = createMark();
+    insertBefore(start, mark);
+  }
+
+  addSub(
+    mark,
+    binding.subscribe((node) => {
+      removeNodes(start!.nextSibling, mark);
+      if (node) insertBefore(node, mark);
+    })
+  );
 }
