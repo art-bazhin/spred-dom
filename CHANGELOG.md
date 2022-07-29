@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.4](https://github.com/art-bazhin/spred-dom/compare/v0.3.3...v0.3.4) (2022-07-29)
+
+
+### Features
+
+* support multiple arguments in cleanup ([edd7611](https://github.com/art-bazhin/spred-dom/commit/edd7611fa630c07ae0a28d14dc21a6414b4ec49e))
+
+
+### Bug Fixes
+
+* remove bind function ([a8a5650](https://github.com/art-bazhin/spred-dom/commit/a8a5650d7f137702384bd66f0de206cee9194693))
+
 ### [0.3.3](https://github.com/art-bazhin/spred-dom/compare/v0.3.2...v0.3.3) (2022-07-29)
 
 
