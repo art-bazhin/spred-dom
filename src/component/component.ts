@@ -1,3 +1,4 @@
+import { isolate } from 'spred';
 import { isMark } from '../dom/dom';
 import { node } from '../node/node';
 import {
@@ -67,7 +68,7 @@ function setupComponent<A extends unknown[]>(
     node: container,
   };
 
-  fn(...args);
+  isolate(() => fn(...args));
 
   state.pathState = tempPathState;
   state.isCreating = tempIsCreating;
@@ -89,7 +90,7 @@ function createComponentData<A extends unknown[]>(
   const tempIsCreating = state.isCreating;
   state.isCreating = true;
 
-  fn(...args);
+  isolate(() => fn(...args));
 
   let pathString = getPathString(state.path);
 
@@ -105,6 +106,7 @@ function createComponentData<A extends unknown[]>(
 
   return { rootNode, pathString };
 }
+
 const NEXT_SIBLING_REGEX = new RegExp(PARENT_NODE + FIRST_CHILD, 'g');
 const EMPTY_NESTING_REGEX = new RegExp(
   `${START_CHILDREN}[^${BINDING}${START_CHILDREN}${END_CHILDREN}]*${END_CHILDREN}`,
