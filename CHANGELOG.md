@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.3](https://github.com/art-bazhin/spred-dom/compare/v0.3.2...v0.3.3) (2022-07-29)
+
+
+### Features
+
+* add bind function ([d582fc0](https://github.com/art-bazhin/spred-dom/commit/d582fc041a0214eaaffd52a4aa6b451b9a41355a))
+* add cleanup function ([6a8a7e5](https://github.com/art-bazhin/spred-dom/commit/6a8a7e5c854a8bcc9c000026d08ac6ffa3eee9d9))
+* create memos using node fn ([7e4a948](https://github.com/art-bazhin/spred-dom/commit/7e4a9487fbd7be101d5330ff4a99c4b34d8fc043))
+
+
+### Code Refactoring
+
+* refactor dom cleanup ([e0ab155](https://github.com/art-bazhin/spred-dom/commit/e0ab15506fe5078109a3909aef19b561f13282b8))
+* refactor node function ([fad5e37](https://github.com/art-bazhin/spred-dom/commit/fad5e37a31c5d7fb22a2d077ba0fd2ac11b5e377))
+
 ### [0.3.2](https://github.com/art-bazhin/spred-dom/compare/v0.3.1...v0.3.2) (2022-07-28)
 
 
