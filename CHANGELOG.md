@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.5](https://github.com/art-bazhin/spred-dom/compare/v0.3.4...v0.3.5) (2022-07-29)
+
+
+### Features
+
+* isolate component fn from parent computed ([7194310](https://github.com/art-bazhin/spred-dom/commit/7194310d0d96516fc90b3d5301e771b5ad864f7f))
+
 ### [0.3.4](https://github.com/art-bazhin/spred-dom/compare/v0.3.3...v0.3.4) (2022-07-29)
 
 
