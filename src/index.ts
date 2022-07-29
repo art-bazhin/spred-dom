@@ -4,5 +4,15 @@ import { text } from './text/text';
 import { node } from './node/node';
 import { list } from './list/list';
 import { bind } from './bind/bind';
+import { cleanup } from './cleanup/cleanup';
 
-export { h, createComponent, createComponentFn, text, node, list, bind };
+export {
+  h,
+  createComponent,
+  createComponentFn,
+  text,
+  node,
+  list,
+  bind,
+  cleanup,
+};
