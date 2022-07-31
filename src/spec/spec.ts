@@ -1,5 +1,4 @@
 import { isSignal } from 'spred';
-import { addCleanup } from '../dom/dom';
 import { BINDING, next, state } from '../state/state';
 
 type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
@@ -34,7 +33,6 @@ export function spec<Element extends HTMLElement>(
   if (!props || (state.isCreating && !state.root)) return;
 
   let node: Element;
-  let key: keyof PropsWithAttrs<Element>;
   let hasBindings = false;
 
   if (state.isCreating) {
@@ -48,10 +46,8 @@ export function spec<Element extends HTMLElement>(
     node = state.pathState.node! as Element;
   }
 
-  const subs: (() => any)[] = [];
-
-  for (key in props) {
-    const value = props[key] as any;
+  for (let key in props) {
+    const value = (props as any)[key];
 
     if (key === 'attrs') {
       setupAttrs(node, value);
@@ -62,46 +58,33 @@ export function spec<Element extends HTMLElement>(
       hasBindings = true;
 
       if (key.substring(0, 2) == 'on') {
-        setupEvent(node, key.substring(2), value, subs);
+        setupEvent(node, key.substring(2), value);
         continue;
       }
 
       if (isSignal(value)) {
-        subs.push(value.subscribe((v) => ((node as any)[key] = v)));
+        value.subscribe((v) => ((node as any)[key] = v));
         continue;
       }
 
-      node[key] = value();
+      (node as any)[key] = value();
 
       continue;
     }
 
-    if (state.isCreating) node[key] = value;
+    if (state.isCreating) (node as any)[key] = value;
   }
 
   if (hasBindings && state.isCreating) {
     state.path += BINDING;
   }
-
-  if (subs.length) {
-    addCleanup(node, () => {
-      for (let unsub of subs) unsub();
-    });
-  }
 }
 
-function setupEvent(
-  node: any,
-  event: string,
-  listener: () => any,
-  subs: any[]
-) {
+function setupEvent(node: any, event: string, listener: () => any) {
   if (isSignal(listener)) {
-    subs.push(
-      listener.subscribe((v) => {
-        (node as any)['$$' + event] = v;
-      })
-    );
+    listener.subscribe((v) => {
+      (node as any)['$$' + event] = v;
+    });
     delegate(event);
     return;
   }
