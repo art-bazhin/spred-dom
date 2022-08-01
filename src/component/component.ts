@@ -11,7 +11,7 @@ import {
   state,
 } from '../state/state';
 
-export function createComponent<A extends unknown[]>(fn: (...args: A) => any) {
+export function component<A extends unknown[]>(fn: (...args: A) => any) {
   let template: Node | null = null;
   let pathString = '';
 
@@ -40,7 +40,7 @@ export function createComponent<A extends unknown[]>(fn: (...args: A) => any) {
   };
 }
 
-export function createComponentFn<A extends unknown[]>(
+export function templateFn<A extends unknown[]>(
   component: (...args: A) => Node
 ) {
   return (...args: A) => node(component(...args));

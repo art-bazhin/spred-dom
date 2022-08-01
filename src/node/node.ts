@@ -1,4 +1,4 @@
-import { createMemo, isSignal, Signal } from 'spred';
+import { memo, isSignal, Signal } from 'spred';
 import { createBinding } from '../create-binding/create-binding';
 import { createMark, insertBefore, removeNodes } from '../dom/dom';
 import { state } from '../state/state';
@@ -38,7 +38,7 @@ function setupNode(
       return;
     }
 
-    setupSignalNode(createMemo(binding), mark);
+    setupSignalNode(memo(binding), mark);
     return;
   }
 
