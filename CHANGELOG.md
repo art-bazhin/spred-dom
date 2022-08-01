@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.0](https://github.com/art-bazhin/spred-dom/compare/v0.4.0...v0.5.0) (2022-08-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* createComponent -> component, createComponentFn -> templateFn
+
+### Features
+
+* rename api methods ([1cc8574](https://github.com/art-bazhin/spred-dom/commit/1cc8574a7e8f8d0e335f978f5192fe55f385517d))
+* transform value functions to signals automatically ([951a278](https://github.com/art-bazhin/spred-dom/commit/951a27829f70805a50c35abb4098c08736227fac))
+
+
+### Build System
+
+* update spred version ([2f6888a](https://github.com/art-bazhin/spred-dom/commit/2f6888a237420d0920bfa6fff021110b53e05f80))
+
 ## [0.4.0](https://github.com/art-bazhin/spred-dom/compare/v0.3.6...v0.4.0) (2022-07-31)
 
 
