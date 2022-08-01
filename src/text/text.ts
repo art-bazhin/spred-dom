@@ -1,10 +1,11 @@
-import { isSignal } from 'spred';
+import { check } from 'spred';
+import { isSignal, memo } from 'spred';
+import { setupSignalProp } from '../dom/dom';
 import { BINDING, FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
 
-export function text(str: string | (() => string)) {
+export function text(data: string | (() => string)) {
   if (state.isCreating && !state.root) return;
 
-  const isFn = typeof str === 'function';
   let node: Node | undefined;
 
   if (state.isCreating) {
@@ -15,23 +16,34 @@ export function text(str: string | (() => string)) {
     node = state.pathState.node!;
   }
 
-  if (isFn) {
+  if (typeof data === 'function') {
     if (state.isCreating) {
       state.path += FIRST_CHILD + BINDING + PARENT_NODE;
     } else next();
 
-    if (isSignal(str)) {
-      str.subscribe((v) => (node!.textContent = v));
+    if (isSignal(data)) {
+      setupSignalProp(node, 'textContent', data);
       return;
     }
 
-    node.textContent = str();
+    let value: any;
+
+    const hasSignalCalls = check(() => {
+      value = (data as any)();
+    });
+
+    if (hasSignalCalls) {
+      setupSignalProp(node, 'textContent', memo(data));
+      return;
+    }
+
+    node.textContent = value;
 
     return;
   }
 
   if (state.isCreating) {
     state.path += FIRST_CHILD + PARENT_NODE;
-    node.textContent = str;
+    node.textContent = data;
   }
 }

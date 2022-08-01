@@ -1,4 +1,5 @@
-import { isSignal } from 'spred';
+import { check, isSignal, memo } from 'spred';
+import { setupSignalProp } from '../dom/dom';
 import { BINDING, next, state } from '../state/state';
 
 type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
@@ -47,7 +48,7 @@ export function spec<Element extends HTMLElement>(
   }
 
   for (let key in props) {
-    const value = (props as any)[key];
+    let value = (props as any)[key];
 
     if (key === 'attrs') {
       setupAttrs(node, value);
@@ -63,11 +64,22 @@ export function spec<Element extends HTMLElement>(
       }
 
       if (isSignal(value)) {
-        value.subscribe((v) => ((node as any)[key] = v));
+        setupSignalProp(node, key, value);
         continue;
       }
 
-      (node as any)[key] = value();
+      let v: any;
+
+      const hasSignalCalls = check(() => {
+        v = value();
+      });
+
+      if (hasSignalCalls) {
+        setupSignalProp(node, key, memo(value));
+        continue;
+      }
+
+      (node as any)[key] = v;
 
       continue;
     }
