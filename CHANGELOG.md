@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.1](https://github.com/art-bazhin/spred-dom/compare/v0.5.0...v0.5.1) (2022-08-02)
+
+
+### Features
+
+* reconcile lists ([882c572](https://github.com/art-bazhin/spred-dom/commit/882c572ce09579976fc80d8d9ad527257afee07a))
+
 ## [0.5.0](https://github.com/art-bazhin/spred-dom/compare/v0.4.0...v0.5.0) (2022-08-01)
 
 
