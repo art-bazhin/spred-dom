@@ -2,9 +2,7 @@ import { Signal } from 'spred';
 
 export function insertBefore(child: Node, mark: Node, parentNode?: Node) {
   const parent = parentNode || mark.parentNode;
-
-  if (!parent) return;
-  parent.insertBefore(child, mark);
+  if (parent) parent.insertBefore(child, mark);
 }
 
 export function removeNodes(

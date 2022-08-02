@@ -198,12 +198,11 @@ function setupList<T>(
           }
         }
       } else if (oldLength - removedCount !== newLength) {
-        for (let i = 0; i < newLength; i++) {
+        for (let i = 0; i < newLength; ++i) {
+          if (positions[newLength - i - 1] !== -1) continue;
+
           const index = b - i;
           const el = newArr[index];
-
-          if (elementIndexMap.get(el) !== -1) continue;
-
           const nextEl = newArr[index + 1];
           const nextNode =
             nextEl === undefined //
