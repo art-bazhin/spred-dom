@@ -189,7 +189,7 @@ function setupList<T>(
               while (1) {
                 next = current.nextSibling!;
                 insertBefore(current, nextNode, parent);
-                if (current === lastChild) return;
+                if (current === lastChild) break;
                 current = next;
               }
             } else {
