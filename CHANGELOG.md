@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.4](https://github.com/art-bazhin/spred-dom/compare/v0.5.3...v0.5.4) (2022-08-03)
+
+
+### Bug Fixes
+
+* fix reconciliation memory leak ([38ca0de](https://github.com/art-bazhin/spred-dom/commit/38ca0de22493f71cbb7c63afc538e9c8837a9195))
+
 ### [0.5.3](https://github.com/art-bazhin/spred-dom/compare/v0.5.2...v0.5.3) (2022-08-02)
 
 
