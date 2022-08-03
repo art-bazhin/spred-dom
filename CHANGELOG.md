@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.8](https://github.com/art-bazhin/spred-dom/compare/v0.5.7...v0.5.8) (2022-08-03)
+
+
+### Bug Fixes
+
+* update lists during recalculation instead of notification ([d69ec63](https://github.com/art-bazhin/spred-dom/commit/d69ec636ee6dd95e40e99d818ce9e2e653d3dc52))
+
 ### [0.5.7](https://github.com/art-bazhin/spred-dom/compare/v0.5.6...v0.5.7) (2022-08-03)
 
 
