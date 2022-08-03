@@ -60,7 +60,7 @@ export function spec<Element extends HTMLElement>(
       hasBindings = true;
 
       if (key.substring(0, 2) == 'on') {
-        setupEvent(node, key.substring(2), value);
+        (node as any)[key] = value;
         continue;
       }
 
@@ -93,46 +93,7 @@ export function spec<Element extends HTMLElement>(
   }
 }
 
-function setupEvent(node: any, event: string, listener: () => any) {
-  if (isSignal(listener)) {
-    listener.subscribe((v) => {
-      (node as any)['$$' + event] = v;
-    });
-    delegate(event);
-    return;
-  }
-
-  (node as any)['$$' + event] = listener;
-  delegate(event);
-}
-
 function setupAttrs(node: Node, attrs: Attrs) {
   for (let key in attrs) {
   }
 }
-
-function eventListener(e: Event) {
-  const key = '$$' + e.type;
-  let node = e.target as any;
-
-  while (node) {
-    const handler = node[key];
-
-    if (handler) {
-      handler(e);
-      if (e.cancelBubble) return;
-    }
-
-    node = node.parentNode;
-  }
-}
-
-function delegate(event: string) {
-  if (EVENTS[event]) return;
-
-  EVENTS[event] = true;
-
-  document.addEventListener(event, eventListener);
-}
-
-const EVENTS = {} as any;
