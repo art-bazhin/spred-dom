@@ -1,4 +1,4 @@
-import { isSignal, Signal } from 'spred';
+import { collect, isSignal, Signal } from 'spred';
 import { createMark, insertBefore, isFragment, removeNodes } from '../dom/dom';
 import { BINDING, FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
 
@@ -39,7 +39,8 @@ function setupList<T>(
     }
 
     let oldArr: T[] = [];
-    let nodesMap = new Map<any, Node>();
+    let nodeMap = new Map<any, Node>();
+    let cleanupMap = new Map<any, () => any>();
 
     // the algorithm is taken from
     // https://github.com/localvoid/ivi/blob/2c81ead934b9128e092cc2a5ef2d3cabc73cb5dd/packages/ivi/src/vdom/implementation.ts#L1366
@@ -77,11 +78,11 @@ function setupList<T>(
       if (s > a) {
         const index = b + 1;
         const endNode =
-          index === newLength ? mark : nodesMap.get(newArr[index])!;
+          index === newLength ? mark : nodeMap.get(newArr[index])!;
 
         while (s <= b) {
           insertBefore(
-            createListNode(newArr[s], mapFn, nodesMap), //
+            createListNode(newArr[s], mapFn, nodeMap, cleanupMap),
             endNode,
             parent
           );
@@ -96,12 +97,19 @@ function setupList<T>(
       // remove nodes
       if (s > b) {
         const endIndex = a + 1;
-        const startNode = nodesMap.get(oldArr[s])!;
+        const startNode = nodeMap.get(oldArr[s])!;
         const endNode =
-          endIndex === oldLength ? mark : nodesMap.get(oldArr[endIndex])!;
+          endIndex === oldLength ? mark : nodeMap.get(oldArr[endIndex])!;
 
         removeNodes(startNode, endNode, parent);
-        while (s < endIndex) nodesMap.delete(oldArr[s++]);
+
+        while (s < endIndex) {
+          const el = oldArr[s++];
+
+          cleanupMap.get(el)!();
+          cleanupMap.delete(el);
+          nodeMap.delete(el);
+        }
 
         oldArr = newArr;
 
@@ -131,11 +139,13 @@ function setupList<T>(
         const newIndex = elementIndexMap.get(el);
 
         if (newIndex === undefined) {
-          const node = nodesMap.get(el)!;
+          const node = nodeMap.get(el)!;
           const end = ((node as any).$lc || node).nextSibling;
 
           removeNodes(node, end, parent);
-          nodesMap.delete(el);
+          cleanupMap.get(el)!();
+          cleanupMap.delete(el);
+          nodeMap.delete(el);
           removedCount++;
 
           continue;
@@ -167,7 +177,7 @@ function setupList<T>(
           const nextNode =
             nextEl === undefined //
               ? mark
-              : nodesMap.get(nextEl)!;
+              : nodeMap.get(nextEl)!;
 
           if (position === lisPosition) {
             --j;
@@ -176,12 +186,12 @@ function setupList<T>(
 
           if (position < 0) {
             insertBefore(
-              createListNode(el, mapFn, nodesMap), //
+              createListNode(el, mapFn, nodeMap, cleanupMap),
               nextNode,
               parent
             );
           } else {
-            const node = nodesMap.get(el)!;
+            const node = nodeMap.get(el)!;
             const lastChild = (node as any).$lc;
 
             if (lastChild && node !== lastChild) {
@@ -209,10 +219,10 @@ function setupList<T>(
           const nextNode =
             nextEl === undefined //
               ? mark
-              : nodesMap.get(nextEl)!;
+              : nodeMap.get(nextEl)!;
 
           insertBefore(
-            createListNode(el, mapFn, nodesMap), //
+            createListNode(el, mapFn, nodeMap, cleanupMap),
             nextNode,
             parent
           );
@@ -273,9 +283,19 @@ export function getLIS(arr: number[]) {
   return lis;
 }
 
-function createListNode<T>(el: T, mapFn: (e: T) => Node, map: Map<T, Node>) {
-  const node = mapFn(el);
-  let nodeInMap: Node | null = node;
+function createListNode<T>(
+  el: T,
+  mapFn: (e: T) => Node,
+  nodeMap: Map<T, Node>,
+  cleanupMap: Map<T, () => any>
+) {
+  let node: any;
+
+  const cleanup = collect(() => {
+    node = mapFn(el);
+  });
+
+  let nodeInMap: Node = node;
 
   if (isFragment(node)) {
     const firstChild = node.firstChild;
@@ -288,7 +308,8 @@ function createListNode<T>(el: T, mapFn: (e: T) => Node, map: Map<T, Node>) {
     (nodeInMap as any).$lc = node.lastChild;
   }
 
-  map.set(el, nodeInMap);
+  nodeMap.set(el, nodeInMap);
+  cleanupMap.set(el, cleanup);
 
-  return node;
+  return node as Node;
 }
