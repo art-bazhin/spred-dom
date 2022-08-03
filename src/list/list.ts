@@ -101,6 +101,7 @@ function setupList<T>(
           endIndex === oldLength ? mark : nodesMap.get(oldArr[endIndex])!;
 
         removeNodes(startNode, endNode, parent);
+        while (s < endIndex) nodesMap.delete(oldArr[s++]);
 
         oldArr = newArr;
 
@@ -134,6 +135,7 @@ function setupList<T>(
           const end = ((node as any).$lc || node).nextSibling;
 
           removeNodes(node, end, parent);
+          nodesMap.delete(el);
           removedCount++;
 
           continue;
