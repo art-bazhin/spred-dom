@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.9](https://github.com/art-bazhin/spred-dom/compare/v0.5.8...v0.5.9) (2022-08-03)
+
+
+### Code Refactoring
+
+* use native listeners instead of event delegation ([5f4362b](https://github.com/art-bazhin/spred-dom/commit/5f4362bfa466eee9677cf154ea0f3a37dddc3c86))
+
 ### [0.5.8](https://github.com/art-bazhin/spred-dom/compare/v0.5.7...v0.5.8) (2022-08-03)
 
 
