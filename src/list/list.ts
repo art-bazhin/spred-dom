@@ -42,18 +42,11 @@ function setupList<T>(
     let nodeMap = new Map<any, Node>();
     let cleanupMap = new Map<any, () => any>();
 
-    const arrSignal = computed(binding);
-
-    onDeactivate(arrSignal, () => {
-      cleanupMap.forEach((cleanup) => cleanup());
-      cleanupMap.clear();
-      nodeMap.clear();
-    });
-
     // the algorithm is taken from
     // https://github.com/localvoid/ivi/blob/2c81ead934b9128e092cc2a5ef2d3cabc73cb5dd/packages/ivi/src/vdom/implementation.ts#L1366
 
-    arrSignal.subscribe((newArr) => {
+    const arrSignal = computed(() => {
+      const newArr = binding();
       const parent = mark.parentNode!;
 
       let oldLength = oldArr.length;
@@ -240,6 +233,14 @@ function setupList<T>(
       oldArr = newArr;
     });
 
+    arrSignal.subscribe(NOOP);
+
+    onDeactivate(arrSignal, () => {
+      cleanupMap.forEach((cleanup) => cleanup());
+      cleanupMap.clear();
+      nodeMap.clear();
+    });
+
     return;
   }
 
@@ -321,3 +322,5 @@ function createListNode<T>(
 
   return node as Node;
 }
+
+const NOOP = () => {};
