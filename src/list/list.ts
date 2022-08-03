@@ -1,4 +1,4 @@
-import { collect, isSignal, Signal } from 'spred';
+import { collect, computed, isSignal, onDeactivate, Signal } from 'spred';
 import { createMark, insertBefore, isFragment, removeNodes } from '../dom/dom';
 import { BINDING, FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
 
@@ -42,10 +42,18 @@ function setupList<T>(
     let nodeMap = new Map<any, Node>();
     let cleanupMap = new Map<any, () => any>();
 
+    const arrSignal = computed(binding);
+
+    onDeactivate(arrSignal, () => {
+      cleanupMap.forEach((cleanup) => cleanup());
+      cleanupMap.clear();
+      nodeMap.clear();
+    });
+
     // the algorithm is taken from
     // https://github.com/localvoid/ivi/blob/2c81ead934b9128e092cc2a5ef2d3cabc73cb5dd/packages/ivi/src/vdom/implementation.ts#L1366
 
-    binding.subscribe((newArr) => {
+    arrSignal.subscribe((newArr) => {
       const parent = mark.parentNode!;
 
       let oldLength = oldArr.length;
