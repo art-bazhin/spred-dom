@@ -4,8 +4,6 @@ import { setupSignalProp } from '../dom/dom';
 import { BINDING, FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
 
 export function text(data: string | (() => string)) {
-  if (state.isCreating && !state.root) return;
-
   let node: Node | undefined;
 
   if (state.isCreating) {

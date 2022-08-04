@@ -48,11 +48,9 @@ export function h<TagName extends keyof HTMLElementTagNameMap>(
   }
 
   if (state.isCreating) {
-    if (!state.root) return;
-
     const child = document.createElement(tag);
 
-    state.root.appendChild(child);
+    state.root!.appendChild(child);
 
     state.root = child;
     state.path += FIRST_CHILD;

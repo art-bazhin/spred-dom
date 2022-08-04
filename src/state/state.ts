@@ -33,9 +33,6 @@ export const END_CHILDREN = '<';
 
 export function next(fn?: () => any) {
   const pathState = state.pathState;
-
-  if (!pathState) return;
-
   const current = pathState.path[pathState.i];
   const nextValue = pathState.path[++pathState.i];
   const goDeeper = nextValue === START_CHILDREN;

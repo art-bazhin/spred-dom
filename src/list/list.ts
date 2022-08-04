@@ -16,7 +16,7 @@ export function list<T>(binding: Signal<T[]> | T[], mapFn: (el: T) => Node) {
   next();
 
   const pathState = state.pathState;
-  const mark = pathState && pathState.node;
+  const mark = pathState && pathState.node!;
 
   setupList(binding, mapFn, mark);
 
@@ -26,10 +26,8 @@ export function list<T>(binding: Signal<T[]> | T[], mapFn: (el: T) => Node) {
 function setupList<T>(
   binding: Signal<T[]> | T[],
   mapFn: (el: T) => Node,
-  mark: Node | null
+  mark: Node
 ) {
-  if (!mark) return;
-
   if (isSignal(binding)) {
     let start = mark.previousSibling;
 

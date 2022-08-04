@@ -54,7 +54,7 @@ function setupSignalNode(binding: Signal<Node | EmptyNode>, mark: Node) {
   }
 
   binding.subscribe((node) => {
-    removeNodes(start!.nextSibling, mark);
+    removeNodes(start!.nextSibling!, mark);
     if (node) insertBefore(node, mark);
   });
 }
