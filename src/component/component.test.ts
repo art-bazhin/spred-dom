@@ -81,6 +81,30 @@ describe('component', () => {
     expect(li3.tagName).toBe('LI');
     expect(li3.textContent).toBe('3');
   });
+
+  it('can render document fragments', () => {
+    const Test = component(() => {
+      h('span', { textContent: '1' });
+      h('span', { textContent: () => '2' });
+      h('span', { textContent: '3' });
+    });
+
+    const fragment = Test() as DocumentFragment;
+    const span1 = fragment.children[0] as HTMLSpanElement;
+    const span2 = fragment.children[1] as HTMLSpanElement;
+    const span3 = fragment.children[2] as HTMLSpanElement;
+
+    expect(fragment.nodeType).toBe(Node.DOCUMENT_FRAGMENT_NODE);
+
+    expect(span1.tagName).toBe('SPAN');
+    expect(span1.textContent).toBe('1');
+
+    expect(span2.tagName).toBe('SPAN');
+    expect(span2.textContent).toBe('2');
+
+    expect(span3.tagName).toBe('SPAN');
+    expect(span3.textContent).toBe('3');
+  });
 });
 
 describe('templateFn', () => {
