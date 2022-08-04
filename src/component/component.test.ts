@@ -19,6 +19,7 @@ describe('component', () => {
           h('li', { textContent: () => '2' });
           h('li', { textContent: '3' });
         });
+        h('div', { textContent: () => 'test' });
       });
     });
 
@@ -31,6 +32,9 @@ describe('component', () => {
 
     const ul = root.firstElementChild as HTMLUListElement;
     expect(ul.tagName).toBe('UL');
+
+    const div = root.lastElementChild as HTMLDivElement;
+    expect(div.textContent).toBe('test');
 
     const li1 = ul.children[0] as HTMLLIElement;
     expect(li1.tagName).toBe('LI');
@@ -54,6 +58,7 @@ describe('component', () => {
           h('li', { textContent: () => '2' });
           h('li', { textContent: '3' });
         });
+        h('div', { textContent: () => 'test' });
       });
     });
 
@@ -68,6 +73,9 @@ describe('component', () => {
 
     const ul = root.firstElementChild as HTMLUListElement;
     expect(ul.tagName).toBe('UL');
+
+    const div = root.lastElementChild as HTMLDivElement;
+    expect(div.textContent).toBe('test');
 
     const li1 = ul.children[0] as HTMLLIElement;
     expect(li1.tagName).toBe('LI');
