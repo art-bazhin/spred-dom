@@ -1,4 +1,6 @@
-import { Signal } from 'spred';
+import { check, isSignal, memo, Signal } from 'spred';
+
+export type AttrValue = string | boolean | null | undefined;
 
 export function insertBefore(child: Node, mark: Node, parentNode?: Node) {
   const parent = parentNode || mark.parentNode;
@@ -32,4 +34,50 @@ export function isMark(node: Node | null) {
 
 export function setupSignalProp(node: Node, key: string, signal: Signal<any>) {
   signal.subscribe((value) => ((node as any)[key] = value));
+}
+
+export function setupAttr(
+  node: Node,
+  key: string,
+  value: AttrValue | (() => AttrValue)
+) {
+  if (typeof value === 'function') {
+    if (isSignal(value)) {
+      setupSignalAttr(node, key, value);
+      return;
+    }
+
+    let v: any;
+    const hasSignalCalls = check(() => {
+      v = (value as any)();
+    });
+
+    if (hasSignalCalls) {
+      setupSignalAttr(node, key, memo(value));
+      return;
+    }
+
+    value = value();
+  }
+
+  setupBaseAttr(node, key, value);
+}
+
+export function setupBaseAttr(node: Node, key: string, value: AttrValue) {
+  if (value === null || value === false || value === undefined) {
+    (node as Element).removeAttribute(key);
+    return;
+  }
+
+  if (value === true) value = '';
+
+  (node as Element).setAttribute(key, value);
+}
+
+export function setupSignalAttr(
+  node: Node,
+  key: string,
+  value: Signal<AttrValue>
+) {
+  value.subscribe((v) => setupBaseAttr(node, key, v));
 }

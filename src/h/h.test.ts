@@ -50,18 +50,25 @@ describe('h function', () => {
 
     button.click();
     expect(onclick).toBeCalledTimes(1);
+
+    button.click();
+    expect(onclick).toBeCalledTimes(2);
   });
 
   it('can use functions as element props', () => {
     const textContent = () => 'text';
 
     const Button = component(() => {
-      h('button', { textContent });
+      h('button', { textContent, type: 'button' });
     });
 
-    const button = Button() as HTMLButtonElement;
-
+    let button = Button() as HTMLButtonElement;
     expect(button.textContent).toBe('text');
+    expect(button.type).toBe('button');
+
+    button = Button() as HTMLButtonElement; // second render test
+    expect(button.textContent).toBe('text');
+    expect(button.type).toBe('button');
   });
 
   it('can use signals as element props', () => {
@@ -93,5 +100,96 @@ describe('h function', () => {
 
     val('after');
     expect(button.textContent).toBe('after');
+  });
+
+  it('can set element attrs', () => {
+    const Button = component(() => {
+      h('button', {
+        attrs: {
+          class: 'test',
+          'data-foo': 'bar',
+          'data-bar': true, // handle boolean attrs
+          false: false, // handle falsy attrs
+          null: null, // handle falsy attrs
+          undefined: undefined, // handle falsy attrs
+        },
+      });
+    });
+
+    const button = Button() as HTMLButtonElement;
+
+    expect(button.getAttribute('class')).toBe('test');
+    expect(button.getAttribute('data-foo')).toBe('bar');
+    expect(button.getAttribute('data-bar')).toBe('');
+    expect(button.getAttribute('false')).toBe(null);
+    expect(button.getAttribute('null')).toBe(null);
+    expect(button.getAttribute('undefined')).toBe(null);
+  });
+
+  it('can use fn as element attr value', () => {
+    const Button = component(() => {
+      h('button', {
+        attrs: {
+          class: () => 'test',
+        },
+      });
+    });
+
+    const button = Button() as HTMLButtonElement;
+    expect(button.getAttribute('class')).toBe('test');
+  });
+
+  it('can use signal as element attr value', () => {
+    const value = writable<any>('foo');
+
+    const Button = component(() => {
+      h('button', {
+        attrs: {
+          class: value,
+        },
+      });
+    });
+
+    const button = Button() as HTMLButtonElement;
+    expect(button.getAttribute('class')).toBe('foo');
+
+    value(null);
+    expect(button.getAttribute('class')).toBe(null);
+
+    value('bar');
+    expect(button.getAttribute('class')).toBe('bar');
+
+    value(false);
+    expect(button.getAttribute('class')).toBe(null);
+
+    value(true);
+    expect(button.getAttribute('class')).toBe('');
+  });
+
+  it('turns the fn attr value into a signal if it has signal calls', () => {
+    const value = writable<any>('foo');
+
+    const Button = component(() => {
+      h('button', {
+        attrs: {
+          class: () => value(),
+        },
+      });
+    });
+
+    const button = Button() as HTMLButtonElement;
+    expect(button.getAttribute('class')).toBe('foo');
+
+    value(null);
+    expect(button.getAttribute('class')).toBe(null);
+
+    value('bar');
+    expect(button.getAttribute('class')).toBe('bar');
+
+    value(false);
+    expect(button.getAttribute('class')).toBe(null);
+
+    value(true);
+    expect(button.getAttribute('class')).toBe('');
   });
 });

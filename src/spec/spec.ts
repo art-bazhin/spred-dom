@@ -1,5 +1,5 @@
 import { check, isSignal, memo } from 'spred';
-import { setupSignalProp } from '../dom/dom';
+import { setupAttr, setupSignalProp } from '../dom/dom';
 import { BINDING, next, state } from '../state/state';
 
 type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
@@ -18,7 +18,12 @@ type WritableKeys<T> = {
 }[keyof T];
 
 interface Attrs {
-  [attr: string]: string | boolean | (() => string | boolean);
+  [attr: string]:
+    | string
+    | boolean
+    | null
+    | undefined
+    | (() => string | boolean | null | undefined);
 }
 
 type Props<Element extends HTMLElement> = {
@@ -49,17 +54,18 @@ export function spec<Element extends HTMLElement>(
   }
 
   for (let key in props) {
+    const reserved = RESERVED_PROPS[key];
     let value = (props as any)[key];
 
-    if (key === 'attrs') {
-      setupAttrs(node, value);
+    if (reserved) {
+      reserved(node, value);
       continue;
     }
 
     if (typeof value === 'function') {
       hasBindings = true;
 
-      if (key.substring(0, 2) == 'on') {
+      if (key[0] === 'o' && key[1] === 'n') {
         (node as any)[key] = value;
         continue;
       }
@@ -93,7 +99,10 @@ export function spec<Element extends HTMLElement>(
   }
 }
 
-function setupAttrs(node: Node, attrs: Attrs) {
-  for (let key in attrs) {
-  }
-}
+const RESERVED_PROPS = {
+  attrs(node: Node, attrs: Attrs) {
+    for (let key in attrs) {
+      setupAttr(node, key, attrs[key]);
+    }
+  },
+} as any;
