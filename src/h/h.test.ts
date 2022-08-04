@@ -173,12 +173,16 @@ describe('h function', () => {
       h('button', {
         attrs: {
           class: () => value(),
+          'data-foo': 'bar',
         },
       });
     });
 
-    const button = Button() as HTMLButtonElement;
+    Button();
+    const button = Button() as HTMLButtonElement; // second render test
+
     expect(button.getAttribute('class')).toBe('foo');
+    expect(button.getAttribute('data-foo')).toBe('bar');
 
     value(null);
     expect(button.getAttribute('class')).toBe(null);
@@ -191,5 +195,19 @@ describe('h function', () => {
 
     value(true);
     expect(button.getAttribute('class')).toBe('');
+  });
+
+  it('correctly handles prop aliases', () => {
+    const Button = component(() => {
+      h('button', {
+        class: 'foo',
+        text: 'bar',
+      });
+    });
+
+    const button = Button() as HTMLButtonElement;
+
+    expect(button.className).toBe('foo');
+    expect(button.textContent).toBe('bar');
   });
 });

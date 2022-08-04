@@ -6,7 +6,7 @@ import {
   PARENT_NODE,
   FIRST_CHILD,
 } from '../state/state';
-import { PropsWithAttrs, spec } from '../spec/spec';
+import { Props, spec } from '../spec/spec';
 
 export function h<TagName extends keyof HTMLElementTagNameMap>(
   tag: TagName
@@ -14,7 +14,7 @@ export function h<TagName extends keyof HTMLElementTagNameMap>(
 
 export function h<TagName extends keyof HTMLElementTagNameMap>(
   tag: TagName,
-  props: PropsWithAttrs<HTMLElementTagNameMap[TagName]>
+  props: Props<HTMLElementTagNameMap[TagName]>
 ): void;
 
 export function h<TagName extends keyof HTMLElementTagNameMap>(
@@ -24,7 +24,7 @@ export function h<TagName extends keyof HTMLElementTagNameMap>(
 
 export function h<TagName extends keyof HTMLElementTagNameMap>(
   tag: TagName,
-  props: PropsWithAttrs<HTMLElementTagNameMap[TagName]>,
+  props: Props<HTMLElementTagNameMap[TagName]>,
   fn: () => any
 ): void;
 
@@ -33,7 +33,7 @@ export function h<TagName extends keyof HTMLElementTagNameMap>(
   second?: any,
   third?: any
 ) {
-  let props: PropsWithAttrs<HTMLElementTagNameMap[TagName]> | undefined;
+  let props: Props<HTMLElementTagNameMap[TagName]> | undefined;
   let fn: (() => any) | undefined;
 
   switch (arguments.length) {

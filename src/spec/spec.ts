@@ -1,5 +1,5 @@
 import { check, isSignal, memo } from 'spred';
-import { setupAttr, setupSignalProp } from '../dom/dom';
+import { AttrValue, setupAttr, setupSignalProp } from '../dom/dom';
 import { BINDING, next, state } from '../state/state';
 
 type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
@@ -18,25 +18,20 @@ type WritableKeys<T> = {
 }[keyof T];
 
 interface Attrs {
-  [attr: string]:
-    | string
-    | boolean
-    | null
-    | undefined
-    | (() => string | boolean | null | undefined);
+  [attr: string]: AttrValue | (() => AttrValue);
 }
 
-type Props<Element extends HTMLElement> = {
+type ElProps<Element extends HTMLElement> = {
   [key in WritableKeys<Element>]?: Element[key] | (() => Element[key]);
 };
 
-export type PropsWithAttrs<Element extends HTMLElement> = Props<Element> & {
+export type Props<Element extends HTMLElement> = ElProps<Element> & {
   attrs?: Attrs;
+  class?: AttrValue | (() => AttrValue);
+  text?: string | (() => string);
 };
 
-export function spec<Element extends HTMLElement>(
-  props?: PropsWithAttrs<Element>
-) {
+export function spec<Element extends HTMLElement>(props?: Props<Element>) {
   if (!props || (state.isCreating && !state.root)) return;
 
   let node: Element;
@@ -54,13 +49,16 @@ export function spec<Element extends HTMLElement>(
   }
 
   for (let key in props) {
-    const reserved = RESERVED_PROPS[key];
+    const reserved = RESERVED[key];
     let value = (props as any)[key];
 
     if (reserved) {
-      reserved(node, value);
+      const result = reserved(node, value);
+      if (result) hasBindings = true;
       continue;
     }
+
+    key = ALIASES[key] || key;
 
     if (typeof value === 'function') {
       hasBindings = true;
@@ -99,10 +97,22 @@ export function spec<Element extends HTMLElement>(
   }
 }
 
-const RESERVED_PROPS = {
+const RESERVED = {
   attrs(node: Node, attrs: Attrs) {
+    let hasBindings = false;
+
     for (let key in attrs) {
-      setupAttr(node, key, attrs[key]);
+      hasBindings = setupAttr(node, key, attrs[key]) || hasBindings;
     }
+
+    return hasBindings;
   },
+
+  class(node: Node, value: any) {
+    return setupAttr(node, 'class', value);
+  },
+} as any;
+
+const ALIASES = {
+  text: 'textContent',
 } as any;
