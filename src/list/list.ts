@@ -180,11 +180,6 @@ function setupList<T>(
               ? mark
               : nodeMap.get(nextEl)!;
 
-          if (position === lisPosition) {
-            --j;
-            continue;
-          }
-
           if (position < 0) {
             insertBefore(
               createListNode(el, mapFn, nodeMap, cleanupMap),
