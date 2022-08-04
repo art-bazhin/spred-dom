@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.10](https://github.com/art-bazhin/spred-dom/compare/v0.5.9...v0.5.10) (2022-08-04)
+
+
+### Features
+
+* add attrs support ([bbcfccf](https://github.com/art-bazhin/spred-dom/commit/bbcfccf9f371fe690247fa70f3a51f3814251f71))
+* add text and class aliases ([5ee1e6a](https://github.com/art-bazhin/spred-dom/commit/5ee1e6adf4ff3d0d1b9066071f571e66f164ee0d))
+
+
+### Tests
+
+* add component fn tests ([5a27995](https://github.com/art-bazhin/spred-dom/commit/5a27995920e7f2a4b8b6c809d0a45ca9838e6b65))
+* add fragment rendering test ([1249df1](https://github.com/art-bazhin/spred-dom/commit/1249df1425713877cb57cfaafc4b017def3c5063))
+* add h function tests ([ec5f383](https://github.com/art-bazhin/spred-dom/commit/ec5f3834c703bcf7cab215e3f4af9914e39df3ac))
+* add list function tests ([5220740](https://github.com/art-bazhin/spred-dom/commit/52207401e9e1febc2335ef9c69db93bcf416bb54))
+* add node fn tests ([f7d8bff](https://github.com/art-bazhin/spred-dom/commit/f7d8bff4a8d4582cff69a7860eab61034fe0cfa7))
+* add text fn tests ([dc355c8](https://github.com/art-bazhin/spred-dom/commit/dc355c83c802adb0a30acd0b0fe2f219a15bc54c))
+* cover missed branches ([bc43c8a](https://github.com/art-bazhin/spred-dom/commit/bc43c8a80cfba7197d847be97415ed9d72193fc2))
+
+
+### Code Refactoring
+
+* remove redundant checks ([7bd49eb](https://github.com/art-bazhin/spred-dom/commit/7bd49eb65a873059ffad1604054dfc721bb98ad8))
+
 ### [0.5.9](https://github.com/art-bazhin/spred-dom/compare/v0.5.8...v0.5.9) (2022-08-03)
 
 
