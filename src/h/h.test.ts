@@ -210,4 +210,24 @@ describe('h function', () => {
     expect(button.className).toBe('foo');
     expect(button.textContent).toBe('bar');
   });
+
+  it('correctly handles ref prop', () => {
+    const button = writable<HTMLButtonElement>();
+
+    const Div = component(() => {
+      h('div', () => {
+        h('button', {
+          id: 'foo',
+          text: 'bar',
+          ref: button,
+        });
+      });
+    });
+
+    const div = Div() as HTMLButtonElement;
+    const b = button();
+
+    expect(b && b.id).toBe('foo');
+    expect(b && b.textContent).toBe('bar');
+  });
 });

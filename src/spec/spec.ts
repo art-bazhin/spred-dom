@@ -29,6 +29,7 @@ export type Props<Element extends HTMLElement> = ElProps<Element> & {
   attrs?: Attrs;
   class?: AttrValue | (() => AttrValue);
   text?: string | (() => string);
+  ref?: (el: Element) => any;
 };
 
 export function spec<Element extends HTMLElement>(props?: Props<Element>) {
@@ -110,6 +111,11 @@ const RESERVED = {
 
   class(node: Node, value: any) {
     return setupAttr(node, 'class', value);
+  },
+
+  ref(node: Node, cb: any) {
+    cb(node);
+    return true;
   },
 } as any;
 
