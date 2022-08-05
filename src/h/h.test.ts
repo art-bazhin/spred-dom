@@ -278,6 +278,36 @@ describe('h function', () => {
     expect(inp2.value).toBe('b');
   });
 
+  it('sets binded values on second render (case 4)', () => {
+    const Div = component((str: () => string) => {
+      h('div', () => {
+        h('div', { id: () => 'test-id' }, () => {
+          h('button', { id: 'btn', text: str });
+        });
+        h('input', {
+          id: str,
+          value: str,
+        });
+      });
+    });
+
+    const div1 = Div(() => 'a') as HTMLDivElement;
+    const inp1 = div1.querySelector('#a') as any;
+    const btn1 = div1.querySelector('#btn') as any;
+
+    expect(inp1).toBeTruthy();
+    expect(inp1.value).toBe('a');
+    expect(btn1.textContent).toBe('a');
+
+    const div2 = Div(() => 'b') as HTMLDivElement;
+    const inp2 = div2.querySelector('#b') as any;
+    const btn2 = div2.querySelector('#btn') as any;
+
+    expect(inp2).toBeTruthy();
+    expect(inp2.value).toBe('b');
+    expect(btn2.textContent).toBe('b');
+  });
+
   it('correctly handles prop aliases', () => {
     const Button = component(() => {
       h('button', {
