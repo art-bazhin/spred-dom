@@ -1,6 +1,6 @@
 import { check, isSignal, memo } from 'spred';
 import { AttrValue, setupAttr, setupSignalProp } from '../dom/dom';
-import { BINDING, next, state } from '../state/state';
+import { BINDING, next, creatingState, traversalState } from '../state/state';
 
 type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
   T
@@ -33,19 +33,18 @@ export type Props<Element extends HTMLElement> = ElProps<Element> & {
 };
 
 export function spec<Element extends HTMLElement>(props?: Props<Element>) {
-  if (!props || (state.isCreating && !state.root)) return;
+  if (!props || (creatingState.isCreating && !creatingState.root)) return;
 
   let node: Element;
   let hasBindings = false;
 
-  if (state.isCreating) {
-    node = state.root! as Element;
+  if (creatingState.isCreating) {
+    node = creatingState.root! as Element;
   } else {
-    const s = state.pathState;
-    if (s.path[s.i] !== BINDING) return;
+    if (traversalState.path[traversalState.i] !== BINDING) return;
 
     next();
-    node = state.pathState.node! as Element;
+    node = traversalState.node! as Element;
   }
 
   for (let key in props) {
@@ -89,11 +88,11 @@ export function spec<Element extends HTMLElement>(props?: Props<Element>) {
       continue;
     }
 
-    if (state.isCreating) (node as any)[key] = value;
+    if (creatingState.isCreating) (node as any)[key] = value;
   }
 
-  if (hasBindings && state.isCreating) {
-    state.path += BINDING;
+  if (hasBindings && creatingState.isCreating) {
+    creatingState.path += BINDING;
   }
 }
 

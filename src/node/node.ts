@@ -1,7 +1,7 @@
 import { memo, isSignal, Signal } from 'spred';
 import { createBinding } from '../create-binding/create-binding';
 import { createMark, insertBefore, removeNodes } from '../dom/dom';
-import { state } from '../state/state';
+import { creatingState } from '../state/state';
 
 type EmptyNode = null | false | undefined;
 
@@ -13,8 +13,8 @@ export function node(
     | (() => Node | EmptyNode)
 ) {
   createBinding((mark) => {
-    if (state.isCreating) {
-      state.setupQueue.push(() => setupNode(binding, mark));
+    if (creatingState.isCreating) {
+      creatingState.setupQueue.push(() => setupNode(binding, mark));
       return;
     }
 

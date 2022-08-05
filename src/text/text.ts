@@ -1,22 +1,29 @@
 import { check } from 'spred';
 import { isSignal, memo } from 'spred';
 import { setupSignalProp } from '../dom/dom';
-import { BINDING, FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
+import {
+  BINDING,
+  FIRST_CHILD,
+  next,
+  PARENT_NODE,
+  creatingState,
+  traversalState,
+} from '../state/state';
 
 export function text(data: string | (() => string)) {
   let node: Node | undefined;
 
-  if (state.isCreating) {
+  if (creatingState.isCreating) {
     node = document.createTextNode('_');
-    state.root!.appendChild(node);
+    creatingState.root!.appendChild(node);
   } else {
     next();
-    node = state.pathState.node!;
+    node = traversalState.node!;
   }
 
   if (typeof data === 'function') {
-    if (state.isCreating) {
-      state.path += FIRST_CHILD + BINDING + PARENT_NODE;
+    if (creatingState.isCreating) {
+      creatingState.path += FIRST_CHILD + BINDING + PARENT_NODE;
     } else next();
 
     if (isSignal(data)) {
@@ -40,8 +47,8 @@ export function text(data: string | (() => string)) {
     return;
   }
 
-  if (state.isCreating) {
-    state.path += FIRST_CHILD + PARENT_NODE;
+  if (creatingState.isCreating) {
+    creatingState.path += FIRST_CHILD + PARENT_NODE;
     node.textContent = data;
   }
 }

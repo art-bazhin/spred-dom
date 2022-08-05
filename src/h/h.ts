@@ -2,7 +2,7 @@ import {
   START_CHILDREN,
   END_CHILDREN,
   next,
-  state,
+  creatingState,
   PARENT_NODE,
   FIRST_CHILD,
 } from '../state/state';
@@ -47,24 +47,24 @@ export function h<TagName extends keyof HTMLElementTagNameMap>(
       break;
   }
 
-  if (state.isCreating) {
+  if (creatingState.isCreating) {
     const child = document.createElement(tag);
 
-    state.root!.appendChild(child);
+    creatingState.root!.appendChild(child);
 
-    state.root = child;
-    state.path += FIRST_CHILD;
+    creatingState.root = child;
+    creatingState.path += FIRST_CHILD;
 
     spec(props);
 
     if (fn) {
-      state.path += START_CHILDREN;
+      creatingState.path += START_CHILDREN;
       fn && fn();
-      state.path += END_CHILDREN;
+      creatingState.path += END_CHILDREN;
     }
 
-    state.path += PARENT_NODE;
-    state.root = state.root!.parentNode;
+    creatingState.path += PARENT_NODE;
+    creatingState.root = creatingState.root!.parentNode;
 
     return;
   }

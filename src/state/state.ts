@@ -1,27 +1,27 @@
-interface State {
+interface CreatingState {
   root: Node | null;
   isCreating: boolean;
   path: string;
-  pathState: {
-    path: string;
-    i: number;
-    node: Node | null;
-  };
-  lastChild: Node | null;
   setupQueue: (() => any)[];
 }
 
-export const state: State = {
+interface TraversalState {
+  path: string;
+  i: number;
+  node: Node | null;
+}
+
+export const creatingState: CreatingState = {
   root: null,
   isCreating: false,
   path: '',
-  pathState: {
-    path: '',
-    i: 0,
-    node: null,
-  },
-  lastChild: null,
   setupQueue: [],
+};
+
+export const traversalState: TraversalState = {
+  path: '',
+  i: 0,
+  node: null,
 };
 
 export const FIRST_CHILD = 'F';
@@ -32,28 +32,27 @@ export const START_CHILDREN = '>';
 export const END_CHILDREN = '<';
 
 export function next(fn?: () => any) {
-  const pathState = state.pathState;
-  const current = pathState.path[pathState.i];
-  const nextValue = pathState.path[++pathState.i];
+  const current = traversalState.path[traversalState.i];
+  const nextValue = traversalState.path[++traversalState.i];
   const goDeeper = nextValue === START_CHILDREN;
 
   switch (current) {
     case FIRST_CHILD:
-      pathState.node = pathState.node!.firstChild;
+      traversalState.node = traversalState.node!.firstChild;
       break;
 
     case NEXT_SIBLING:
-      pathState.node = pathState.node!.nextSibling;
+      traversalState.node = traversalState.node!.nextSibling;
       break;
 
     case PARENT_NODE:
-      pathState.node = pathState.node!.parentNode;
+      traversalState.node = traversalState.node!.parentNode;
       next(fn);
       break;
   }
 
   if (goDeeper) {
-    ++pathState.i;
-    if (fn) fn();
+    ++traversalState.i;
+    fn!();
   }
 }

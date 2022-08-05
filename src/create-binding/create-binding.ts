@@ -1,12 +1,19 @@
 import { createMark } from '../dom/dom';
-import { BINDING, FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
+import {
+  BINDING,
+  FIRST_CHILD,
+  next,
+  PARENT_NODE,
+  creatingState,
+  traversalState,
+} from '../state/state';
 
 export function createBinding(cb: (mark: Node) => any) {
-  if (state.isCreating) {
+  if (creatingState.isCreating) {
     const mark = createMark();
 
-    state.path += FIRST_CHILD + BINDING + PARENT_NODE;
-    state.root!.appendChild(mark);
+    creatingState.path += FIRST_CHILD + BINDING + PARENT_NODE;
+    creatingState.root!.appendChild(mark);
 
     cb(mark);
 
@@ -15,8 +22,7 @@ export function createBinding(cb: (mark: Node) => any) {
 
   next();
 
-  const pathState = state.pathState;
-  const mark = pathState && pathState.node!;
+  const mark = traversalState && traversalState.node!;
 
   cb(mark);
 

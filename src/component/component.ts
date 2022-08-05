@@ -8,7 +8,8 @@ import {
   FIRST_CHILD,
   NEXT_SIBLING,
   PARENT_NODE,
-  state,
+  creatingState,
+  traversalState,
 } from '../state/state';
 
 export function component<A extends unknown[]>(fn: (...args: A) => any) {
@@ -19,8 +20,8 @@ export function component<A extends unknown[]>(fn: (...args: A) => any) {
     let rootNode: Node | null = null;
 
     if (!template) {
-      const prevSetupQueue = state.setupQueue;
-      state.setupQueue = [];
+      const prevSetupQueue = creatingState.setupQueue;
+      creatingState.setupQueue = [];
 
       const data = createComponentData(fn, args);
 
@@ -28,9 +29,9 @@ export function component<A extends unknown[]>(fn: (...args: A) => any) {
       template = data.rootNode.cloneNode(true);
       rootNode = data.rootNode;
 
-      for (let fn of state.setupQueue) fn();
+      for (let fn of creatingState.setupQueue) fn();
 
-      state.setupQueue = prevSetupQueue;
+      creatingState.setupQueue = prevSetupQueue;
     } else {
       rootNode = template.cloneNode(true);
       setupComponent(fn, args, rootNode, pathString);
@@ -52,51 +53,45 @@ function setupComponent<A extends unknown[]>(
   container: Node,
   pathString: string
 ) {
-  const tempPath = state.path;
-  state.path = '';
+  const prevIsCreating = creatingState.isCreating;
+  const prevPath = traversalState.path;
+  const prevIndex = traversalState.i;
+  const prevNode = traversalState.node;
 
-  const tempRoot = state.root!;
-  state.root = container;
-
-  const tempIsCreating = state.isCreating;
-  state.isCreating = false;
-
-  const tempPathState = state.pathState;
-  state.pathState = {
-    path: pathString,
-    i: 0,
-    node: container,
-  };
+  creatingState.isCreating = false;
+  traversalState.path = pathString;
+  traversalState.i = 0;
+  traversalState.node = container;
 
   isolate(fn, args);
 
-  state.pathState = tempPathState;
-  state.isCreating = tempIsCreating;
-  state.path = tempPath;
-  state.root = tempRoot;
+  creatingState.isCreating = prevIsCreating;
+  traversalState.path = prevPath;
+  traversalState.i = prevIndex;
+  traversalState.node = prevNode;
 }
 
 function createComponentData<A extends unknown[]>(
   fn: (...args: A) => any,
   args: A
 ) {
-  const tempPath = state.path;
-  state.path = '';
+  const prevPath = creatingState.path;
+  creatingState.path = '';
 
-  const tempRoot = state.root;
+  const prevRoot = creatingState.root;
   let rootNode: Node = document.createDocumentFragment();
-  state.root = rootNode;
+  creatingState.root = rootNode;
 
-  const tempIsCreating = state.isCreating;
-  state.isCreating = true;
+  const prevIsCreating = creatingState.isCreating;
+  creatingState.isCreating = true;
 
   isolate(fn, args);
 
-  let pathString = getPathString(state.path);
+  let pathString = getPathString(creatingState.path);
 
-  state.isCreating = tempIsCreating;
-  state.path = tempPath;
-  state.root = tempRoot;
+  creatingState.isCreating = prevIsCreating;
+  creatingState.path = prevPath;
+  creatingState.root = prevRoot;
 
   if (rootNode.childNodes.length === 1 && !isMark(rootNode.firstChild)) {
     rootNode = rootNode.firstChild!;
@@ -119,10 +114,10 @@ const PARENT_NODE_REGEX = new RegExp(`${NEXT_SIBLING}+${PARENT_NODE}`, 'g');
 function getPathString(str: string) {
   str = str.replace(NEXT_SIBLING_REGEX, NEXT_SIBLING);
 
-  let temp = '';
+  let prev = '';
 
-  while (temp !== str) {
-    temp = str;
+  while (prev !== str) {
+    prev = str;
     str = str.replace(EMPTY_NESTING_REGEX, '');
   }
 

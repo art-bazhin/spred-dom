@@ -1,5 +1,5 @@
 import { check, isSignal, memo, Signal } from 'spred';
-import { state } from '../state/state';
+import { creatingState } from '../state/state';
 
 export type AttrValue = string | boolean | null | undefined;
 
@@ -62,7 +62,7 @@ export function setupAttr(
     return true;
   }
 
-  if (state.isCreating) setupBaseAttr(node, key, value);
+  if (creatingState.isCreating) setupBaseAttr(node, key, value);
 }
 
 export function setupBaseAttr(node: Node, key: string, value: AttrValue) {
