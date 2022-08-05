@@ -197,6 +197,87 @@ describe('h function', () => {
     expect(button.getAttribute('class')).toBe('');
   });
 
+  it('sets binded values on second render', () => {
+    const Div = component((str: () => string) => {
+      h('div', () => {
+        h('div', () => {
+          h('button', { text: str });
+        });
+        h('input', {
+          id: str,
+          value: str,
+        });
+      });
+    });
+
+    const div1 = Div(() => 'a') as HTMLDivElement;
+    const inp1 = div1.querySelector('#a') as any;
+
+    expect(inp1).toBeTruthy();
+    expect(inp1.value).toBe('a');
+
+    const div2 = Div(() => 'b') as HTMLDivElement;
+    const inp2 = div2.querySelector('#b') as any;
+
+    expect(inp2).toBeTruthy();
+    expect(inp2.value).toBe('b');
+  });
+
+  it('sets binded values on second render (case 2)', () => {
+    const Div = component((str: () => string) => {
+      h('div', () => {
+        h('div', () => {
+          h('button', { text: str });
+        });
+        h('div');
+        h('input', {
+          id: str,
+          value: str,
+        });
+      });
+    });
+
+    const div1 = Div(() => 'a') as HTMLDivElement;
+    const inp1 = div1.querySelector('#a') as any;
+
+    expect(inp1).toBeTruthy();
+    expect(inp1.value).toBe('a');
+
+    const div2 = Div(() => 'b') as HTMLDivElement;
+    const inp2 = div2.querySelector('#b') as any;
+
+    expect(inp2).toBeTruthy();
+    expect(inp2.value).toBe('b');
+  });
+
+  it('sets binded values on second render (case 3)', () => {
+    const Div = component((str: () => string) => {
+      h('div', () => {
+        h('div', () => {
+          h('div', () => {
+            h('button', { text: str });
+          });
+        });
+        h('input', {
+          id: str,
+          value: str,
+        });
+      });
+    });
+
+    const div1 = Div(() => 'a') as HTMLDivElement;
+    const inp1 = div1.querySelector('#a') as any;
+
+    expect(inp1).toBeTruthy();
+    expect(inp1.value).toBe('a');
+
+    const div2 = Div(() => 'b') as HTMLDivElement;
+    const inp2 = div2.querySelector('#b') as any;
+
+    expect(inp2).toBeTruthy();
+    expect(inp2.value).toBe('b');
+  });
+
   it('correctly handles prop aliases', () => {
     const Button = component(() => {
       h('button', {
@@ -212,22 +293,29 @@ describe('h function', () => {
   });
 
   it('correctly handles ref prop', () => {
-    const button = writable<HTMLButtonElement>();
+    let button: any;
 
-    const Div = component(() => {
+    const Div = component((id: () => string) => {
       h('div', () => {
-        h('button', {
-          id: 'foo',
-          text: 'bar',
-          ref: button,
+        h('div', () => {
+          h('div', { text: id });
         });
+        h('button', {
+          id,
+          text: id,
+          ref: (n) => (button = n),
+        });
+        h('span');
       });
     });
 
-    const div = Div() as HTMLButtonElement;
-    const b = button();
+    Div(() => 'foo');
+    expect(button.id).toBe('foo');
+    expect(button.textContent).toBe('foo');
 
-    expect(b && b.id).toBe('foo');
-    expect(b && b.textContent).toBe('bar');
+    // second render test
+    Div(() => 'bar');
+    expect(button.id).toBe('bar');
+    expect(button.textContent).toBe('bar');
   });
 });

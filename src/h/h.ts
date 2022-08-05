@@ -69,8 +69,8 @@ export function h<TagName extends keyof HTMLElementTagNameMap>(
     return;
   }
 
-  spec(props);
   next(fn);
+  spec(props);
 
   return;
 }

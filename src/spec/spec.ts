@@ -42,8 +42,7 @@ export function spec<Element extends HTMLElement>(props?: Props<Element>) {
     node = state.root! as Element;
   } else {
     const s = state.pathState;
-
-    if (s.path[s.i + 1] !== BINDING) return;
+    if (s.path[s.i] !== BINDING) return;
 
     next();
     node = state.pathState.node! as Element;

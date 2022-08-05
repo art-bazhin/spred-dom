@@ -54,6 +54,6 @@ export function next(fn?: () => any) {
 
   if (goDeeper) {
     ++pathState.i;
-    fn && fn();
+    if (fn) fn();
   }
 }
