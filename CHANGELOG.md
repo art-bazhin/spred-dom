@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.13](https://github.com/art-bazhin/spred-dom/compare/v0.5.12...v0.5.13) (2022-08-06)
+
+
+### Bug Fixes
+
+* fix traversal order bug ([f8aabc7](https://github.com/art-bazhin/spred-dom/commit/f8aabc79ef46e69200470b4e8d688976c9bd29a7))
+
+
+### Tests
+
+* add missed prop binding case ([9ea3e55](https://github.com/art-bazhin/spred-dom/commit/9ea3e5561dae741ba45035145edddb4460d98243))
+
 ### [0.5.12](https://github.com/art-bazhin/spred-dom/compare/v0.5.11...v0.5.12) (2022-08-05)
 
 
