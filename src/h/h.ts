@@ -59,7 +59,7 @@ export function h<TagName extends keyof HTMLElementTagNameMap>(
 
     if (fn) {
       creatingState.path += START_CHILDREN;
-      fn && fn();
+      fn();
       creatingState.path += END_CHILDREN;
     }
 
@@ -70,7 +70,7 @@ export function h<TagName extends keyof HTMLElementTagNameMap>(
   }
 
   next(fn);
-  spec(props);
+  spec(props, fn);
 
   return;
 }

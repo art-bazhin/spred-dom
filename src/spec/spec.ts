@@ -32,7 +32,10 @@ export type Props<Element extends HTMLElement> = ElProps<Element> & {
   ref?: (el: Element) => any;
 };
 
-export function spec<Element extends HTMLElement>(props?: Props<Element>) {
+export function spec<Element extends HTMLElement>(
+  props?: Props<Element>,
+  fn?: () => any
+) {
   if (!props || (creatingState.isCreating && !creatingState.root)) return;
 
   let node: Element;
@@ -43,8 +46,8 @@ export function spec<Element extends HTMLElement>(props?: Props<Element>) {
   } else {
     if (traversalState.path[traversalState.i] !== BINDING) return;
 
-    next();
     node = traversalState.node! as Element;
+    next(fn);
   }
 
   for (let key in props) {

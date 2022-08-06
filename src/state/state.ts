@@ -51,8 +51,8 @@ export function next(fn?: () => any) {
       break;
   }
 
-  if (goDeeper) {
+  if (goDeeper && fn) {
     ++traversalState.i;
-    fn!();
+    fn();
   }
 }
