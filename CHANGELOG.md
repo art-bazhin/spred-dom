@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.0](https://github.com/art-bazhin/spred-dom/compare/v0.5.13...v0.6.0) (2022-08-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* fn props and attrs are not turned into a signal automatically
+
+### Features
+
+* do not turn fn props and attrs into signal ([eeb35c3](https://github.com/art-bazhin/spred-dom/commit/eeb35c312c5c74732d952ec77b86d69dd5cb60cf))
+
 ### [0.5.13](https://github.com/art-bazhin/spred-dom/compare/v0.5.12...v0.5.13) (2022-08-06)
 
 
