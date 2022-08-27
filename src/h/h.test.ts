@@ -86,21 +86,21 @@ describe('h function', () => {
     expect(button.textContent).toBe('after');
   });
 
-  it('turns the fn prop value into a signal if it has signal calls', () => {
-    const val = writable('before');
-    const textContent = () => val();
+  // it('turns the fn prop value into a signal if it has signal calls', () => {
+  //   const val = writable('before');
+  //   const textContent = () => val();
 
-    const Button = component(() => {
-      h('button', { textContent });
-    });
+  //   const Button = component(() => {
+  //     h('button', { textContent });
+  //   });
 
-    const button = Button() as HTMLButtonElement;
+  //   const button = Button() as HTMLButtonElement;
 
-    expect(button.textContent).toBe('before');
+  //   expect(button.textContent).toBe('before');
 
-    val('after');
-    expect(button.textContent).toBe('after');
-  });
+  //   val('after');
+  //   expect(button.textContent).toBe('after');
+  // });
 
   it('can set element attrs', () => {
     const Button = component(() => {
@@ -166,36 +166,36 @@ describe('h function', () => {
     expect(button.getAttribute('class')).toBe('');
   });
 
-  it('turns the fn attr value into a signal if it has signal calls', () => {
-    const value = writable<any>('foo');
+  // it('turns the fn attr value into a signal if it has signal calls', () => {
+  //   const value = writable<any>('foo');
 
-    const Button = component(() => {
-      h('button', {
-        attrs: {
-          class: () => value(),
-          'data-foo': 'bar',
-        },
-      });
-    });
+  //   const Button = component(() => {
+  //     h('button', {
+  //       attrs: {
+  //         class: () => value(),
+  //         'data-foo': 'bar',
+  //       },
+  //     });
+  //   });
 
-    Button();
-    const button = Button() as HTMLButtonElement; // second render test
+  //   Button();
+  //   const button = Button() as HTMLButtonElement; // second render test
 
-    expect(button.getAttribute('class')).toBe('foo');
-    expect(button.getAttribute('data-foo')).toBe('bar');
+  //   expect(button.getAttribute('class')).toBe('foo');
+  //   expect(button.getAttribute('data-foo')).toBe('bar');
 
-    value(null);
-    expect(button.getAttribute('class')).toBe(null);
+  //   value(null);
+  //   expect(button.getAttribute('class')).toBe(null);
 
-    value('bar');
-    expect(button.getAttribute('class')).toBe('bar');
+  //   value('bar');
+  //   expect(button.getAttribute('class')).toBe('bar');
 
-    value(false);
-    expect(button.getAttribute('class')).toBe(null);
+  //   value(false);
+  //   expect(button.getAttribute('class')).toBe(null);
 
-    value(true);
-    expect(button.getAttribute('class')).toBe('');
-  });
+  //   value(true);
+  //   expect(button.getAttribute('class')).toBe('');
+  // });
 
   it('sets binded values on second render', () => {
     const Div = component((str: () => string) => {

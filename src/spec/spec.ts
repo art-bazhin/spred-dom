@@ -1,4 +1,4 @@
-import { check, isSignal, memo } from 'spred';
+import { isSignal } from 'spred';
 import { AttrValue, setupAttr, setupSignalProp } from '../dom/dom';
 import { BINDING, next, creatingState, traversalState } from '../state/state';
 
@@ -75,18 +75,7 @@ export function spec<Element extends HTMLElement>(
         continue;
       }
 
-      let v: any;
-
-      const hasSignalCalls = check(() => {
-        v = value();
-      });
-
-      if (hasSignalCalls) {
-        setupSignalProp(node, key, memo(value));
-        continue;
-      }
-
-      (node as any)[key] = v;
+      (node as any)[key] = value();
 
       continue;
     }

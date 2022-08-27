@@ -1,4 +1,4 @@
-import { check, isSignal, memo, Signal } from 'spred';
+import { isSignal, Signal } from 'spred';
 import { creatingState } from '../state/state';
 
 export type AttrValue = string | boolean | null | undefined;
@@ -48,17 +48,7 @@ export function setupAttr(
       return true;
     }
 
-    let v: any;
-    const hasSignalCalls = check(() => {
-      v = (value as any)();
-    });
-
-    if (hasSignalCalls) {
-      setupSignalAttr(node, key, memo(value));
-      return true;
-    }
-
-    setupBaseAttr(node, key, v);
+    setupBaseAttr(node, key, value());
     return true;
   }
 
