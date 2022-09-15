@@ -60,7 +60,7 @@ describe('text function', () => {
     expect(test.childNodes[0].textContent).toBe('b');
   });
 
-  it('turns the fn value into a signal if it has signal calls', () => {
+  it('turns the fn value into a signal', () => {
     const value = writable('a');
 
     const Test = component(() => {

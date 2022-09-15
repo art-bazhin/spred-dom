@@ -1,4 +1,3 @@
-import { check } from 'spred';
 import { isSignal, memo } from 'spred';
 import { setupSignalProp } from '../dom/dom';
 import {
@@ -26,23 +25,7 @@ export function text(data: string | (() => string)) {
       creatingState.path += FIRST_CHILD + BINDING + PARENT_NODE;
     } else next();
 
-    if (isSignal(data)) {
-      setupSignalProp(node, 'textContent', data);
-      return;
-    }
-
-    let value: any;
-
-    const hasSignalCalls = check(() => {
-      value = (data as any)();
-    });
-
-    if (hasSignalCalls) {
-      setupSignalProp(node, 'textContent', memo(data));
-      return;
-    }
-
-    node.textContent = value;
+    setupSignalProp(node, 'textContent', isSignal(data) ? data : memo(data));
 
     return;
   }
