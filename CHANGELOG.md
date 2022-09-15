@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.7.0](https://github.com/art-bazhin/spred-dom/compare/v0.6.0...v0.7.0) (2022-09-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* **component:** component fn should return h call result
+
+### Features
+
+* automatically turn fn props into signals ([7e984ff](https://github.com/art-bazhin/spred-dom/commit/7e984ff548971c98eda7812e7c71c24f3bd334d9))
+* **component:** add component fn return types ([0b08b3b](https://github.com/art-bazhin/spred-dom/commit/0b08b3b90a4ff78588c04916c8232c7a39e3fb09))
+
 ## [0.6.0](https://github.com/art-bazhin/spred-dom/compare/v0.5.13...v0.6.0) (2022-08-27)
 
 
