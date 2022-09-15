@@ -5,12 +5,12 @@ import { text } from './text';
 
 describe('text function', () => {
   it('creates text node inside component template', () => {
-    const Test = component(() => {
+    const Test = component(() =>
       h('div', () => {
         text('a');
         text('b');
-      });
-    });
+      })
+    );
 
     const test = Test();
 
@@ -22,11 +22,11 @@ describe('text function', () => {
   });
 
   it('can use fn as node data', () => {
-    const Test = component(() => {
+    const Test = component(() =>
       h('div', () => {
         text(() => 'a');
-      });
-    });
+      })
+    );
 
     let test = Test();
 
@@ -45,7 +45,7 @@ describe('text function', () => {
     const value = writable('a');
 
     const Test = component(() => {
-      h('div', () => {
+      return h('div', () => {
         text(value);
       });
     });
@@ -64,7 +64,7 @@ describe('text function', () => {
     const value = writable('a');
 
     const Test = component(() => {
-      h('div', () => {
+      return h('div', () => {
         text(() => value());
       });
     });

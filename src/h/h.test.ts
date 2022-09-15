@@ -4,37 +4,33 @@ import { h } from './h';
 
 describe('h function', () => {
   it('creates element node inside component template', () => {
-    const Span = component(() => {
-      h('span');
-    }) as () => HTMLSpanElement;
+    const Span = component(() => h('span'));
 
     expect(Span().tagName).toBe('SPAN');
   });
 
   it('can receive element props as second argument', () => {
-    const Span = component(() => {
-      h('span', { textContent: 'test' });
-    }) as () => HTMLSpanElement;
+    const Span = component(() => h('span', { textContent: 'test' }));
 
     expect(Span().textContent).toBe('test');
   });
 
   it('can receive children template fn as second argument', () => {
-    const Span = component(() => {
+    const Span = component(() =>
       h('span', () => {
         h('span');
-      });
-    }) as () => HTMLSpanElement;
+      })
+    );
 
     expect(Span().innerHTML).toBe('<span></span>');
   });
 
   it('can receive element props as second argument and children template fn as third argument', () => {
-    const Span = component(() => {
+    const Span = component(() =>
       h('span', { className: 'test' }, () => {
         h('span');
-      });
-    }) as () => HTMLSpanElement;
+      })
+    );
 
     expect(Span().outerHTML).toBe('<span class="test"><span></span></span>');
   });
@@ -42,11 +38,9 @@ describe('h function', () => {
   it('can set element event handlers', () => {
     const onclick = jest.fn();
 
-    const Button = component(() => {
-      h('button', { onclick });
-    });
+    const Button = component(() => h('button', { onclick }));
 
-    const button = Button() as HTMLButtonElement;
+    const button = Button();
 
     button.click();
     expect(onclick).toBeCalledTimes(1);
@@ -58,15 +52,15 @@ describe('h function', () => {
   it('can use functions as element props', () => {
     const textContent = () => 'text';
 
-    const Button = component(() => {
-      h('button', { textContent, type: 'button' });
-    });
+    const Button = component(() =>
+      h('button', { textContent, type: 'button' })
+    );
 
-    let button = Button() as HTMLButtonElement;
+    let button = Button();
     expect(button.textContent).toBe('text');
     expect(button.type).toBe('button');
 
-    button = Button() as HTMLButtonElement; // second render test
+    button = Button(); // second render test
     expect(button.textContent).toBe('text');
     expect(button.type).toBe('button');
   });
@@ -74,11 +68,9 @@ describe('h function', () => {
   it('can use signals as element props', () => {
     const textContent = writable('before');
 
-    const Button = component(() => {
-      h('button', { textContent });
-    });
+    const Button = component(() => h('button', { textContent }));
 
-    const button = Button() as HTMLButtonElement;
+    const button = Button();
 
     expect(button.textContent).toBe('before');
 
@@ -90,11 +82,9 @@ describe('h function', () => {
     const val = writable('before');
     const textContent = () => val();
 
-    const Button = component(() => {
-      h('button', { textContent });
-    });
+    const Button = component(() => h('button', { textContent }));
 
-    const button = Button() as HTMLButtonElement;
+    const button = Button();
 
     expect(button.textContent).toBe('before');
 
@@ -103,7 +93,7 @@ describe('h function', () => {
   });
 
   it('can set element attrs', () => {
-    const Button = component(() => {
+    const Button = component(() =>
       h('button', {
         attrs: {
           class: 'test',
@@ -113,10 +103,10 @@ describe('h function', () => {
           null: null, // handle falsy attrs
           undefined: undefined, // handle falsy attrs
         },
-      });
-    });
+      })
+    );
 
-    const button = Button() as HTMLButtonElement;
+    const button = Button();
 
     expect(button.getAttribute('class')).toBe('test');
     expect(button.getAttribute('data-foo')).toBe('bar');
@@ -127,30 +117,30 @@ describe('h function', () => {
   });
 
   it('can use fn as element attr value', () => {
-    const Button = component(() => {
+    const Button = component(() =>
       h('button', {
         attrs: {
           class: () => 'test',
         },
-      });
-    });
+      })
+    );
 
-    const button = Button() as HTMLButtonElement;
+    const button = Button();
     expect(button.getAttribute('class')).toBe('test');
   });
 
   it('can use signal as element attr value', () => {
     const value = writable<any>('foo');
 
-    const Button = component(() => {
+    const Button = component(() =>
       h('button', {
         attrs: {
           class: value,
         },
-      });
-    });
+      })
+    );
 
-    const button = Button() as HTMLButtonElement;
+    const button = Button();
     expect(button.getAttribute('class')).toBe('foo');
 
     value(null);
@@ -169,17 +159,17 @@ describe('h function', () => {
   it('turns the fn attr value into a signal', () => {
     const value = writable<any>('foo');
 
-    const Button = component(() => {
+    const Button = component(() =>
       h('button', {
         attrs: {
           class: () => value(),
           'data-foo': 'bar',
         },
-      });
-    });
+      })
+    );
 
     Button();
-    const button = Button() as HTMLButtonElement; // second render test
+    const button = Button(); // second render test
 
     expect(button.getAttribute('class')).toBe('foo');
     expect(button.getAttribute('data-foo')).toBe('bar');
@@ -198,7 +188,7 @@ describe('h function', () => {
   });
 
   it('sets binded values on second render', () => {
-    const Div = component((str: () => string) => {
+    const Div = component((str: () => string) =>
       h('div', () => {
         h('div', () => {
           h('button', { text: str });
@@ -207,16 +197,16 @@ describe('h function', () => {
           id: str,
           value: str,
         });
-      });
-    });
+      })
+    );
 
-    const div1 = Div(() => 'a') as HTMLDivElement;
+    const div1 = Div(() => 'a');
     const inp1 = div1.querySelector('#a') as any;
 
     expect(inp1).toBeTruthy();
     expect(inp1.value).toBe('a');
 
-    const div2 = Div(() => 'b') as HTMLDivElement;
+    const div2 = Div(() => 'b');
     const inp2 = div2.querySelector('#b') as any;
 
     expect(inp2).toBeTruthy();
@@ -224,7 +214,7 @@ describe('h function', () => {
   });
 
   it('sets binded values on second render (case 2)', () => {
-    const Div = component((str: () => string) => {
+    const Div = component((str: () => string) =>
       h('div', () => {
         h('div', () => {
           h('button', { text: str });
@@ -234,16 +224,16 @@ describe('h function', () => {
           id: str,
           value: str,
         });
-      });
-    });
+      })
+    );
 
-    const div1 = Div(() => 'a') as HTMLDivElement;
+    const div1 = Div(() => 'a');
     const inp1 = div1.querySelector('#a') as any;
 
     expect(inp1).toBeTruthy();
     expect(inp1.value).toBe('a');
 
-    const div2 = Div(() => 'b') as HTMLDivElement;
+    const div2 = Div(() => 'b');
     const inp2 = div2.querySelector('#b') as any;
 
     expect(inp2).toBeTruthy();
@@ -251,7 +241,7 @@ describe('h function', () => {
   });
 
   it('sets binded values on second render (case 3)', () => {
-    const Div = component((str: () => string) => {
+    const Div = component((str: () => string) =>
       h('div', () => {
         h('div', () => {
           h('div', () => {
@@ -262,16 +252,16 @@ describe('h function', () => {
           id: str,
           value: str,
         });
-      });
-    });
+      })
+    );
 
-    const div1 = Div(() => 'a') as HTMLDivElement;
+    const div1 = Div(() => 'a');
     const inp1 = div1.querySelector('#a') as any;
 
     expect(inp1).toBeTruthy();
     expect(inp1.value).toBe('a');
 
-    const div2 = Div(() => 'b') as HTMLDivElement;
+    const div2 = Div(() => 'b');
     const inp2 = div2.querySelector('#b') as any;
 
     expect(inp2).toBeTruthy();
@@ -279,7 +269,7 @@ describe('h function', () => {
   });
 
   it('sets binded values on second render (case 4)', () => {
-    const Div = component((str: () => string) => {
+    const Div = component((str: () => string) =>
       h('div', () => {
         h('div', { id: () => 'test-id' }, () => {
           h('button', { id: 'btn', text: str });
@@ -288,10 +278,10 @@ describe('h function', () => {
           id: str,
           value: str,
         });
-      });
-    });
+      })
+    );
 
-    const div1 = Div(() => 'a') as HTMLDivElement;
+    const div1 = Div(() => 'a');
     const inp1 = div1.querySelector('#a') as any;
     const btn1 = div1.querySelector('#btn') as any;
 
@@ -299,7 +289,7 @@ describe('h function', () => {
     expect(inp1.value).toBe('a');
     expect(btn1.textContent).toBe('a');
 
-    const div2 = Div(() => 'b') as HTMLDivElement;
+    const div2 = Div(() => 'b');
     const inp2 = div2.querySelector('#b') as any;
     const btn2 = div2.querySelector('#btn') as any;
 
@@ -309,14 +299,14 @@ describe('h function', () => {
   });
 
   it('correctly handles prop aliases', () => {
-    const Button = component(() => {
+    const Button = component(() =>
       h('button', {
         class: 'foo',
         text: 'bar',
-      });
-    });
+      })
+    );
 
-    const button = Button() as HTMLButtonElement;
+    const button = Button();
 
     expect(button.className).toBe('foo');
     expect(button.textContent).toBe('bar');
@@ -325,7 +315,7 @@ describe('h function', () => {
   it('correctly handles ref prop', () => {
     let button: any;
 
-    const Div = component((id: () => string) => {
+    const Div = component((id: () => string) =>
       h('div', () => {
         h('div', () => {
           h('div', { text: id });
@@ -336,8 +326,8 @@ describe('h function', () => {
           ref: (n) => (button = n),
         });
         h('span');
-      });
-    });
+      })
+    );
 
     Div(() => 'foo');
     expect(button.id).toBe('foo');
@@ -347,5 +337,12 @@ describe('h function', () => {
     Div(() => 'bar');
     expect(button.id).toBe('bar');
     expect(button.textContent).toBe('bar');
+  });
+
+  it('correctly handles fragments', () => {
+    const Fragment = component(() => h(() => {}));
+    const fragment = Fragment();
+
+    expect(fragment.nodeType).toBe(Node.DOCUMENT_FRAGMENT_NODE);
   });
 });

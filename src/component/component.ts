@@ -11,14 +11,15 @@ import {
   creatingState,
   traversalState,
 } from '../state/state';
+import { TemplateResult } from '../template-result/template-result';
 
-export function component<A extends unknown[]>(fn: (...args: A) => any) {
+export function component<A extends unknown[], N extends Node>(
+  fn: (...args: A) => TemplateResult<N>
+) {
   let template: Node | null = null;
   let pathString = '';
 
-  return function (...args: A) {
-    let rootNode: Node | null = null;
-
+  return function (...args: A): N {
     if (!template) {
       const prevSetupQueue = creatingState.setupQueue;
       creatingState.setupQueue = [];
@@ -27,15 +28,16 @@ export function component<A extends unknown[]>(fn: (...args: A) => any) {
 
       pathString = data.pathString;
       template = data.rootNode.cloneNode(true);
-      rootNode = data.rootNode;
 
       for (let fn of creatingState.setupQueue) fn();
 
       creatingState.setupQueue = prevSetupQueue;
-    } else {
-      rootNode = template.cloneNode(true);
-      setupComponent(fn, args, rootNode, pathString);
+
+      return data.rootNode as N;
     }
+
+    const rootNode = template.cloneNode(true) as N;
+    setupComponent(fn, args, rootNode, pathString);
 
     return rootNode;
   };
