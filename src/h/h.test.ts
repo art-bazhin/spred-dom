@@ -312,6 +312,29 @@ describe('h function', () => {
     expect(button.textContent).toBe('bar');
   });
 
+  it('correctly handles class prop with object value', () => {
+    const Button = component(() =>
+      h('button', {
+        class: {
+          foo: 'true',
+          bar: () => true,
+        },
+      })
+    );
+
+    expect(Button().className).toBe('foo bar');
+  });
+
+  it('correctly handles class prop with array value', () => {
+    const Button = component(() =>
+      h('button', {
+        class: ['foo', () => 'bar'],
+      })
+    );
+
+    expect(Button().className).toBe('foo bar');
+  });
+
   it('correctly handles ref prop', () => {
     let button: any;
 

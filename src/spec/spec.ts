@@ -1,4 +1,5 @@
 import { isSignal, memo } from 'spred';
+import { ClassMap, ClassName, fromArray, fromObject } from '../classes/classes';
 import { AttrValue, setupAttr, setupSignalProp } from '../dom/dom';
 import { BINDING, next, creatingState, traversalState } from '../state/state';
 
@@ -27,7 +28,7 @@ type ElProps<Element extends HTMLElement> = {
 
 export type Props<Element extends HTMLElement> = ElProps<Element> & {
   attrs?: Attrs;
-  class?: AttrValue | (() => AttrValue);
+  class?: AttrValue | (() => AttrValue) | ClassMap | ClassName[];
   text?: string | (() => string);
   ref?: (el: Element) => any;
 };
@@ -94,6 +95,10 @@ const RESERVED = {
   },
 
   class(node: Node, value: any) {
+    if (typeof value === 'object') {
+      value = Array.isArray(value) ? fromArray(value) : fromObject(value);
+    }
+
     return setupAttr(node, 'class', value);
   },
 

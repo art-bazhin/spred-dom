@@ -1,11 +1,13 @@
 import { memo, Signal } from 'spred';
 import { Falsy } from '../dom/dom';
 
+export type ClassMap = Record<string, unknown>;
+
 export type ClassName =
   | Falsy
   | string
   | (() => Falsy | string)
-  | Record<string, unknown>
+  | ClassMap
   | ClassName[];
 
 export function classes(
@@ -21,7 +23,7 @@ export function classes() {
   return result;
 }
 
-export function fromObject(obj: Record<string, unknown>) {
+export function fromObject(obj: ClassMap) {
   let dynamic: string[] | undefined;
   let result = '';
 
