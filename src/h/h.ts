@@ -61,7 +61,7 @@ export function h(first: any, second?: any, third?: any) {
   }
 
   if (!tag) {
-    if (fn) fn();
+    fn!();
     return TEMPLATE_RESULT;
   }
 

@@ -3,5 +3,6 @@ import { h } from './h/h';
 import { text } from './text/text';
 import { node } from './node/node';
 import { list } from './list/list';
+import { classes } from './classes/classes';
 
-export { h, component, templateFn, text, node, list };
+export { h, component, templateFn, text, node, list, classes };
