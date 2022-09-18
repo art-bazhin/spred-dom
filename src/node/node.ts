@@ -1,16 +1,10 @@
 import { memo, isSignal, Signal } from 'spred';
 import { createBinding } from '../create-binding/create-binding';
-import { createMark, insertBefore, removeNodes } from '../dom/dom';
+import { createMark, Falsy, insertBefore, removeNodes } from '../dom/dom';
 import { creatingState } from '../state/state';
 
-type EmptyNode = null | false | undefined;
-
 export function node(
-  binding:
-    | Node
-    | EmptyNode
-    | Signal<Node | EmptyNode>
-    | (() => Node | EmptyNode)
+  binding: Node | Falsy | Signal<Node | Falsy> | (() => Node | Falsy)
 ) {
   createBinding((mark) => {
     if (creatingState.isCreating) {
@@ -23,11 +17,7 @@ export function node(
 }
 
 function setupNode(
-  binding:
-    | Node
-    | EmptyNode
-    | Signal<Node | EmptyNode>
-    | (() => Node | EmptyNode),
+  binding: Node | Falsy | Signal<Node | Falsy> | (() => Node | Falsy),
   mark: Node | null
 ) {
   if (!mark || !binding) return;
@@ -45,7 +35,7 @@ function setupNode(
   insertBefore(binding, mark);
 }
 
-function setupSignalNode(binding: Signal<Node | EmptyNode>, mark: Node) {
+function setupSignalNode(binding: Signal<Node | Falsy>, mark: Node) {
   let start = mark.previousSibling;
 
   if (!start) {

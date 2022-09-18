@@ -1,7 +1,8 @@
 import { isSignal, memo, Signal } from 'spred';
 import { creatingState } from '../state/state';
 
-export type AttrValue = string | boolean | null | undefined;
+export type Falsy = null | undefined | false | 0 | '';
+export type AttrValue = string | true | Falsy;
 
 export function insertBefore(child: Node, mark: Node, parentNode?: Node) {
   const parent = parentNode || mark.parentNode;
@@ -51,12 +52,12 @@ export function setupAttr(
 }
 
 export function setupBaseAttr(node: Node, key: string, value: AttrValue) {
-  if (value === null || value === false || value === undefined) {
+  if (value === true || value === '') {
+    value = '';
+  } else if (!value) {
     (node as Element).removeAttribute(key);
     return;
   }
-
-  if (value === true) value = '';
 
   (node as Element).setAttribute(key, value);
 }
