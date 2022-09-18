@@ -9,7 +9,7 @@ describe('ssr', () => {
     const innerBox = { value: 'none' };
 
     const TestComponent = component(() => {
-      env.await(() => Promise.resolve('foo').then((v) => (box.value = v)));
+      // env.await(() => Promise.resolve('foo').then((v) => (box.value = v)));
 
       return h('div', () => {
         h('span', { text: () => box.value });
@@ -18,7 +18,7 @@ describe('ssr', () => {
     });
 
     const InnerComponent = component(() => {
-      env.await(() => Promise.resolve('bar').then((v) => (innerBox.value = v)));
+      // env.await(() => Promise.resolve('bar').then((v) => (innerBox.value = v)));
 
       return h('div', () => {
         h('span', { text: () => innerBox.value });

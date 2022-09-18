@@ -1,11 +1,13 @@
 import { Signal } from 'spred';
 import { Falsy } from '../dom/dom';
 
-export type SSRPart = string | (() => Promise<SSRPart[]>);
+export type SSRPart = string | (() => Promise<string>);
 
 interface SSRState {
   ssr: boolean;
   parts: SSRPart[];
+  str: string;
+  i: number;
   shouldRender: boolean;
   promise: (() => Promise<string>) | null;
   h: typeof h;
@@ -15,19 +17,21 @@ interface SSRState {
 
 export const ssrState: SSRState = {
   ssr: false,
-  parts: createParts(),
+  i: 0,
+  str: '',
+  parts: [],
 } as any;
 
 export async function renderToString(Component: () => Node) {
   initSSR();
 
-  const res = Component() as any;
-  const parts = res.__ssr__ === 2 ? await res() : res;
+  const value = Component() as any;
+  const res =
+    typeof value === 'function' ? await value() : buildStringFromParts(value);
 
-  return buildStringFromParts(parts).then((str) => {
-    ssrState.ssr = false;
-    return str;
-  });
+  ssrState.ssr = false;
+
+  return res;
 }
 
 export const env = Object.freeze({
@@ -49,7 +53,9 @@ export const env = Object.freeze({
 });
 
 function initSSR() {
-  ssrState.parts = createParts();
+  ssrState.i = 0;
+  ssrState.str = '';
+  ssrState.parts = [''];
   ssrState.ssr = true;
   ssrState.shouldRender = true;
   ssrState.h = h;
@@ -57,21 +63,23 @@ function initSSR() {
   ssrState.node = node;
 }
 
-function createParts() {
-  const parts: any = [];
-  parts.__ssr__ = 1;
-  return parts;
-}
+// function createParts() {
+//   const parts: any = [];
+//   parts.__ssr__ = 1;
+//   return parts;
+// }
 
 function createTemplate<A extends unknown[]>(fn: (...args: A) => any) {
   return (...args: A) => {
-    // if (!ssrState.shouldRender) return;
-    // ssrState.shouldRender = false;
-
+    const prevI = ssrState.i;
     const prevParts = ssrState.parts;
 
-    ssrState.parts = createParts();
+    ssrState.i = 0;
+    ssrState.parts = [''];
+
     const res = fn(...args);
+
+    ssrState.i = prevI;
     ssrState.parts = prevParts;
 
     return res;
@@ -85,10 +93,7 @@ async function buildStringFromParts(parts: SSRPart[]): Promise<any> {
     if (typeof part === 'string') {
       result += part;
     } else {
-      const nextPart = typeof part === 'function' ? await part() : part;
-      const nextResult = await buildStringFromParts(nextPart);
-
-      result += nextResult;
+      result += await part();
     }
   }
 
@@ -96,12 +101,27 @@ async function buildStringFromParts(parts: SSRPart[]): Promise<any> {
 }
 
 function node(value: any) {
-  if (!value.__ssr__ && typeof value === 'function') {
-    value = value();
-  }
+  // if (typeof value === 'function') {
+  //   if (value.__ssr__) {
+  //   } else {
+  //     value = value();
+  //   }
+  // }
+
+  // console.log(value);
+  add('<!--[-->');
+
+  // if (typeof value === 'function') {
+  //   if (value.__ssr__) {
+  //     ssrState.parts.push(ssrState.str);
+  //     ssrState.parts.push(value);
+  //     ssrState.str = '';
+  //   }
+  // }
 
   add(value);
-  add('<!---->');
+
+  add('<!--]-->');
 }
 
 function h(tag?: string, props?: Record<string, any>, fn?: () => any) {
@@ -112,16 +132,19 @@ function h(tag?: string, props?: Record<string, any>, fn?: () => any) {
   if (promise) {
     const res: any = async () => {
       const prevParts = ssrState.parts;
-      const parts: SSRPart[] = createParts();
+      const prevI = ssrState.i;
+      const parts = [''];
 
+      ssrState.i = 0;
       ssrState.parts = parts;
 
       await promise();
       hSync(tag, props, fn);
 
       ssrState.parts = prevParts;
+      ssrState.i = prevI;
 
-      return parts;
+      return buildStringFromParts(parts);
     };
 
     res.__ssr__ = 2;
@@ -172,5 +195,6 @@ function attrs(props?: Record<string, any>) {
 }
 
 function add(value: any) {
-  ssrState.parts.push(value);
+  const i = ssrState.i;
+  ssrState.parts[i] += value;
 }

@@ -4,9 +4,21 @@ const box = { value: 'none' };
 const innerBox = { value: 'none' };
 
 const TestComponent = component(() => {
-  env.await(() => Promise.resolve('foo').then((v) => (box.value = v)));
+  // env.await(() => Promise.resolve('foo').then((v) => (box.value = v)));
 
   return h('div', () => {
+    h('span', { text: () => box.value });
+    node(InnerComponent());
+    h('span', { text: () => box.value });
+    node(InnerComponent());
+    h('span', { text: () => box.value });
+    node(InnerComponent());
+    h('span', { text: () => box.value });
+    node(InnerComponent());
+    h('span', { text: () => box.value });
+    node(InnerComponent());
+    h('span', { text: () => box.value });
+    node(InnerComponent());
     h('span', { text: () => box.value });
     node(InnerComponent());
     h('span', { text: () => box.value });
@@ -17,14 +29,14 @@ const TestComponent = component(() => {
 });
 
 const InnerComponent = component(() => {
-  env.await(() => Promise.resolve('bar').then((v) => (innerBox.value = v)));
+  // env.await(() => Promise.resolve('bar').then((v) => (innerBox.value = v)));
 
   return h('div', () => {
     h('span', { text: () => innerBox.value });
   });
 });
 
-async function bench(count = 10000) {
+async function bench(count = 30) {
   const ts = performance.now();
   const promises = [];
 
