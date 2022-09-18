@@ -1,11 +1,14 @@
 import { memo, isSignal, Signal } from 'spred';
 import { createBinding } from '../create-binding/create-binding';
 import { createMark, Falsy, insertBefore, removeNodes } from '../dom/dom';
+import { ssrState } from '../ssr/ssr';
 import { creatingState } from '../state/state';
 
 export function node(
   binding: Node | Falsy | Signal<Node | Falsy> | (() => Node | Falsy)
 ) {
+  if (ssrState.ssr) return ssrState.addMark();
+
   createBinding((mark) => {
     if (creatingState.isCreating) {
       creatingState.setupQueue.push(() => setupNode(binding, mark));

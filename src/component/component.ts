@@ -1,6 +1,7 @@
 import { isolate } from 'spred';
 import { isMark } from '../dom/dom';
 import { node } from '../node/node';
+import { SSRPart, ssrState } from '../ssr/ssr';
 import {
   BINDING,
   START_CHILDREN,
@@ -17,9 +18,15 @@ export function component<A extends unknown[], N extends Node>(
   fn: (...args: A) => TemplateResult<N>
 ) {
   let template: Node | null = null;
+  let ssrTemplate: ((...args: A) => string) | null = null;
   let pathString = '';
 
   return function (...args: A): N {
+    if (ssrState.ssr) {
+      if (!ssrTemplate) ssrTemplate = ssrState.createTemplate(fn, args);
+      return ssrTemplate(...args) as any;
+    }
+
     if (!template) {
       const prevSetupQueue = creatingState.setupQueue;
       creatingState.setupQueue = [];

@@ -11,6 +11,7 @@ import {
   TemplateResult,
   TEMPLATE_RESULT,
 } from '../template-result/template-result';
+import { ssrState } from '../ssr/ssr';
 
 export function h<TagName extends keyof HTMLElementTagNameMap>(
   tag: TagName
@@ -59,6 +60,8 @@ export function h(first: any, second?: any, third?: any) {
       fn = third;
       break;
   }
+
+  if (ssrState.ssr) return ssrState.h(tag, props, fn);
 
   if (!tag) {
     fn!();
