@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.1](https://github.com/art-bazhin/spred-dom/compare/v0.7.0...v0.7.1) (2022-09-18)
+
+
+### Features
+
+* **classes:** add classes function ([56e702a](https://github.com/art-bazhin/spred-dom/commit/56e702a3c390494b20ef886194bfaeefbaa37243))
+* **h:** use an object or an array as class prop value ([83d4908](https://github.com/art-bazhin/spred-dom/commit/83d4908cafd290ece972cf4b55d5d5c39baacd59))
+
+
+### Build System
+
+* **tsconfig:** change target to ESNEXT ([e0f1344](https://github.com/art-bazhin/spred-dom/commit/e0f134407618874932ba3e4b6683328878f0f5d9))
+
+
+### Code Refactoring
+
+* use one common type for falsy dom values ([dcf62a5](https://github.com/art-bazhin/spred-dom/commit/dcf62a5a11f46857f5d7c30f97ec855be31ca4f9))
+
 ## [0.7.0](https://github.com/art-bazhin/spred-dom/compare/v0.6.0...v0.7.0) (2022-09-15)
 
 
