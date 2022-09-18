@@ -7,7 +7,7 @@ import { creatingState } from '../state/state';
 export function node(
   binding: Node | Falsy | Signal<Node | Falsy> | (() => Node | Falsy)
 ) {
-  if (ssrState.ssr) return ssrState.addMark();
+  if (ssrState.ssr) return ssrState.node(binding);
 
   createBinding((mark) => {
     if (creatingState.isCreating) {
