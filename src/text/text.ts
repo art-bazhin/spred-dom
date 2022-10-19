@@ -1,4 +1,4 @@
-import { isSignal, memo } from 'spred';
+import { isSignal, computed } from 'spred';
 import { setupSignalProp } from '../dom/dom';
 import {
   BINDING,
@@ -25,7 +25,11 @@ export function text(data: string | (() => string)) {
       creatingState.path += FIRST_CHILD + BINDING + PARENT_NODE;
     } else next();
 
-    setupSignalProp(node, 'textContent', isSignal(data) ? data : memo(data));
+    setupSignalProp(
+      node,
+      'textContent',
+      isSignal(data) ? data : computed(data)
+    );
 
     return;
   }

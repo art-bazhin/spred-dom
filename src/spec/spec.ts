@@ -1,4 +1,4 @@
-import { isSignal, memo } from 'spred';
+import { isSignal, computed } from 'spred';
 import { ClassMap, ClassName, fromArray, fromObject } from '../classes/classes';
 import { AttrValue, setupAttr, setupSignalProp } from '../dom/dom';
 import { BINDING, next, creatingState, traversalState } from '../state/state';
@@ -71,7 +71,7 @@ export function spec<Element extends HTMLElement>(
         continue;
       }
 
-      setupSignalProp(node, key, isSignal(value) ? value : memo(value));
+      setupSignalProp(node, key, isSignal(value) ? value : computed(value));
       continue;
     }
 

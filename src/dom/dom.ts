@@ -1,4 +1,4 @@
-import { isSignal, memo, Signal } from 'spred';
+import { isSignal, computed, Signal } from 'spred';
 import { creatingState } from '../state/state';
 
 export type Falsy = null | undefined | false | 0 | '';
@@ -44,7 +44,7 @@ export function setupAttr(
   value: AttrValue | (() => AttrValue)
 ) {
   if (typeof value === 'function') {
-    setupSignalAttr(node, key, isSignal(value) ? value : memo(value));
+    setupSignalAttr(node, key, isSignal(value) ? value : computed(value));
     return true;
   }
 

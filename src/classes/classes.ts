@@ -1,4 +1,4 @@
-import { memo, Signal } from 'spred';
+import { computed, Signal } from 'spred';
 import { Falsy } from '../dom/dom';
 
 export type ClassMap = Record<string, unknown>;
@@ -17,7 +17,7 @@ export function classes() {
   const result = fromArray(arguments as any);
 
   if (typeof result === 'function') {
-    return memo(result);
+    return computed(result);
   }
 
   return result;
