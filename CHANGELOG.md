@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.3](https://github.com/art-bazhin/spred-dom/compare/v0.7.2...v0.7.3) (2022-10-27)
+
+
+### Bug Fixes
+
+* **list:** fix mutated list rendering bug ([e0c080a](https://github.com/art-bazhin/spred-dom/commit/e0c080a7a3a7b6c3123dd2bfd93ab76d313d88a1))
+
 ### [0.7.2](https://github.com/art-bazhin/spred-dom/compare/v0.7.1...v0.7.2) (2022-10-19)
 
 
