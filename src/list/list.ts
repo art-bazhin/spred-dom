@@ -90,7 +90,7 @@ function setupList<T>(
           ++s;
         }
 
-        oldArr = newArr;
+        oldArr = newArr.slice();
 
         return;
       }
@@ -112,7 +112,7 @@ function setupList<T>(
           nodeMap.delete(el);
         }
 
-        oldArr = newArr;
+        oldArr = newArr.slice();
 
         return;
       }
@@ -225,7 +225,7 @@ function setupList<T>(
         }
       }
 
-      oldArr = newArr;
+      oldArr = newArr.slice();
     });
 
     arrSignal.subscribe(NOOP);
