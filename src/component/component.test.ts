@@ -4,7 +4,9 @@ import { component, templateFn } from './component';
 
 describe('component', () => {
   it('creates a function which returns DOM node', () => {
-    const Test = component(() => {});
+    const Test = component(() => {
+      return h(() => {});
+    });
 
     expect(typeof Test).toBe('function');
     expect(Test()).toBeInstanceOf(Node);
@@ -12,7 +14,7 @@ describe('component', () => {
 
   it('returns correct DOM structure on the first run', () => {
     const Test = component(() => {
-      h('div', { className: 'test' }, () => {
+      return h('div', { className: 'test' }, () => {
         text('Test text');
         h('ul', () => {
           h('li', { textContent: '1' });
@@ -51,7 +53,7 @@ describe('component', () => {
 
   it('returns correct DOM structure on the second run', () => {
     const Test = component(() => {
-      h('div', { className: 'test' }, () => {
+      return h('div', { className: 'test' }, () => {
         text('Test text');
         h('ul', () => {
           h('li', { textContent: '1' });
@@ -92,9 +94,11 @@ describe('component', () => {
 
   it('can render document fragments', () => {
     const Test = component(() => {
-      h('span', { textContent: '1' });
-      h('span', { textContent: () => '2' });
-      h('span', { textContent: '3' });
+      return h(() => {
+        h('span', { textContent: '1' });
+        h('span', { textContent: () => '2' });
+        h('span', { textContent: '3' });
+      });
     });
 
     const fragment = Test() as DocumentFragment;
@@ -118,14 +122,16 @@ describe('component', () => {
 describe('templateFn', () => {
   it('creates template function from component', () => {
     const Test = component(() => {
-      h('div', { textContent: 'test' });
+      return h('div', { textContent: 'test' });
     });
 
     const test = templateFn(Test);
     expect(typeof test).toBe('function');
 
     const Wrap = component(() => {
-      test();
+      return h(() => {
+        test();
+      });
     });
 
     const inner = Test() as HTMLDivElement;

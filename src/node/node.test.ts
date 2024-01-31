@@ -8,7 +8,7 @@ describe('node function', () => {
     const a = document.createTextNode('a');
 
     const Div = component(() => {
-      h('div', () => node(a));
+      return h('div', () => node(a));
     });
 
     expect(Div().firstChild).toBe(a);
@@ -22,7 +22,7 @@ describe('node function', () => {
     const value = writable(a);
 
     const Div = component(() => {
-      h('div', () => node(value));
+      return h('div', () => node(value));
     });
 
     const div = Div() as HTMLDivElement;
@@ -39,7 +39,7 @@ describe('node function', () => {
     const value = writable(a);
 
     const Div = component(() => {
-      h('div', () => {
+      return h('div', () => {
         h('span');
         node(() => value());
       });
@@ -57,7 +57,7 @@ describe('node function', () => {
     const value = writable<any>(a);
 
     const Div = component(() => {
-      h('div', () => {
+      return h('div', () => {
         node(null);
         h('span');
         node(() => value());
