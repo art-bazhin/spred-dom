@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.4](https://github.com/art-bazhin/spred-dom/compare/v0.7.3...v0.7.4) (2024-01-31)
+
+
+### Docs
+
+* add package replacement note ([c144235](https://github.com/art-bazhin/spred-dom/commit/c1442350a6a009a729a62851ad706bacfd9f8e58))
+
 ### [0.7.3](https://github.com/art-bazhin/spred-dom/compare/v0.7.2...v0.7.3) (2022-10-27)
 
 
