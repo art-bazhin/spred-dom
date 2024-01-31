@@ -1,3 +1,3 @@
-# spred-dom
+# Spred DOM
 
-Moved to @spred/dom
+DOM rendering engine based on [Spred](https://github.com/art-bazhin/spred).

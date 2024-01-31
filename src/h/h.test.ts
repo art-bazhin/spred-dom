@@ -1,4 +1,4 @@
-import { writable } from 'spred';
+import { writable } from '@spred/core';
 import { component } from '../component/component';
 import { h } from './h';
 
@@ -19,7 +19,7 @@ describe('h function', () => {
     const Span = component(() =>
       h('span', () => {
         h('span');
-      })
+      }),
     );
 
     expect(Span().innerHTML).toBe('<span></span>');
@@ -29,7 +29,7 @@ describe('h function', () => {
     const Span = component(() =>
       h('span', { className: 'test' }, () => {
         h('span');
-      })
+      }),
     );
 
     expect(Span().outerHTML).toBe('<span class="test"><span></span></span>');
@@ -53,7 +53,7 @@ describe('h function', () => {
     const textContent = () => 'text';
 
     const Button = component(() =>
-      h('button', { textContent, type: 'button' })
+      h('button', { textContent, type: 'button' }),
     );
 
     let button = Button();
@@ -74,13 +74,13 @@ describe('h function', () => {
 
     expect(button.textContent).toBe('before');
 
-    textContent('after');
+    textContent.set('after');
     expect(button.textContent).toBe('after');
   });
 
   it('turns the fn prop value into a signal', () => {
     const val = writable('before');
-    const textContent = () => val();
+    const textContent = () => val.get();
 
     const Button = component(() => h('button', { textContent }));
 
@@ -88,7 +88,7 @@ describe('h function', () => {
 
     expect(button.textContent).toBe('before');
 
-    val('after');
+    val.set('after');
     expect(button.textContent).toBe('after');
   });
 
@@ -103,7 +103,7 @@ describe('h function', () => {
           null: null, // handle falsy attrs
           undefined: undefined, // handle falsy attrs
         },
-      })
+      }),
     );
 
     const button = Button();
@@ -122,7 +122,7 @@ describe('h function', () => {
         attrs: {
           class: () => 'test',
         },
-      })
+      }),
     );
 
     const button = Button();
@@ -137,22 +137,22 @@ describe('h function', () => {
         attrs: {
           class: value,
         },
-      })
+      }),
     );
 
     const button = Button();
     expect(button.getAttribute('class')).toBe('foo');
 
-    value(null);
+    value.set(null);
     expect(button.getAttribute('class')).toBe(null);
 
-    value('bar');
+    value.set('bar');
     expect(button.getAttribute('class')).toBe('bar');
 
-    value(false);
+    value.set(false);
     expect(button.getAttribute('class')).toBe(null);
 
-    value(true);
+    value.set(true);
     expect(button.getAttribute('class')).toBe('');
   });
 
@@ -162,10 +162,10 @@ describe('h function', () => {
     const Button = component(() =>
       h('button', {
         attrs: {
-          class: () => value(),
+          class: () => value.get(),
           'data-foo': 'bar',
         },
-      })
+      }),
     );
 
     Button();
@@ -174,16 +174,16 @@ describe('h function', () => {
     expect(button.getAttribute('class')).toBe('foo');
     expect(button.getAttribute('data-foo')).toBe('bar');
 
-    value(null);
+    value.set(null);
     expect(button.getAttribute('class')).toBe(null);
 
-    value('bar');
+    value.set('bar');
     expect(button.getAttribute('class')).toBe('bar');
 
-    value(false);
+    value.set(false);
     expect(button.getAttribute('class')).toBe(null);
 
-    value(true);
+    value.set(true);
     expect(button.getAttribute('class')).toBe('');
   });
 
@@ -197,7 +197,7 @@ describe('h function', () => {
           id: str,
           value: str,
         });
-      })
+      }),
     );
 
     const div1 = Div(() => 'a');
@@ -224,7 +224,7 @@ describe('h function', () => {
           id: str,
           value: str,
         });
-      })
+      }),
     );
 
     const div1 = Div(() => 'a');
@@ -252,7 +252,7 @@ describe('h function', () => {
           id: str,
           value: str,
         });
-      })
+      }),
     );
 
     const div1 = Div(() => 'a');
@@ -278,7 +278,7 @@ describe('h function', () => {
           id: str,
           value: str,
         });
-      })
+      }),
     );
 
     const div1 = Div(() => 'a');
@@ -303,13 +303,23 @@ describe('h function', () => {
       h('button', {
         class: 'foo',
         text: 'bar',
-      })
+      }),
     );
 
     const button = Button();
 
     expect(button.className).toBe('foo');
     expect(button.textContent).toBe('bar');
+  });
+
+  it('correctly handles class prop with signal value', () => {
+    const Button = component(() =>
+      h('button', {
+        class: writable('foo bar'),
+      }),
+    );
+
+    expect(Button().className).toBe('foo bar');
   });
 
   it('correctly handles class prop with object value', () => {
@@ -319,7 +329,7 @@ describe('h function', () => {
           foo: 'true',
           bar: () => true,
         },
-      })
+      }),
     );
 
     expect(Button().className).toBe('foo bar');
@@ -329,7 +339,7 @@ describe('h function', () => {
     const Button = component(() =>
       h('button', {
         class: ['foo', () => 'bar'],
-      })
+      }),
     );
 
     expect(Button().className).toBe('foo bar');
@@ -349,7 +359,7 @@ describe('h function', () => {
           ref: (n) => (button = n),
         });
         h('span');
-      })
+      }),
     );
 
     Div(() => 'foo');

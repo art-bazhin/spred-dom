@@ -1,4 +1,4 @@
-import { writable } from 'spred';
+import { writable } from '@spred/core';
 import { component } from '../component/component';
 import { h } from '../h/h';
 import { node } from '../node/node';
@@ -37,7 +37,7 @@ describe('list function', () => {
     const Div = component(() =>
       h('div', () => {
         list(arr, Item);
-      })
+      }),
     );
 
     const div = Div();
@@ -61,23 +61,23 @@ describe('list function', () => {
     const List = component(() =>
       h(() => {
         list(arr, Item);
-      })
+      }),
     );
 
     const App = component(() =>
       h(() => {
-        node(() => toggle() && List());
-      })
+        node(() => toggle.get() && List());
+      }),
     );
 
     App();
     expect(spy).toBeCalledTimes(3);
 
-    counter(1);
+    counter.set(1);
     expect(spy).toBeCalledTimes(6);
 
-    toggle(false);
-    counter(2);
+    toggle.set(false);
+    counter.set(2);
     expect(spy).toBeCalledTimes(6);
   });
 
@@ -88,18 +88,18 @@ describe('list function', () => {
       const Div = component(() =>
         h('div', () => {
           list(arr, Item);
-        })
+        }),
       );
 
       const div = Div();
       expect(div.textContent).toBe('');
       expect(div.children.length).toBe(0);
 
-      arr(['a', 'b', 'c', 'd']);
+      arr.set(['a', 'b', 'c', 'd']);
       expect(div.textContent).toBe('abcd');
       expect(div.children.length).toBe(4);
 
-      arr([]);
+      arr.set([]);
       expect(div.textContent).toBe('');
       expect(div.children.length).toBe(0);
     });
@@ -111,7 +111,7 @@ describe('list function', () => {
         h('div', () => {
           text(''); // test rendering with previous node
           list(arr, Item);
-        })
+        }),
       );
 
       const div = Div();
@@ -121,7 +121,7 @@ describe('list function', () => {
       const first = div.firstElementChild;
       const last = div.lastElementChild;
 
-      arr(['a', 'b', 'x', 'y', 'c', 'd']);
+      arr.set(['a', 'b', 'x', 'y', 'c', 'd']);
       expect(div.textContent).toBe('abxycd');
       expect(div.children.length).toBe(6);
       expect(first).toBe(div.firstElementChild);
@@ -134,7 +134,7 @@ describe('list function', () => {
       const Div = component(() =>
         h('div', () => {
           list(arr, Item);
-        })
+        }),
       );
 
       const div = Div();
@@ -144,7 +144,7 @@ describe('list function', () => {
       const first = div.firstElementChild;
       const last = div.lastElementChild;
 
-      arr(['a', 'b', 'c', 'd']);
+      arr.set(['a', 'b', 'c', 'd']);
       expect(div.textContent).toBe('abcd');
       expect(div.children.length).toBe(4);
       expect(first).toBe(div.firstElementChild);
@@ -157,7 +157,7 @@ describe('list function', () => {
       const Div = component(() =>
         h('div', () => {
           list(arr, Item);
-        })
+        }),
       );
 
       const div = Div();
@@ -170,7 +170,7 @@ describe('list function', () => {
       const d = div.children[3];
       const e = div.children[4];
 
-      arr(['a', 'b', 'c', 'd', 'e']);
+      arr.set(['a', 'b', 'c', 'd', 'e']);
       expect(div.textContent).toBe('abcde');
       expect(div.children.length).toBe(5);
       expect(a).toBe(div.children[0]);
@@ -186,7 +186,7 @@ describe('list function', () => {
       const Div = component(() =>
         h('div', () => {
           list(arr, Item);
-        })
+        }),
       );
 
       const div = Div();
@@ -199,7 +199,7 @@ describe('list function', () => {
       const d = div.children[3];
       const e = div.children[4];
 
-      arr(['b', 'a', 'd', 'c', 'x', 'e']);
+      arr.set(['b', 'a', 'd', 'c', 'x', 'e']);
       expect(div.textContent).toBe('badcxe');
       expect(div.children.length).toBe(6);
       expect(a).toBe(div.children[1]);
@@ -215,14 +215,14 @@ describe('list function', () => {
       const Div = component(() =>
         h('div', () => {
           list(arr, Item);
-        })
+        }),
       );
 
       const div = Div();
       expect(div.textContent).toBe('abcdefg');
       expect(div.children.length).toBe(7);
 
-      arr(['a', 'c', 'b', 'h', 'f', 'e', 'x']);
+      arr.set(['a', 'c', 'b', 'h', 'f', 'e', 'x']);
       expect(div.textContent).toBe('acbhfex');
       expect(div.children.length).toBe(7);
     });
@@ -233,7 +233,7 @@ describe('list function', () => {
       const Div = component(() =>
         h('div', () => {
           list(arr, FragmentItem);
-        })
+        }),
       );
 
       const div = Div() && Div(); // second render test
@@ -246,7 +246,7 @@ describe('list function', () => {
       const d = div.children[6];
       const e = div.children[8];
 
-      arr(['b', 'a', 'd', 'c', 'x', 'e']);
+      arr.set(['b', 'a', 'd', 'c', 'x', 'e']);
       expect(div.textContent).toBe('bbaaddccxxee');
       expect(div.children.length).toBe(12);
       expect(a).toBe(div.children[2]);
@@ -262,7 +262,7 @@ describe('list function', () => {
       const Div = component(() =>
         h('div', () => {
           list(arr, Item);
-        })
+        }),
       );
 
       const div = Div();
@@ -273,7 +273,7 @@ describe('list function', () => {
       const c = div.children[2];
       const e = div.children[4];
 
-      arr(['a', 'c', 'e']);
+      arr.set(['a', 'c', 'e']);
       expect(div.textContent).toBe('ace');
       expect(div.children.length).toBe(3);
       expect(a).toBe(div.children[0]);
@@ -287,7 +287,7 @@ describe('list function', () => {
       const Div = component(() =>
         h('div', () => {
           list(arr, Item);
-        })
+        }),
       );
 
       const div = Div();
@@ -300,7 +300,7 @@ describe('list function', () => {
       const d = div.children[3];
       const e = div.children[4];
 
-      arr(['a', 'b', 'x', 'c', 'y', 'd', 'e', 'z']);
+      arr.set(['a', 'b', 'x', 'c', 'y', 'd', 'e', 'z']);
       expect(div.textContent).toBe('abxcydez');
       expect(div.children.length).toBe(8);
       expect(a).toBe(div.children[0]);
@@ -318,13 +318,13 @@ describe('list function', () => {
       const Div = component(() =>
         h('div', () => {
           list(arr, Item);
-        })
+        }),
       );
 
       const div = Div();
       expect(div.textContent).toBe('');
 
-      arr(['a', 'c', 'b', 'h', 'f', 'e', 'g']);
+      arr.set(['a', 'c', 'b', 'h', 'f', 'e', 'g']);
       expect(div.textContent).toBe('');
     });
   });
@@ -336,21 +336,21 @@ describe('list function', () => {
       const Div = component(() =>
         h('div', () => {
           list(arr, Item);
-        })
+        }),
       );
 
       const div = Div();
       expect(div.textContent).toBe('');
       expect(div.children.length).toBe(0);
 
-      arr().splice(0, 0, 'a', 'b', 'c', 'd');
-      arr.notify();
+      arr.get().splice(0, 0, 'a', 'b', 'c', 'd');
+      arr.update();
 
       expect(div.textContent).toBe('abcd');
       expect(div.children.length).toBe(4);
 
-      arr().length = 0;
-      arr.notify();
+      arr.get().length = 0;
+      arr.update();
 
       expect(div.textContent).toBe('');
       expect(div.children.length).toBe(0);
@@ -363,7 +363,7 @@ describe('list function', () => {
         h('div', () => {
           text(''); // test rendering with previous node
           list(arr, Item);
-        })
+        }),
       );
 
       const div = Div();
@@ -373,8 +373,8 @@ describe('list function', () => {
       const first = div.firstElementChild;
       const last = div.lastElementChild;
 
-      arr().splice(2, 0, 'x', 'y');
-      arr.notify();
+      arr.get().splice(2, 0, 'x', 'y');
+      arr.update();
 
       expect(div.textContent).toBe('abxycd');
       expect(div.children.length).toBe(6);
@@ -388,7 +388,7 @@ describe('list function', () => {
       const Div = component(() =>
         h('div', () => {
           list(arr, Item);
-        })
+        }),
       );
 
       const div = Div();
@@ -398,16 +398,16 @@ describe('list function', () => {
       const first = div.firstElementChild;
       const last = div.lastElementChild;
 
-      arr().splice(2, 2);
-      arr.notify();
+      arr.get().splice(2, 2);
+      arr.update();
 
       expect(div.textContent).toBe('abcd');
       expect(div.children.length).toBe(4);
       expect(first).toBe(div.firstElementChild);
       expect(last).toBe(div.lastElementChild);
 
-      ['a', 'b', 'x', 'y', 'c', 'd'].forEach((el, i) => (arr()[i] = el));
-      arr.notify();
+      ['a', 'b', 'x', 'y', 'c', 'd'].forEach((el, i) => (arr.get()[i] = el));
+      arr.update();
 
       expect(div.textContent).toBe('abxycd');
       expect(div.children.length).toBe(6);
@@ -419,7 +419,7 @@ describe('list function', () => {
       const Div = component(() =>
         h('div', () => {
           list(arr, Item);
-        })
+        }),
       );
 
       const div = Div();
@@ -432,8 +432,8 @@ describe('list function', () => {
       const d = div.children[3];
       const e = div.children[4];
 
-      ['b', 'a', 'd', 'c', 'x', 'e'].forEach((el, i) => (arr()[i] = el));
-      arr.notify();
+      ['b', 'a', 'd', 'c', 'x', 'e'].forEach((el, i) => (arr.get()[i] = el));
+      arr.update();
 
       expect(div.textContent).toBe('badcxe');
       expect(div.children.length).toBe(6);
@@ -443,8 +443,8 @@ describe('list function', () => {
       expect(d).toBe(div.children[2]);
       expect(e).toBe(div.children[5]);
 
-      ['a', 'b', 'c', 'd', 'x', 'e'].forEach((el, i) => (arr()[i] = el));
-      arr.notify();
+      ['a', 'b', 'c', 'd', 'x', 'e'].forEach((el, i) => (arr.get()[i] = el));
+      arr.update();
 
       expect(div.textContent).toBe('abcdxe');
       expect(div.children.length).toBe(6);
@@ -461,21 +461,25 @@ describe('list function', () => {
       const Div = component(() =>
         h('div', () => {
           list(arr, Item);
-        })
+        }),
       );
 
       const div = Div();
       expect(div.textContent).toBe('abcdefg');
       expect(div.children.length).toBe(7);
 
-      ['a', 'c', 'b', 'h', 'f', 'e', 'x'].forEach((el, i) => (arr()[i] = el));
-      arr.notify();
+      ['a', 'c', 'b', 'h', 'f', 'e', 'x'].forEach(
+        (el, i) => (arr.get()[i] = el),
+      );
+      arr.update();
 
       expect(div.textContent).toBe('acbhfex');
       expect(div.children.length).toBe(7);
 
-      ['c', 'a', 'b', 'h', 'f', 'x', 'e'].forEach((el, i) => (arr()[i] = el));
-      arr.notify();
+      ['c', 'a', 'b', 'h', 'f', 'x', 'e'].forEach(
+        (el, i) => (arr.get()[i] = el),
+      );
+      arr.update();
 
       expect(div.textContent).toBe('cabhfxe');
       expect(div.children.length).toBe(7);
@@ -487,7 +491,7 @@ describe('list function', () => {
       const Div = component(() =>
         h('div', () => {
           list(arr, FragmentItem);
-        })
+        }),
       );
 
       const div = Div() && Div(); // second render test
@@ -500,8 +504,8 @@ describe('list function', () => {
       const d = div.children[6];
       const e = div.children[8];
 
-      ['b', 'a', 'd', 'c', 'x', 'e'].forEach((el, i) => (arr()[i] = el));
-      arr.notify();
+      ['b', 'a', 'd', 'c', 'x', 'e'].forEach((el, i) => (arr.get()[i] = el));
+      arr.update();
 
       expect(div.textContent).toBe('bbaaddccxxee');
       expect(div.children.length).toBe(12);
@@ -511,8 +515,8 @@ describe('list function', () => {
       expect(d).toBe(div.children[4]);
       expect(e).toBe(div.children[10]);
 
-      ['a', 'b', 'c', 'd', 'x', 'e'].forEach((el, i) => (arr()[i] = el));
-      arr.notify();
+      ['a', 'b', 'c', 'd', 'x', 'e'].forEach((el, i) => (arr.get()[i] = el));
+      arr.update();
 
       expect(div.textContent).toBe('aabbccddxxee');
       expect(div.children.length).toBe(12);
@@ -529,7 +533,7 @@ describe('list function', () => {
       const Div = component(() =>
         h('div', () => {
           list(arr, Item);
-        })
+        }),
       );
 
       const div = Div();
@@ -541,9 +545,9 @@ describe('list function', () => {
       const c = div.children[2];
       const e = div.children[4];
 
-      ['a', 'b', 'c', 'e'].forEach((el, i) => (arr()[i] = el));
-      arr().length = 4;
-      arr.notify();
+      ['a', 'b', 'c', 'e'].forEach((el, i) => (arr.get()[i] = el));
+      arr.get().length = 4;
+      arr.update();
 
       expect(div.textContent).toBe('abce');
       expect(div.children.length).toBe(4);
@@ -552,9 +556,9 @@ describe('list function', () => {
       expect(c).toBe(div.children[2]);
       expect(e).toBe(div.children[3]);
 
-      ['a', 'c', 'e'].forEach((el, i) => (arr()[i] = el));
-      arr().length = 3;
-      arr.notify();
+      ['a', 'c', 'e'].forEach((el, i) => (arr.get()[i] = el));
+      arr.get().length = 3;
+      arr.update();
 
       expect(div.textContent).toBe('ace');
       expect(div.children.length).toBe(3);
@@ -569,7 +573,7 @@ describe('list function', () => {
       const Div = component(() =>
         h('div', () => {
           list(arr, Item);
-        })
+        }),
       );
 
       const div = Div();
@@ -583,9 +587,9 @@ describe('list function', () => {
       const e = div.children[4];
 
       ['a', 'b', 'x', 'c', 'y', 'd', 'e', 'z'].forEach(
-        (el, i) => (arr()[i] = el)
+        (el, i) => (arr.get()[i] = el),
       );
-      arr.notify();
+      arr.update();
 
       expect(div.textContent).toBe('abxcydez');
       expect(div.children.length).toBe(8);
@@ -596,9 +600,9 @@ describe('list function', () => {
       expect(e).toBe(div.children[6]);
 
       ['a', 'b', 'x', 'c', 'y', 'd', 'e', 'z', 'j', 'k'].forEach(
-        (el, i) => (arr()[i] = el)
+        (el, i) => (arr.get()[i] = el),
       );
-      arr.notify();
+      arr.update();
 
       expect(div.textContent).toBe('abxcydezjk');
       expect(div.children.length).toBe(10);
@@ -617,19 +621,23 @@ describe('list function', () => {
       const Div = component(() =>
         h('div', () => {
           list(arr, Item);
-        })
+        }),
       );
 
       const div = Div();
       expect(div.textContent).toBe('');
 
-      ['a', 'c', 'b', 'h', 'f', 'e', 'g'].forEach((el, i) => (arr()[i] = el));
-      arr.notify();
+      ['a', 'c', 'b', 'h', 'f', 'e', 'g'].forEach(
+        (el, i) => (arr.get()[i] = el),
+      );
+      arr.update();
 
       expect(div.textContent).toBe('');
 
-      ['a', 'c', 'b', 'f', 'h', 'e', 'g'].forEach((el, i) => (arr()[i] = el));
-      arr.notify();
+      ['a', 'c', 'b', 'f', 'h', 'e', 'g'].forEach(
+        (el, i) => (arr.get()[i] = el),
+      );
+      arr.update();
 
       expect(div.textContent).toBe('');
     });

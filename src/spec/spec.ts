@@ -1,13 +1,10 @@
-import { isSignal, computed } from 'spred';
+import { isSignal, computed, Signal } from '@spred/core';
 import { ClassMap, ClassName, fromArray, fromObject } from '../classes/classes';
 import { AttrValue, setupAttr, setupSignalProp } from '../dom/dom';
 import { BINDING, next, creatingState, traversalState } from '../state/state';
 
-type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
-  T
->() => T extends Y ? 1 : 2
-  ? A
-  : B;
+type IfEquals<X, Y, A = X, B = never> =
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? A : B;
 
 type WritableKeys<T> = {
   [P in keyof T]-?: IfEquals<
@@ -19,23 +16,31 @@ type WritableKeys<T> = {
 }[keyof T];
 
 interface Attrs {
-  [attr: string]: AttrValue | (() => AttrValue);
+  [attr: string]: AttrValue | (() => AttrValue) | Signal<AttrValue>;
 }
 
 type ElProps<Element extends HTMLElement> = {
-  [key in WritableKeys<Element>]?: Element[key] | (() => Element[key]);
+  [key in WritableKeys<Element>]?:
+    | Element[key]
+    | (() => Element[key])
+    | Signal<Element[key]>;
 };
 
 export type Props<Element extends HTMLElement> = ElProps<Element> & {
   attrs?: Attrs;
-  class?: AttrValue | (() => AttrValue) | ClassMap | ClassName[];
-  text?: string | (() => string);
+  class?:
+    | AttrValue
+    | (() => AttrValue)
+    | Signal<AttrValue>
+    | ClassMap
+    | ClassName[];
+  text?: string | (() => string) | Signal<string>;
   ref?: (el: Element) => any;
 };
 
 export function spec<Element extends HTMLElement>(
   props?: Props<Element>,
-  fn?: () => any
+  fn?: () => any,
 ) {
   if (!props || (creatingState.isCreating && !creatingState.root)) return;
 
@@ -71,7 +76,11 @@ export function spec<Element extends HTMLElement>(
         continue;
       }
 
-      setupSignalProp(node, key, isSignal(value) ? value : computed(value));
+      setupSignalProp(node, key, computed(value));
+      continue;
+    } else if (typeof value === 'object' && value !== null) {
+      hasBindings = true;
+      setupSignalProp(node, key, value);
       continue;
     }
 
@@ -96,7 +105,8 @@ const RESERVED = {
 
   class(node: Node, value: any) {
     if (typeof value === 'object') {
-      value = Array.isArray(value) ? fromArray(value) : fromObject(value);
+      if (Array.isArray(value)) value = fromArray(value);
+      else if (!isSignal(value)) value = fromObject(value);
     }
 
     return setupAttr(node, 'class', value);

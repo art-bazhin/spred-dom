@@ -1,4 +1,4 @@
-import { writable } from 'spred';
+import { writable } from '@spred/core';
 import { component } from '../component/component';
 import { h } from '../h/h';
 import { text } from './text';
@@ -9,7 +9,7 @@ describe('text function', () => {
       h('div', () => {
         text('a');
         text('b');
-      })
+      }),
     );
 
     const test = Test();
@@ -25,7 +25,7 @@ describe('text function', () => {
     const Test = component(() =>
       h('div', () => {
         text(() => 'a');
-      })
+      }),
     );
 
     let test = Test();
@@ -56,7 +56,7 @@ describe('text function', () => {
     expect(test.childNodes[0].nodeType).toBe(Node.TEXT_NODE);
     expect(test.childNodes[0].textContent).toBe('a');
 
-    value('b');
+    value.set('b');
     expect(test.childNodes[0].textContent).toBe('b');
   });
 
@@ -65,7 +65,7 @@ describe('text function', () => {
 
     const Test = component(() => {
       return h('div', () => {
-        text(() => value());
+        text(() => value.get());
       });
     });
 
@@ -75,7 +75,7 @@ describe('text function', () => {
     expect(test.childNodes[0].nodeType).toBe(Node.TEXT_NODE);
     expect(test.childNodes[0].textContent).toBe('a');
 
-    value('b');
+    value.set('b');
     expect(test.childNodes[0].textContent).toBe('b');
   });
 });

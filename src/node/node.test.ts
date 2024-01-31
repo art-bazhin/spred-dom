@@ -1,4 +1,4 @@
-import { writable } from 'spred';
+import { writable } from '@spred/core';
 import { component } from '../component/component';
 import { h } from '../h/h';
 import { node } from './node';
@@ -28,7 +28,7 @@ describe('node function', () => {
     const div = Div() as HTMLDivElement;
     expect(div.firstElementChild).toBe(a);
 
-    value(b);
+    value.set(b);
     expect(div.firstElementChild).toBe(b);
   });
 
@@ -41,14 +41,14 @@ describe('node function', () => {
     const Div = component(() => {
       return h('div', () => {
         h('span');
-        node(() => value());
+        node(() => value.get());
       });
     });
 
     const div = Div() as HTMLDivElement;
     expect(div.children[1]).toBe(a);
 
-    value(b);
+    value.set(b);
     expect(div.children[1]).toBe(b);
   });
 
@@ -60,17 +60,17 @@ describe('node function', () => {
       return h('div', () => {
         node(null);
         h('span');
-        node(() => value());
+        node(() => value.get());
       });
     });
 
     const div = Div() as HTMLDivElement;
     expect(div.children[1]).toBe(a);
 
-    value(null);
+    value.set(null);
     expect(div.children[1]).toBeUndefined();
 
-    value(false);
+    value.set(false);
     expect(div.children[1]).toBeUndefined();
   });
 });

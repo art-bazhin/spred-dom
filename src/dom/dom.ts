@@ -1,4 +1,4 @@
-import { isSignal, computed, Signal } from 'spred';
+import { computed, Signal } from '@spred/core';
 import { creatingState } from '../state/state';
 
 export type Falsy = null | undefined | false | 0 | '';
@@ -41,14 +41,21 @@ export function setupSignalProp(node: Node, key: string, signal: Signal<any>) {
 export function setupAttr(
   node: Node,
   key: string,
-  value: AttrValue | (() => AttrValue)
+  value: AttrValue | (() => AttrValue) | Signal<AttrValue>,
 ) {
   if (typeof value === 'function') {
-    setupSignalAttr(node, key, isSignal(value) ? value : computed(value));
+    setupSignalAttr(node, key, computed(value));
+    return true;
+  }
+
+  if (typeof value === 'object' && value !== null) {
+    setupSignalAttr(node, key, value);
     return true;
   }
 
   if (creatingState.isCreating) setupBaseAttr(node, key, value);
+
+  return false;
 }
 
 export function setupBaseAttr(node: Node, key: string, value: AttrValue) {
@@ -65,7 +72,7 @@ export function setupBaseAttr(node: Node, key: string, value: AttrValue) {
 export function setupSignalAttr(
   node: Node,
   key: string,
-  value: Signal<AttrValue>
+  value: Signal<AttrValue>,
 ) {
   value.subscribe((v) => setupBaseAttr(node, key, v));
 }

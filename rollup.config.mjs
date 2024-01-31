@@ -10,11 +10,14 @@ const terserPlugin = terser({
   },
 });
 
+const external = ['@spred/core'];
+
 export default [
   {
     input: 'src/index.ts',
     output: { file: `${pkg.types}`, format: 'es' },
     plugins: [dts()],
+    external,
   },
   {
     input: 'src/index.ts',
@@ -22,17 +25,23 @@ export default [
       name: 'spredDOM',
       file: `dist/spred-dom.min.js`,
       format: 'umd',
+      globals: {
+        '@spred/core': 'spred',
+      },
     },
     plugins: [ts(), terserPlugin],
+    external,
   },
   {
     input: 'src/index.ts',
     plugins: [ts()],
     output: { file: pkg.main, format: 'cjs' },
+    external,
   },
   {
     input: 'src/index.ts',
     plugins: [ts()],
     output: { file: pkg.module, format: 'es' },
+    external,
   },
 ];

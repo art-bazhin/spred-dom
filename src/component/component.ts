@@ -1,4 +1,4 @@
-import { isolate } from 'spred';
+import { isolate } from '@spred/core';
 import { isMark } from '../dom/dom';
 import { node } from '../node/node';
 import {
@@ -14,7 +14,7 @@ import {
 import { TemplateResult } from '../template-result/template-result';
 
 export function component<A extends unknown[], N extends Node>(
-  fn: (...args: A) => TemplateResult<N>
+  fn: (...args: A) => TemplateResult<N>,
 ) {
   let template: Node | null = null;
   let pathString = '';
@@ -44,7 +44,7 @@ export function component<A extends unknown[], N extends Node>(
 }
 
 export function templateFn<A extends unknown[]>(
-  component: (...args: A) => Node
+  component: (...args: A) => Node,
 ) {
   return (...args: A) => node(component(...args));
 }
@@ -53,7 +53,7 @@ function setupComponent<A extends unknown[]>(
   fn: (...args: A) => any,
   args: A,
   container: Node,
-  pathString: string
+  pathString: string,
 ) {
   const prevIsCreating = creatingState.isCreating;
   const prevPath = traversalState.path;
@@ -75,7 +75,7 @@ function setupComponent<A extends unknown[]>(
 
 function createComponentData<A extends unknown[]>(
   fn: (...args: A) => any,
-  args: A
+  args: A,
 ) {
   const prevPath = creatingState.path;
   creatingState.path = '';
@@ -107,7 +107,7 @@ function createComponentData<A extends unknown[]>(
 const NEXT_SIBLING_REGEX = new RegExp(PARENT_NODE + FIRST_CHILD, 'g');
 const EMPTY_NESTING_REGEX = new RegExp(
   `${START_CHILDREN}[^${BINDING}${START_CHILDREN}${END_CHILDREN}]*${END_CHILDREN}`,
-  'g'
+  'g',
 );
 const END_CHILDREN_REGEX = new RegExp(END_CHILDREN, 'g');
 const EMPTY_TAIL = new RegExp(`[^${BINDING}]+$`, 'g');

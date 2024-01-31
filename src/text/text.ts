@@ -1,4 +1,4 @@
-import { isSignal, computed } from 'spred';
+import { isSignal, computed, Signal } from '@spred/core';
 import { setupSignalProp } from '../dom/dom';
 import {
   BINDING,
@@ -9,7 +9,7 @@ import {
   traversalState,
 } from '../state/state';
 
-export function text(data: string | (() => string)) {
+export function text(data: string | Signal<string> | (() => string)) {
   let node: Node | undefined;
 
   if (creatingState.isCreating) {
@@ -20,16 +20,14 @@ export function text(data: string | (() => string)) {
     node = traversalState.node!;
   }
 
-  if (typeof data === 'function') {
+  const isFunction = typeof data === 'function';
+
+  if (isFunction || typeof data === 'object') {
     if (creatingState.isCreating) {
       creatingState.path += FIRST_CHILD + BINDING + PARENT_NODE;
     } else next();
 
-    setupSignalProp(
-      node,
-      'textContent',
-      isSignal(data) ? data : computed(data)
-    );
+    setupSignalProp(node, 'textContent', isFunction ? computed(data) : data);
 
     return;
   }

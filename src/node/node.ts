@@ -1,10 +1,10 @@
-import { computed, isSignal, Signal } from 'spred';
+import { computed, isSignal, Signal } from '@spred/core';
 import { createBinding } from '../create-binding/create-binding';
 import { createMark, Falsy, insertBefore, removeNodes } from '../dom/dom';
 import { creatingState } from '../state/state';
 
 export function node(
-  binding: Node | Falsy | Signal<Node | Falsy> | (() => Node | Falsy)
+  binding: Node | Falsy | Signal<Node | Falsy> | (() => Node | Falsy),
 ) {
   createBinding((mark) => {
     if (creatingState.isCreating) {
@@ -18,17 +18,17 @@ export function node(
 
 function setupNode(
   binding: Node | Falsy | Signal<Node | Falsy> | (() => Node | Falsy),
-  mark: Node | null
+  mark: Node | null,
 ) {
   if (!mark || !binding) return;
 
   if (typeof binding === 'function') {
-    if (isSignal(binding)) {
-      setupSignalNode(binding, mark);
-      return;
-    }
-
     setupSignalNode(computed(binding), mark);
+    return;
+  }
+
+  if (typeof binding === 'object' && isSignal(binding)) {
+    setupSignalNode(binding, mark);
     return;
   }
 

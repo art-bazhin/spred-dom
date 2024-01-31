@@ -1,4 +1,4 @@
-import { collect, computed, isSignal, onDeactivate, Signal } from 'spred';
+import { collect, computed, isSignal, Signal } from '@spred/core';
 import { createMark, insertBefore, isFragment, removeNodes } from '../dom/dom';
 import {
   BINDING,
@@ -28,7 +28,7 @@ export function list<T>(binding: Signal<T[]> | T[], mapFn: (el: T) => Node) {
 function setupList<T>(
   binding: Signal<T[]> | T[],
   mapFn: (el: T) => Node,
-  mark: Node
+  mark: Node,
 ) {
   if (isSignal(binding)) {
     let start = mark.previousSibling;
@@ -45,196 +45,199 @@ function setupList<T>(
     // the algorithm is taken from
     // https://github.com/localvoid/ivi/blob/2c81ead934b9128e092cc2a5ef2d3cabc73cb5dd/packages/ivi/src/vdom/implementation.ts#L1366
 
-    const arrSignal = computed(() => {
-      const newArr = binding();
-      const parent = mark.parentNode!;
+    const arrSignal = computed(
+      () => {
+        const newArr = binding.get();
+        const parent = mark.parentNode!;
 
-      let oldLength = oldArr.length;
-      let newLength = newArr.length;
+        let oldLength = oldArr.length;
+        let newLength = newArr.length;
 
-      if (!newLength && !oldLength) return;
+        if (!newLength && !oldLength) return;
 
-      const minLength = Math.min(oldLength, newLength);
+        const minLength = Math.min(oldLength, newLength);
 
-      let s = 0; // start index
-      let a = oldLength - 1; // old array end index
-      let b = newLength - 1; // new array end index
+        let s = 0; // start index
+        let a = oldLength - 1; // old array end index
+        let b = newLength - 1; // new array end index
 
-      for (let i = 0; i < minLength; ++i) {
-        let shouldStop = 0;
+        for (let i = 0; i < minLength; ++i) {
+          let shouldStop = 0;
 
-        if (oldArr[s] === newArr[s]) ++s;
-        else ++shouldStop;
+          if (oldArr[s] === newArr[s]) ++s;
+          else ++shouldStop;
 
-        if (oldArr[a] === newArr[b]) --a, --b;
-        else ++shouldStop;
+          if (oldArr[a] === newArr[b]) --a, --b;
+          else ++shouldStop;
 
-        if (shouldStop === 2) break;
-      }
-
-      // lists are equal
-      if (a < 0 && b < 0) return;
-
-      // add nodes
-      if (s > a) {
-        const index = b + 1;
-        const endNode =
-          index === newLength ? mark : nodeMap.get(newArr[index])!;
-
-        while (s <= b) {
-          insertBefore(
-            createListNode(newArr[s], mapFn, nodeMap, cleanupMap),
-            endNode,
-            parent
-          );
-          ++s;
+          if (shouldStop === 2) break;
         }
 
-        oldArr = newArr.slice();
+        // lists are equal
+        if (a < 0 && b < 0) return;
 
-        return;
-      }
+        // add nodes
+        if (s > a) {
+          const index = b + 1;
+          const endNode =
+            index === newLength ? mark : nodeMap.get(newArr[index])!;
 
-      // remove nodes
-      if (s > b) {
-        const endIndex = a + 1;
-        const startNode = nodeMap.get(oldArr[s])!;
-        const endNode =
-          endIndex === oldLength ? mark : nodeMap.get(oldArr[endIndex])!;
+          while (s <= b) {
+            insertBefore(
+              createListNode(newArr[s], mapFn, nodeMap, cleanupMap),
+              endNode,
+              parent,
+            );
+            ++s;
+          }
 
-        removeNodes(startNode, endNode, parent);
+          oldArr = newArr.slice();
 
-        while (s < endIndex) {
-          const el = oldArr[s++];
-
-          cleanupMap.get(el)!();
-          cleanupMap.delete(el);
-          nodeMap.delete(el);
+          return;
         }
 
-        oldArr = newArr.slice();
+        // remove nodes
+        if (s > b) {
+          const endIndex = a + 1;
+          const startNode = nodeMap.get(oldArr[s])!;
+          const endNode =
+            endIndex === oldLength ? mark : nodeMap.get(oldArr[endIndex])!;
 
-        return;
-      }
+          removeNodes(startNode, endNode, parent);
 
-      // reconcile
-      const positions = [];
-      const elementIndexMap = new Map<T, number>();
+          while (s < endIndex) {
+            const el = oldArr[s++];
 
-      let removedCount = 0;
-      let last = 0;
-      let moved = false;
+            cleanupMap.get(el)!();
+            cleanupMap.delete(el);
+            nodeMap.delete(el);
+          }
 
-      oldLength = a + 1 - s;
-      newLength = b + 1 - s;
+          oldArr = newArr.slice();
 
-      for (let i = 0; i < newLength; ++i) {
-        const index = s + i;
-        positions[i] = -1;
-        elementIndexMap.set(newArr[index], index);
-      }
-
-      for (let i = 0; i < oldLength; ++i) {
-        const oldIndex = s + i;
-        const el = oldArr[oldIndex];
-        const newIndex = elementIndexMap.get(el);
-
-        if (newIndex === undefined) {
-          const node = nodeMap.get(el)!;
-          const end = ((node as any).$lc || node).nextSibling;
-
-          removeNodes(node, end, parent);
-          cleanupMap.get(el)!();
-          cleanupMap.delete(el);
-          nodeMap.delete(el);
-          removedCount++;
-
-          continue;
+          return;
         }
 
-        positions[newIndex - s] = oldIndex;
+        // reconcile
+        const positions = [];
+        const elementIndexMap = new Map<T, number>();
 
-        if (!moved) {
-          if (last > newIndex) moved = true;
-          else last = newIndex;
+        let removedCount = 0;
+        let last = 0;
+        let moved = false;
+
+        oldLength = a + 1 - s;
+        newLength = b + 1 - s;
+
+        for (let i = 0; i < newLength; ++i) {
+          const index = s + i;
+          positions[i] = -1;
+          elementIndexMap.set(newArr[index], index);
         }
-      }
 
-      if (moved) {
-        const lis = getLIS(positions);
+        for (let i = 0; i < oldLength; ++i) {
+          const oldIndex = s + i;
+          const el = oldArr[oldIndex];
+          const newIndex = elementIndexMap.get(el);
 
-        for (let i = 0, j = lis.length - 1; i < newLength; ++i) {
-          const position = positions[newLength - i - 1];
-          const lisPosition = lis[j];
+          if (newIndex === undefined) {
+            const node = nodeMap.get(el)!;
+            const end = ((node as any).$lc || node).nextSibling;
 
-          if (position === lisPosition) {
-            --j;
+            removeNodes(node, end, parent);
+            cleanupMap.get(el)!();
+            cleanupMap.delete(el);
+            nodeMap.delete(el);
+            removedCount++;
+
             continue;
           }
 
-          const index = b - i;
-          const el = newArr[index];
-          const nextEl = newArr[index + 1];
-          const nextNode =
-            nextEl === undefined //
-              ? mark
-              : nodeMap.get(nextEl)!;
+          positions[newIndex - s] = oldIndex;
 
-          if (position < 0) {
+          if (!moved) {
+            if (last > newIndex) moved = true;
+            else last = newIndex;
+          }
+        }
+
+        if (moved) {
+          const lis = getLIS(positions);
+
+          for (let i = 0, j = lis.length - 1; i < newLength; ++i) {
+            const position = positions[newLength - i - 1];
+            const lisPosition = lis[j];
+
+            if (position === lisPosition) {
+              --j;
+              continue;
+            }
+
+            const index = b - i;
+            const el = newArr[index];
+            const nextEl = newArr[index + 1];
+            const nextNode =
+              nextEl === undefined //
+                ? mark
+                : nodeMap.get(nextEl)!;
+
+            if (position < 0) {
+              insertBefore(
+                createListNode(el, mapFn, nodeMap, cleanupMap),
+                nextNode,
+                parent,
+              );
+            } else {
+              const node = nodeMap.get(el)!;
+              const lastChild = (node as any).$lc;
+
+              if (lastChild && node !== lastChild) {
+                let current = node;
+                let next: any;
+
+                while (1) {
+                  next = current.nextSibling!;
+                  insertBefore(current, nextNode, parent);
+                  if (current === lastChild) break;
+                  current = next;
+                }
+              } else {
+                insertBefore(node, nextNode, parent);
+              }
+            }
+          }
+        } else if (oldLength - removedCount !== newLength) {
+          for (let i = 0; i < newLength; ++i) {
+            if (positions[newLength - i - 1] !== -1) continue;
+
+            const index = b - i;
+            const el = newArr[index];
+            const nextEl = newArr[index + 1];
+            const nextNode =
+              nextEl === undefined //
+                ? mark
+                : nodeMap.get(nextEl)!;
+
             insertBefore(
               createListNode(el, mapFn, nodeMap, cleanupMap),
               nextNode,
-              parent
+              parent,
             );
-          } else {
-            const node = nodeMap.get(el)!;
-            const lastChild = (node as any).$lc;
-
-            if (lastChild && node !== lastChild) {
-              let current = node;
-              let next: any;
-
-              while (1) {
-                next = current.nextSibling!;
-                insertBefore(current, nextNode, parent);
-                if (current === lastChild) break;
-                current = next;
-              }
-            } else {
-              insertBefore(node, nextNode, parent);
-            }
           }
         }
-      } else if (oldLength - removedCount !== newLength) {
-        for (let i = 0; i < newLength; ++i) {
-          if (positions[newLength - i - 1] !== -1) continue;
 
-          const index = b - i;
-          const el = newArr[index];
-          const nextEl = newArr[index + 1];
-          const nextNode =
-            nextEl === undefined //
-              ? mark
-              : nodeMap.get(nextEl)!;
-
-          insertBefore(
-            createListNode(el, mapFn, nodeMap, cleanupMap),
-            nextNode,
-            parent
-          );
-        }
-      }
-
-      oldArr = newArr.slice();
-    });
+        oldArr = newArr.slice();
+      },
+      {
+        onDeactivate() {
+          cleanupMap.forEach((cleanup) => cleanup());
+          cleanupMap.clear();
+          nodeMap.clear();
+        },
+      },
+    );
 
     arrSignal.subscribe(NOOP);
-
-    onDeactivate(arrSignal, () => {
-      cleanupMap.forEach((cleanup) => cleanup());
-      cleanupMap.clear();
-      nodeMap.clear();
-    });
 
     return;
   }
@@ -291,7 +294,7 @@ function createListNode<T>(
   el: T,
   mapFn: (e: T) => Node,
   nodeMap: Map<T, Node>,
-  cleanupMap: Map<T, () => any>
+  cleanupMap: Map<T, () => any>,
 ) {
   let node: any;
 

@@ -1,4 +1,4 @@
-import { isSignal, writable } from 'spred';
+import { computed, isSignal, writable } from '@spred/core';
 import { classes } from './classes';
 
 // (compat) tests are copied from clsx package tests
@@ -49,7 +49,7 @@ describe('classes function', () => {
 
   it('(compat) handles arrays that include falsy and true values', () => {
     expect(classes(['a', 0, null, undefined, false, true, 'b'] as any)).toBe(
-      'a b'
+      'a b',
     );
   });
 
@@ -95,7 +95,7 @@ describe('classes function', () => {
     });
 
     expect(out).toBe(
-      'nonEmptyString whitespace emptyObject nonEmptyObject emptyList nonEmptyList greaterZero'
+      'nonEmptyString whitespace emptyObject nonEmptyObject emptyList nonEmptyList greaterZero',
     );
   });
 
@@ -109,16 +109,16 @@ describe('classes function', () => {
     const value = writable<any>(null);
 
     const s: any = classes(
-      () => value() && 'test',
+      () => value.get() && 'test',
       'foo',
       () => 'bar',
-      () => false
+      () => false,
     );
 
-    expect(s()).toBe('foo bar');
+    expect(s.get()).toBe('foo bar');
 
-    value(true);
-    expect(s()).toBe('foo test bar');
+    value.set(true);
+    expect(s.get()).toBe('foo test bar');
   });
 
   it('returns null if all fn results are falsy and there is no static classes', () => {
@@ -129,13 +129,13 @@ describe('classes function', () => {
         test: value,
         qwe: () => false,
       },
-      () => value() && 'bar'
+      () => value.get() && 'bar',
     );
 
-    expect(s()).toBe(null);
+    expect(s.get()).toBe(null);
 
-    value(true);
-    expect(s()).toBe('test bar');
+    value.set(true);
+    expect(s.get()).toBe('test bar');
   });
 
   it('handles fn and signal keys', () => {
@@ -147,10 +147,10 @@ describe('classes function', () => {
       qwe: () => false,
     });
 
-    expect(s()).toBe('bar');
+    expect(s.get()).toBe('bar');
 
-    value(true);
-    expect(s()).toBe('test bar');
+    value.set(true);
+    expect(s.get()).toBe('test bar');
   });
 
   it('handles fn and signal keys mixed static classes', () => {
@@ -163,28 +163,33 @@ describe('classes function', () => {
       qwe: () => false,
     });
 
-    expect(s()).toBe('static class string foo bar');
+    expect(s.get()).toBe('static class string foo bar');
 
-    value(true);
-    expect(s()).toBe('static class string foo test bar');
+    value.set(true);
+    expect(s.get()).toBe('static class string foo test bar');
   });
 
   it('handles fn and signal elements of arrays', () => {
     const value = writable<any>(null);
+    const stringSignal = computed(() => value.get() && 'signal');
 
     const s: any = classes(
-      () => value() && 'test',
+      stringSignal,
+      () => value.get() && 'test',
       'foo',
       true as any,
       ['a', () => 0],
       () => 'bar',
-      [() => value() && 'b', ['c', () => value() && 'd', () => value()]],
-      () => false
+      [
+        () => value.get() && 'b',
+        ['c', () => value.get() && 'd', () => value.get()],
+      ],
+      () => false,
     );
 
-    expect(s()).toBe('foo a bar c');
+    expect(s.get()).toBe('foo a bar c');
 
-    value(true);
-    expect(s()).toBe('foo test a bar b c d');
+    value.set(true);
+    expect(s.get()).toBe('foo signal test a bar b c d');
   });
 });

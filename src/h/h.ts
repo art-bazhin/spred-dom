@@ -13,27 +13,27 @@ import {
 } from '../template-result/template-result';
 
 export function h<TagName extends keyof HTMLElementTagNameMap>(
-  tag: TagName
+  tag: TagName,
 ): TemplateResult<HTMLElementTagNameMap[TagName]>;
 
 export function h<TagName extends keyof HTMLElementTagNameMap>(
   tag: TagName,
-  props: Props<HTMLElementTagNameMap[TagName]>
+  props: Props<HTMLElementTagNameMap[TagName]>,
 ): TemplateResult<HTMLElementTagNameMap[TagName]>;
 
 export function h<TagName extends keyof HTMLElementTagNameMap>(
   tag: TagName,
-  fn: () => any
+  fn: () => any,
 ): TemplateResult<HTMLElementTagNameMap[TagName]>;
 
 export function h<TagName extends keyof HTMLElementTagNameMap>(
-  fn: () => any
+  fn: () => any,
 ): TemplateResult<DocumentFragment>;
 
 export function h<TagName extends keyof HTMLElementTagNameMap>(
   tag: TagName,
   props: Props<HTMLElementTagNameMap[TagName]>,
-  fn: () => any
+  fn: () => any,
 ): TemplateResult<HTMLElementTagNameMap[TagName]>;
 
 export function h(first: any, second?: any, third?: any) {
