@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.8.0](https://github.com/art-bazhin/spred-dom/compare/v0.7.4...v0.8.0) (2024-01-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* bump version
+
+### Features
+
+* add two way binding for text inputs ([14e20df](https://github.com/art-bazhin/spred-dom/commit/14e20dfdf2af36b04d14c08099821078e17db4d5))
+
+
+### Build System
+
+* update dev dependencies ([76c3002](https://github.com/art-bazhin/spred-dom/commit/76c300280ea02f0d73049ed270546d3aa2a54b09))
+
+
+### Code Refactoring
+
+* rename templateFn to template ([4a3cb9e](https://github.com/art-bazhin/spred-dom/commit/4a3cb9e83d390c9525cfadce2001f92b770c502a))
+* update using actual spred version ([d5b9647](https://github.com/art-bazhin/spred-dom/commit/d5b9647b4e15505c81d8aaaf61a347b8e617389d))
+
 ### [0.7.4](https://github.com/art-bazhin/spred-dom/compare/v0.7.3...v0.7.4) (2024-01-31)
 
 
