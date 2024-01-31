@@ -1,6 +1,6 @@
 import { h } from '../h/h';
 import { text } from '../text/text';
-import { component, templateFn } from './component';
+import { component, template } from './component';
 
 describe('component', () => {
   it('creates a function which returns DOM node', () => {
@@ -125,7 +125,7 @@ describe('templateFn', () => {
       return h('div', { textContent: 'test' });
     });
 
-    const test = templateFn(Test);
+    const test = template(Test);
     expect(typeof test).toBe('function');
 
     const Wrap = component(() => {

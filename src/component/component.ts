@@ -43,9 +43,7 @@ export function component<A extends unknown[], N extends Node>(
   };
 }
 
-export function templateFn<A extends unknown[]>(
-  component: (...args: A) => Node,
-) {
+export function template<A extends unknown[]>(component: (...args: A) => Node) {
   return (...args: A) => node(component(...args));
 }
 
