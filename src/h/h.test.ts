@@ -1,6 +1,7 @@
-import { writable } from '@spred/core';
+import { computed, writable } from '@spred/core';
 import { component } from '../component/component';
 import { h } from './h';
+import { fireEvent } from '@testing-library/dom';
 
 describe('h function', () => {
   it('creates element node inside component template', () => {
@@ -343,6 +344,49 @@ describe('h function', () => {
     );
 
     expect(Button().className).toBe('foo bar');
+  });
+
+  it('correctly handles one way binding of text input value prop', () => {
+    const source = writable('foo');
+    const value = computed(() => source.get());
+
+    const Input = component(() =>
+      h('input', {
+        value,
+      }),
+    );
+
+    const input = Input();
+
+    expect(input.value).toBe('foo');
+
+    source.set('bar');
+    expect(input.value).toBe('bar');
+  });
+
+  it('correctly handles two way binding of text input value prop', () => {
+    const value = writable('foo');
+    const Input = component(() => h('input', { value }));
+
+    const input = Input();
+
+    expect(input.value).toBe('foo');
+
+    fireEvent.input(input, { target: { value: 'bar' } });
+    expect(input.value).toBe('bar');
+    expect(value.get()).toBe('bar');
+  });
+
+  it('correctly handles string input value', () => {
+    const Input = component((value: string) =>
+      h('input', {
+        type: () => 'text',
+        value,
+      }),
+    );
+
+    expect(Input('foo').value).toBe('foo');
+    expect(Input('bar').value).toBe('foo'); // second run test
   });
 
   it('correctly handles ref prop', () => {

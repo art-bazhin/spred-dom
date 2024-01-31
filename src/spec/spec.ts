@@ -1,4 +1,4 @@
-import { isSignal, computed, Signal } from '@spred/core';
+import { isSignal, computed, Signal, WritableSignal } from '@spred/core';
 import { ClassMap, ClassName, fromArray, fromObject } from '../classes/classes';
 import { AttrValue, setupAttr, setupSignalProp } from '../dom/dom';
 import { BINDING, next, creatingState, traversalState } from '../state/state';
@@ -61,8 +61,7 @@ export function spec<Element extends HTMLElement>(
     let value = (props as any)[key];
 
     if (reserved) {
-      const result = reserved(node, value);
-      if (result) hasBindings = true;
+      if (reserved(node, value)) hasBindings = true;
       continue;
     }
 
@@ -116,8 +115,35 @@ const RESERVED = {
     cb(node);
     return true;
   },
+
+  value(node: Node, value: any) {
+    return setupTwoWayBinding(node, value, (node, value) => {
+      node.addEventListener('input', (e: any) => {
+        value.set(e.target.value);
+      });
+    });
+  },
 } as any;
 
 const ALIASES = {
   text: 'textContent',
 } as any;
+
+function setupTwoWayBinding<T extends Node>(
+  node: T,
+  value: any,
+  setupWriteFn: (node: T, value: WritableSignal<any>) => void,
+) {
+  if (typeof value === 'function') {
+    setupSignalProp(node, 'value', computed(value));
+    return true;
+  } else if (typeof value === 'object' && value !== null) {
+    if (value.set) setupWriteFn(node, value);
+    setupSignalProp(node, 'value', value);
+    return true;
+  }
+
+  if (creatingState.isCreating) (node as any).value = value;
+
+  return false;
+}
