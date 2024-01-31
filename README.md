@@ -1,3 +1,3 @@
 # spred-dom
 
-Library template repository
+Moved to @spred/dom
