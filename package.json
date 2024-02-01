@@ -17,7 +17,7 @@
     "renderer"
   ],
   "peerDependencies": {
-    "@spred/core": "^0.36.3"
+    "@spred/core": "^0.37.1"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.23.9",
