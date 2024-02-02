@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.2](https://github.com/art-bazhin/spred-dom/compare/v0.8.1...v0.8.2) (2024-02-02)
+
+
+### Bug Fixes
+
+* fix empty class attribute bug ([8df1d23](https://github.com/art-bazhin/spred-dom/commit/8df1d2312cd4a7c2ad0a1eb1ca459a00486ff1d5))
+
 ### [0.8.1](https://github.com/art-bazhin/spred-dom/compare/v0.8.0...v0.8.1) (2024-02-01)
 
 
