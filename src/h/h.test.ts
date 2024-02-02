@@ -346,6 +346,23 @@ describe('h function', () => {
     expect(Button().className).toBe('foo bar');
   });
 
+  it('removes class attribute if all object props become falsy', () => {
+    const foo = writable(true);
+
+    const Button = component(() =>
+      h('button', {
+        class: { foo },
+      }),
+    );
+
+    const button = Button();
+    expect(button.className).toBe('foo');
+
+    foo.set(false);
+    expect(button.className).toBe('');
+    expect(button.hasAttribute('class')).toBe(false);
+  });
+
   it('correctly handles one way binding of text input value prop', () => {
     const source = writable('foo');
     const value = computed(() => source.get());

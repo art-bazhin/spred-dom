@@ -60,7 +60,7 @@ export function fromObject(obj: ClassMap) {
         dynamicResult += key;
       }
 
-      return dynamicResult;
+      return dynamicResult || null;
     };
   }
 

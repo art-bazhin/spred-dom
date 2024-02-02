@@ -192,4 +192,16 @@ describe('classes function', () => {
     value.set(true);
     expect(s.get()).toBe('foo signal test a bar b c d');
   });
+
+  it('returns null if all object props become falsy', () => {
+    const value = writable(true);
+    const s = classes({
+      foo: value,
+    });
+
+    expect((s as any).get()).toBe('foo');
+
+    value.set(false);
+    expect((s as any).get()).toBe(null);
+  });
 });
