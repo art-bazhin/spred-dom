@@ -34,7 +34,7 @@ export type Props<Element extends HTMLElement> = ElProps<Element> & {
     | Signal<AttrValue>
     | ClassMap
     | ClassName[];
-  text?: string | (() => string) | Signal<string>;
+  text?: ElProps<HTMLElement>['textContent'];
   ref?: (el: Element) => any;
 };
 
