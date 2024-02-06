@@ -20,10 +20,9 @@ interface Attrs {
 }
 
 type ElProps<Element extends HTMLElement> = {
-  [key in WritableKeys<Element>]?:
-    | Element[key]
-    | (() => Element[key])
-    | Signal<Element[key]>;
+  [key in WritableKeys<Element>]?: (() => any) extends Element[key]
+    ? Element[key]
+    : Element[key] | (() => Element[key]) | Signal<Element[key]>;
 };
 
 export type Props<Element extends HTMLElement> = ElProps<Element> & {
