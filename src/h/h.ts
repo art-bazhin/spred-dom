@@ -2,7 +2,7 @@ import {
   START_CHILDREN,
   END_CHILDREN,
   next,
-  creatingState,
+  state,
   PARENT_NODE,
   FIRST_CHILD,
 } from '../state/state';
@@ -65,30 +65,30 @@ export function h(first: any, second?: any, third?: any) {
     return TEMPLATE_RESULT;
   }
 
-  if (creatingState.isCreating) {
+  if (state.creating) {
     const child = document.createElement(tag);
 
-    creatingState.root!.appendChild(child);
+    state.root!.appendChild(child);
 
-    creatingState.root = child;
-    creatingState.path += FIRST_CHILD;
+    state.root = child;
+    state.path += FIRST_CHILD;
 
-    spec(props);
+    if (props) spec(props);
 
     if (fn) {
-      creatingState.path += START_CHILDREN;
+      state.path += START_CHILDREN;
       fn();
-      creatingState.path += END_CHILDREN;
+      state.path += END_CHILDREN;
     }
 
-    creatingState.path += PARENT_NODE;
-    creatingState.root = creatingState.root!.parentNode;
+    state.path += PARENT_NODE;
+    state.root = state.root!.parentNode;
 
     return TEMPLATE_RESULT;
   }
 
   next(fn);
-  spec(props, fn);
+  if (props) spec(props, fn);
 
   return TEMPLATE_RESULT;
 }

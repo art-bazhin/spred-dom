@@ -1,19 +1,23 @@
 import { computed, isSignal, Signal } from '@spred/core';
-import { createBinding } from '../create-binding/create-binding';
 import { createMark, Falsy, insertBefore, removeNodes } from '../dom/dom';
-import { creatingState } from '../state/state';
+import { BINDING, FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
 
 export function node(
   binding: Node | Falsy | Signal<Node | Falsy> | (() => Node | Falsy),
 ) {
-  createBinding((mark) => {
-    if (creatingState.isCreating) {
-      creatingState.setupQueue.push(() => setupNode(binding, mark));
-      return;
-    }
+  if (state.creating) {
+    const mark = createMark();
 
-    setupNode(binding, mark);
-  });
+    state.path += FIRST_CHILD + BINDING + PARENT_NODE;
+    state.root!.appendChild(mark);
+    state.setupQueue.push(() => setupNode(binding, mark));
+
+    return;
+  }
+
+  next();
+  setupNode(binding, state.node!);
+  next();
 }
 
 function setupNode(

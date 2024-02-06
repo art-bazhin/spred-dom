@@ -1,27 +1,20 @@
 import { collect, computed, isSignal, Signal } from '@spred/core';
 import { createMark, insertBefore, isFragment, removeNodes } from '../dom/dom';
-import {
-  BINDING,
-  FIRST_CHILD,
-  next,
-  PARENT_NODE,
-  creatingState,
-  traversalState,
-} from '../state/state';
+import { BINDING, FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
 
 export function list<T>(binding: Signal<T[]> | T[], mapFn: (el: T) => Node) {
-  if (creatingState.isCreating && creatingState.root) {
+  if (state.creating) {
     const mark = createMark();
 
-    creatingState.path += FIRST_CHILD + BINDING + PARENT_NODE;
-    creatingState.setupQueue.push(() => setupList(binding, mapFn, mark));
-    creatingState.root.appendChild(mark);
+    state.path += FIRST_CHILD + BINDING + PARENT_NODE;
+    state.setupQueue.push(() => setupList(binding, mapFn, mark));
+    state.root!.appendChild(mark);
 
     return;
   }
 
   next();
-  setupList(binding, mapFn, traversalState.node!);
+  setupList(binding, mapFn, state.node!);
   next();
 }
 

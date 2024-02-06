@@ -1,5 +1,5 @@
 import { computed, Signal } from '@spred/core';
-import { creatingState } from '../state/state';
+import { state } from '../state/state';
 
 export type Falsy = null | undefined | false | 0 | '';
 export type AttrValue = string | true | Falsy;
@@ -53,7 +53,7 @@ export function setupAttr(
     return true;
   }
 
-  if (creatingState.isCreating) setupBaseAttr(node, key, value);
+  if (state.creating) setupBaseAttr(node, key, value);
 
   return false;
 }

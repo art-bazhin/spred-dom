@@ -1,7 +1,7 @@
 import { isSignal, computed, Signal, WritableSignal } from '@spred/core';
 import { ClassMap, ClassName, fromArray, fromObject } from '../classes/classes';
 import { AttrValue, setupAttr, setupSignalProp } from '../dom/dom';
-import { BINDING, next, creatingState, traversalState } from '../state/state';
+import { BINDING, next, state } from '../state/state';
 
 type IfEquals<X, Y, A = X, B = never> =
   (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? A : B;
@@ -38,20 +38,17 @@ export type Props<Element extends HTMLElement> = ElProps<Element> & {
 };
 
 export function spec<Element extends HTMLElement>(
-  props?: Props<Element>,
+  props: Props<Element>,
   fn?: () => any,
 ) {
-  if (!props || (creatingState.isCreating && !creatingState.root)) return;
-
   let node: Element;
   let hasBindings = false;
 
-  if (creatingState.isCreating) {
-    node = creatingState.root! as Element;
+  if (state.creating) {
+    node = state.root! as Element;
   } else {
-    if (traversalState.path[traversalState.i] !== BINDING) return;
-
-    node = traversalState.node! as Element;
+    if (state.path[state.i] !== BINDING) return;
+    node = state.node! as Element;
     next(fn);
   }
 
@@ -82,11 +79,11 @@ export function spec<Element extends HTMLElement>(
       continue;
     }
 
-    if (creatingState.isCreating) (node as any)[key] = value;
+    if (state.creating) (node as any)[key] = value;
   }
 
-  if (hasBindings && creatingState.isCreating) {
-    creatingState.path += BINDING;
+  if (hasBindings && state.creating) {
+    state.path += BINDING;
   }
 }
 
@@ -142,7 +139,7 @@ function setupTwoWayBinding<T extends Node>(
     return true;
   }
 
-  if (creatingState.isCreating) (node as any).value = value;
+  if (state.creating) (node as any).value = value;
 
   return false;
 }
