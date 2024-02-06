@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.4](https://github.com/art-bazhin/spred-dom/compare/v0.8.3...v0.8.4) (2024-02-06)
+
+
+### Bug Fixes
+
+* fix event listener type ([e1ee90c](https://github.com/art-bazhin/spred-dom/commit/e1ee90cd3c0ff45bc7169ef80f2a8827e4a58606))
+
+
+### Code Refactoring
+
+* remove redundant checks ([7e732a7](https://github.com/art-bazhin/spred-dom/commit/7e732a71d42090d8a9e9d9b0d8187e137b1be942))
+
 ### [0.8.3](https://github.com/art-bazhin/spred-dom/compare/v0.8.2...v0.8.3) (2024-02-05)
 
 
