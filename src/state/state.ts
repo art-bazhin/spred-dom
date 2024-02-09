@@ -1,5 +1,4 @@
 interface State {
-  root: Node | null;
   node: Node | null;
   creating: boolean;
   path: string;
@@ -8,7 +7,6 @@ interface State {
 }
 
 export const state: State = {
-  root: null,
   node: null,
   creating: false,
   path: '',

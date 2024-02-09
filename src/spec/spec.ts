@@ -37,20 +37,9 @@ export type Props<Element extends HTMLElement> = ElProps<Element> & {
   ref?: (el: Element) => any;
 };
 
-export function spec<Element extends HTMLElement>(
-  props: Props<Element>,
-  fn?: () => any,
-) {
-  let node: Element;
+export function spec<Element extends HTMLElement>(props: Props<Element>) {
+  let node = state.node!;
   let hasBindings = false;
-
-  if (state.creating) {
-    node = state.root! as Element;
-  } else {
-    if (state.path[state.i] !== BINDING) return;
-    node = state.node! as Element;
-    next(fn);
-  }
 
   for (let key in props) {
     const reserved = RESERVED[key];

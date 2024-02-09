@@ -7,7 +7,7 @@ export function text(data: string | Signal<string> | (() => string)) {
 
   if (state.creating) {
     node = document.createTextNode('_');
-    state.root!.appendChild(node);
+    state.node!.appendChild(node);
   } else {
     next();
     node = state.node!;

@@ -8,7 +8,7 @@ export function list<T>(binding: Signal<T[]> | T[], mapFn: (el: T) => Node) {
 
     state.path += FIRST_CHILD + BINDING + PARENT_NODE;
     state.setupQueue.push(() => setupList(binding, mapFn, mark));
-    state.root!.appendChild(mark);
+    state.node!.appendChild(mark);
 
     return;
   }

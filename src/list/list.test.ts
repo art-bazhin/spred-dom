@@ -23,6 +23,18 @@ describe('list function', () => {
     return h('span', { id, textContent: id });
   });
 
+  const ItemWithChildren = component((_id: string) => {
+    const id = () => _id;
+    return h('span', () => {
+      h('span', () => {
+        h('span', { text: id });
+      });
+      h('span', () => {
+        h('span', { text: id });
+      });
+    });
+  });
+
   const FragmentItem = component((_id: string) => {
     const id = () => _id;
     return h(() => {
@@ -42,6 +54,22 @@ describe('list function', () => {
 
     const div = Div();
     expect(div.textContent).toBe('abcd');
+  });
+
+  it('renders list of elements with nested children', () => {
+    const arr = writable([] as any);
+
+    const Div = component(() =>
+      h('div', () => {
+        list(arr, ItemWithChildren);
+      }),
+    );
+
+    const div = Div();
+    expect(div.textContent).toBe('');
+
+    arr.set(['a', 'b', 'c', 'd']);
+    expect(div.textContent).toBe('aabbccdd');
   });
 
   it('cleans up inner subscriptions on parent signal change', () => {

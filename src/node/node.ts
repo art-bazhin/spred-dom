@@ -9,7 +9,7 @@ export function node(
     const mark = createMark();
 
     state.path += FIRST_CHILD + BINDING + PARENT_NODE;
-    state.root!.appendChild(mark);
+    state.node!.appendChild(mark);
     state.setupQueue.push(() => setupNode(binding, mark));
 
     return;

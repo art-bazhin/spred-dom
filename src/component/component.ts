@@ -77,9 +77,9 @@ function createComponentData<A extends unknown[]>(
   const prevPath = state.path;
   state.path = '';
 
-  const prevRoot = state.root;
+  const prevNode = state.node;
   let root: Node = document.createDocumentFragment();
-  state.root = root;
+  state.node = root;
 
   const prevIsCreating = state.creating;
   state.creating = true;
@@ -90,7 +90,7 @@ function createComponentData<A extends unknown[]>(
 
   state.creating = prevIsCreating;
   state.path = prevPath;
-  state.root = prevRoot;
+  state.node = prevNode;
 
   if (root.childNodes.length === 1 && !isMark(root.firstChild)) {
     root = root.firstChild!;

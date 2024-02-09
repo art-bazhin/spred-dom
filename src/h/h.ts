@@ -5,6 +5,7 @@ import {
   state,
   PARENT_NODE,
   FIRST_CHILD,
+  BINDING,
 } from '../state/state';
 import { Props, spec } from '../spec/spec';
 import {
@@ -68,9 +69,9 @@ export function h(first: any, second?: any, third?: any) {
   if (state.creating) {
     const child = document.createElement(tag);
 
-    state.root!.appendChild(child);
+    state.node!.appendChild(child);
 
-    state.root = child;
+    state.node = child;
     state.path += FIRST_CHILD;
 
     if (props) spec(props);
@@ -82,13 +83,17 @@ export function h(first: any, second?: any, third?: any) {
     }
 
     state.path += PARENT_NODE;
-    state.root = state.root!.parentNode;
+    state.node = state.node!.parentNode;
 
     return TEMPLATE_RESULT;
   }
 
   next(fn);
-  if (props) spec(props, fn);
+
+  if (props && state.path[state.i] === BINDING) {
+    spec(props);
+    next(fn);
+  }
 
   return TEMPLATE_RESULT;
 }
