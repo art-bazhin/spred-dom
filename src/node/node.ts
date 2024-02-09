@@ -1,12 +1,12 @@
 import { computed, isSignal, Signal } from '@spred/core';
-import { createMark, Falsy, insertBefore, removeNodes } from '../dom/dom';
+import { Falsy, insertBefore, removeNodes } from '../dom/dom';
 import { BINDING, FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
 
 export function node(
   binding: Node | Falsy | Signal<Node | Falsy> | (() => Node | Falsy),
 ) {
   if (state.creating) {
-    const mark = createMark();
+    const mark = document.createComment('');
 
     state.path += FIRST_CHILD + BINDING + PARENT_NODE;
     state.node!.appendChild(mark);
@@ -43,7 +43,7 @@ function setupSignalNode(binding: Signal<Node | Falsy>, mark: Node) {
   let start = mark.previousSibling;
 
   if (!start) {
-    start = createMark();
+    start = document.createComment('');
     insertBefore(start, mark);
   }
 

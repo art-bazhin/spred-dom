@@ -26,14 +26,6 @@ export function isFragment(node: Node): node is DocumentFragment {
   return node.nodeType === Node.DOCUMENT_FRAGMENT_NODE;
 }
 
-export function createMark() {
-  return document.createTextNode('');
-}
-
-export function isMark(node: Node | null) {
-  return node && node.nodeType === Node.TEXT_NODE && !node.textContent;
-}
-
 export function setupSignalProp(node: Node, key: string, signal: Signal<any>) {
   signal.subscribe((value) => ((node as any)[key] = value));
 }

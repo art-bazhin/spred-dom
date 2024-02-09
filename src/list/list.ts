@@ -1,10 +1,10 @@
 import { collect, computed, isSignal, Signal } from '@spred/core';
-import { createMark, insertBefore, isFragment, removeNodes } from '../dom/dom';
+import { insertBefore, isFragment, removeNodes } from '../dom/dom';
 import { BINDING, FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
 
 export function list<T>(binding: Signal<T[]> | T[], mapFn: (el: T) => Node) {
   if (state.creating) {
-    const mark = createMark();
+    const mark = document.createComment('');
 
     state.path += FIRST_CHILD + BINDING + PARENT_NODE;
     state.setupQueue.push(() => setupList(binding, mapFn, mark));
@@ -27,7 +27,7 @@ function setupList<T>(
     let start = mark.previousSibling;
 
     if (!start) {
-      start = createMark();
+      start = document.createComment('');
       insertBefore(start, mark);
     }
 
@@ -300,7 +300,7 @@ function createListNode<T>(
   if (isFragment(node)) {
     const firstChild = node.firstChild;
 
-    nodeInMap = createMark();
+    nodeInMap = document.createComment('');
 
     if (firstChild) node.insertBefore(nodeInMap, firstChild);
     else node.appendChild(nodeInMap);

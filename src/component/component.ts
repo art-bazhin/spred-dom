@@ -1,5 +1,4 @@
 import { isolate } from '@spred/core';
-import { isMark } from '../dom/dom';
 import { node } from '../node/node';
 import {
   BINDING,
@@ -92,7 +91,10 @@ function createComponentData<A extends unknown[]>(
   state.path = prevPath;
   state.node = prevNode;
 
-  if (root.childNodes.length === 1 && !isMark(root.firstChild)) {
+  if (
+    root.childNodes.length === 1 &&
+    root.firstChild!.nodeType !== Node.COMMENT_NODE
+  ) {
     root = root.firstChild!;
     if (path[0] === FIRST_CHILD) path = '_' + path.substring(1);
   }
