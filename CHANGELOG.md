@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.9.0](https://github.com/art-bazhin/spred-dom/compare/v0.8.4...v0.9.0) (2024-02-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* fn values don't become signals automatically
+
+### Features
+
+* use fn values to set props during component render ([96afda6](https://github.com/art-bazhin/spred-dom/commit/96afda6451ae309ac5de492bb72a7debbfe28a76))
+
+
+### Code Refactoring
+
+* reduce call stack size during traversal ([72e6ccc](https://github.com/art-bazhin/spred-dom/commit/72e6ccc1a25646225577784382c116761770d5ea))
+* use comment nodes as markers ([b3e6c4f](https://github.com/art-bazhin/spred-dom/commit/b3e6c4f0334b30d1e7633e3093190dcc5f4fed10))
+
 ### [0.8.4](https://github.com/art-bazhin/spred-dom/compare/v0.8.3...v0.8.4) (2024-02-06)
 
 
