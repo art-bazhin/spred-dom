@@ -15,29 +15,28 @@ export function classes(
   ...args: ClassName[]
 ): string | null | Signal<string | null>;
 export function classes() {
-  const result = fromArray(arguments as any);
-
-  if (typeof result === 'function') {
-    return computed(result);
-  }
-
-  return result;
+  return fromArray(arguments as any);
 }
 
 export function fromObject(obj: ClassMap) {
-  let dynamic: string[] | undefined;
+  let functions: string[] | undefined;
+  let signals: string[] | undefined;
   let result = '';
+  let functionResult: (() => string | null) | undefined;
 
   for (let key in obj) {
     const value = obj[key];
 
     if (value) {
-      if (
-        typeof value === 'function' ||
-        (typeof value === 'object' && isSignal(value))
-      ) {
-        if (!dynamic) dynamic = [];
-        dynamic.push(key);
+      if (typeof value === 'function') {
+        if (!functions) functions = [];
+        functions.push(key);
+        continue;
+      }
+
+      if (isSignal(value)) {
+        if (!signals) signals = [];
+        signals.push(key);
         continue;
       }
 
@@ -46,14 +45,12 @@ export function fromObject(obj: ClassMap) {
     }
   }
 
-  if (dynamic) {
-    return () => {
+  if (functions) {
+    functionResult = () => {
       let dynamicResult = result;
 
-      for (let key of dynamic!) {
-        const prop = obj[key];
-        const value =
-          typeof prop === 'object' ? (prop as any).get() : (prop as any)();
+      for (let key of functions!) {
+        const value = (obj as any)[key]();
 
         if (!value) continue;
         if (dynamicResult) dynamicResult += ' ';
@@ -64,53 +61,95 @@ export function fromObject(obj: ClassMap) {
     };
   }
 
-  return result || null;
+  if (signals) {
+    if (functionResult) result = functionResult() || '';
+
+    return computed(() => {
+      let dynamicResult = result;
+
+      for (let key of signals!) {
+        const value = (obj as any)[key].get();
+
+        if (!value) continue;
+        if (dynamicResult) dynamicResult += ' ';
+        dynamicResult += key;
+      }
+
+      return dynamicResult || null;
+    });
+  }
+
+  return functionResult || result || null;
 }
 
 export function fromArray(arr: ClassName[]) {
+  let functions: (() => Falsy | string)[] | undefined;
+  let signals: Signal<Falsy | string>[] | undefined;
   let result = '';
-  let dynamic: (Signal<Falsy | string> | (() => Falsy | string))[] | undefined;
+  let functionResult: (() => string | null) | undefined;
 
   for (let i = 0; i < arr.length; i++) {
-    let item = arr[i] as any;
-    let signal = false;
+    let item = arr[i];
 
     if (!item) continue;
 
     if (typeof item === 'object') {
       if (Array.isArray(item)) item = fromArray(item);
-      else if (isSignal(item)) signal = true;
-      else item = fromObject(item);
+      else if (!isSignal(item)) item = fromObject(item);
     }
 
-    if (item) {
-      const itemType = typeof item;
+    if (typeof item === 'function') {
+      if (!functions) functions = [];
+      functions.push(item);
+      continue;
+    }
 
-      if (signal || itemType === 'function') {
-        if (!dynamic) dynamic = [];
-        dynamic.push(item);
-      } else if (itemType === 'string') {
-        if (result) result += ' ';
-        result += item;
-      }
+    if (typeof item === 'string') {
+      if (result) result += ' ';
+      result += item;
+      continue;
+    }
+
+    if (isSignal(item)) {
+      if (!signals) signals = [];
+      signals.push(item);
+      continue;
     }
   }
 
-  if (dynamic) {
-    return () => {
+  if (functions) {
+    functionResult = () => {
       let dynamicResult = result;
 
-      for (let el of dynamic!) {
-        const add = typeof el === 'object' ? el.get() : el();
+      for (let fn of functions!) {
+        const value = fn();
 
-        if (add && typeof add === 'string') {
-          if (dynamicResult) dynamicResult += ' ';
-          dynamicResult += add;
-        }
+        if (!value || typeof value !== 'string') continue;
+        if (dynamicResult) dynamicResult += ' ';
+        dynamicResult += value;
       }
+
       return dynamicResult || null;
     };
   }
 
-  return result || null;
+  if (signals) {
+    if (functionResult) result = functionResult() || '';
+
+    return computed(() => {
+      let dynamicResult = result;
+
+      for (let s of signals!) {
+        const value = s.get();
+
+        if (!value || typeof value !== 'string') continue;
+        if (dynamicResult) dynamicResult += ' ';
+        dynamicResult += value;
+      }
+
+      return dynamicResult || null;
+    });
+  }
+
+  return functionResult || result || null;
 }

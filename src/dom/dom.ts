@@ -36,7 +36,7 @@ export function setupAttr(
   value: AttrValue | (() => AttrValue) | Signal<AttrValue>,
 ) {
   if (typeof value === 'function') {
-    setupSignalAttr(node, key, computed(value));
+    setupBaseAttr(node, key, value());
     return true;
   }
 

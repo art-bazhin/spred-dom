@@ -99,17 +99,46 @@ describe('classes function', () => {
     );
   });
 
-  it('returns signal if fn arguments passed', () => {
-    expect(isSignal(classes(() => 'test'))).toBeTruthy();
-    expect(isSignal(classes('foo', () => 'test'))).toBeTruthy();
-    expect(isSignal(classes('foo', { bar: () => true }))).toBeTruthy();
+  it('returns function if fn arguments passed', () => {
+    expect(typeof classes(() => 'test')).toBe('function');
+    expect(typeof classes('foo', () => 'test')).toBe('function');
+    expect(typeof classes('foo', { bar: () => true })).toBe('function');
+  });
+
+  it('returns signal if signal arguments passed', () => {
+    expect(isSignal(classes(computed(() => 'test')))).toBeTruthy();
+
+    expect(
+      isSignal(
+        classes(
+          'foo',
+          computed(() => 'test'),
+        ),
+      ),
+    ).toBeTruthy();
+
+    expect(
+      isSignal(
+        classes(
+          'foo',
+          () => 'test',
+          computed(() => 'test'),
+        ),
+      ),
+    ).toBeTruthy();
+
+    expect(isSignal(classes('foo', { bar: writable(true) }))).toBeTruthy();
+
+    expect(
+      isSignal(classes('foo', { foo: () => true, bar: writable(true) })),
+    ).toBeTruthy();
   });
 
   it('handles fn and signal args', () => {
     const value = writable<any>(null);
 
     const s: any = classes(
-      () => value.get() && 'test',
+      computed(() => value.get() && 'test'),
       'foo',
       () => 'bar',
       () => false,
@@ -118,7 +147,25 @@ describe('classes function', () => {
     expect(s.get()).toBe('foo bar');
 
     value.set(true);
-    expect(s.get()).toBe('foo test bar');
+    expect(s.get()).toBe('foo bar test');
+  });
+
+  it('handles fn object props', () => {
+    const result: any = classes({
+      foo: () => 'bar',
+      bar: () => false,
+    });
+
+    expect(result()).toBe('foo');
+  });
+
+  it('handles signal object props', () => {
+    const result: any = classes({
+      foo: computed(() => 'bar'),
+      bar: computed(() => false),
+    });
+
+    expect(result.get()).toBe('foo');
   });
 
   it('returns null if all fn results are falsy and there is no static classes', () => {
@@ -129,13 +176,30 @@ describe('classes function', () => {
         test: value,
         qwe: () => false,
       },
-      () => value.get() && 'bar',
+      computed(() => value.get() && 'bar'),
     );
 
     expect(s.get()).toBe(null);
 
     value.set(true);
     expect(s.get()).toBe('test bar');
+  });
+
+  it('returns null if all fn results are falsy and there is no static classes (case 2)', () => {
+    const value = writable<any>(null);
+
+    const s: any = classes(
+      {
+        test: false,
+        qwe: () => false,
+      },
+      computed(() => value.get() && 'bar'),
+    );
+
+    expect(s.get()).toBe(null);
+
+    value.set(true);
+    expect(s.get()).toBe('bar');
   });
 
   it('handles fn and signal keys', () => {
@@ -150,10 +214,10 @@ describe('classes function', () => {
     expect(s.get()).toBe('bar');
 
     value.set(true);
-    expect(s.get()).toBe('test bar');
+    expect(s.get()).toBe('bar test');
   });
 
-  it('handles fn and signal keys mixed static classes', () => {
+  it('handles fn and signal keys mixed with static classes', () => {
     const value = writable<any>(null);
 
     const s: any = classes('static class string', {
@@ -166,7 +230,7 @@ describe('classes function', () => {
     expect(s.get()).toBe('static class string foo bar');
 
     value.set(true);
-    expect(s.get()).toBe('static class string foo test bar');
+    expect(s.get()).toBe('static class string foo bar test');
   });
 
   it('handles fn and signal elements of arrays', () => {
@@ -175,14 +239,14 @@ describe('classes function', () => {
 
     const s: any = classes(
       stringSignal,
-      () => value.get() && 'test',
+      computed(() => value.get() && 'test'),
       'foo',
       true as any,
-      ['a', () => 0],
+      ['a', () => 1 as any],
       () => 'bar',
       [
-        () => value.get() && 'b',
-        ['c', () => value.get() && 'd', () => value.get()],
+        computed(() => value.get() && 'b'),
+        ['c', computed(() => value.get() && 'd'), computed(() => value.get())],
       ],
       () => false,
     );
@@ -190,7 +254,7 @@ describe('classes function', () => {
     expect(s.get()).toBe('foo a bar c');
 
     value.set(true);
-    expect(s.get()).toBe('foo signal test a bar b c d');
+    expect(s.get()).toBe('foo a bar signal test b c d');
   });
 
   it('returns null if all object props become falsy', () => {

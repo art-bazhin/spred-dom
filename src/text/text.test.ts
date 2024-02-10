@@ -21,24 +21,24 @@ describe('text function', () => {
     expect(test.childNodes[1].textContent).toBe('b');
   });
 
-  it('can use fn as node data', () => {
-    const Test = component(() =>
+  it('can use fn as dynamic node data', () => {
+    const Test = component((value: string) =>
       h('div', () => {
-        text(() => 'a');
+        text(() => value);
       }),
     );
 
-    let test = Test();
+    let test = Test('a');
 
     expect(test.textContent).toBe('a');
     expect(test.childNodes[0].nodeType).toBe(Node.TEXT_NODE);
     expect(test.childNodes[0].textContent).toBe('a');
 
-    test = Test(); // test second render
+    test = Test('b'); // test second render
 
-    expect(test.textContent).toBe('a');
+    expect(test.textContent).toBe('b');
     expect(test.childNodes[0].nodeType).toBe(Node.TEXT_NODE);
-    expect(test.childNodes[0].textContent).toBe('a');
+    expect(test.childNodes[0].textContent).toBe('b');
   });
 
   it('can use signal as node data', () => {
@@ -47,25 +47,6 @@ describe('text function', () => {
     const Test = component(() => {
       return h('div', () => {
         text(value);
-      });
-    });
-
-    const test = Test();
-
-    expect(test.textContent).toBe('a');
-    expect(test.childNodes[0].nodeType).toBe(Node.TEXT_NODE);
-    expect(test.childNodes[0].textContent).toBe('a');
-
-    value.set('b');
-    expect(test.childNodes[0].textContent).toBe('b');
-  });
-
-  it('turns the fn value into a signal', () => {
-    const value = writable('a');
-
-    const Test = component(() => {
-      return h('div', () => {
-        text(() => value.get());
       });
     });
 

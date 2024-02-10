@@ -60,7 +60,7 @@ export function spec<Element extends HTMLElement>(props: Props<Element>) {
         continue;
       }
 
-      setupSignalProp(node, key, computed(value));
+      (node as any)[key] = value();
       continue;
     } else if (typeof value === 'object' && value !== null) {
       hasBindings = true;

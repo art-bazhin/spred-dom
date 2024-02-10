@@ -20,7 +20,8 @@ export function text(data: string | Signal<string> | (() => string)) {
       state.path += FIRST_CHILD + BINDING + PARENT_NODE;
     } else next();
 
-    setupSignalProp(node, 'textContent', isFunction ? computed(data) : data);
+    if (isFunction) node.textContent = data();
+    else setupSignalProp(node, 'textContent', data);
 
     return;
   }

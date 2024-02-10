@@ -50,19 +50,17 @@ describe('h function', () => {
     expect(onclick).toBeCalledTimes(2);
   });
 
-  it('can use functions as element props', () => {
-    const textContent = () => 'text';
-
-    const Button = component(() =>
-      h('button', { textContent, type: 'button' }),
+  it('can use functions as dynamic element props', () => {
+    const Button = component((value: string) =>
+      h('button', { textContent: () => value, type: 'button' }),
     );
 
-    let button = Button();
+    let button = Button('text');
     expect(button.textContent).toBe('text');
     expect(button.type).toBe('button');
 
-    button = Button(); // second render test
-    expect(button.textContent).toBe('text');
+    button = Button('another text'); // second render test
+    expect(button.textContent).toBe('another text');
     expect(button.type).toBe('button');
   });
 
@@ -79,23 +77,10 @@ describe('h function', () => {
     expect(button.textContent).toBe('after');
   });
 
-  it('turns the fn prop value into a signal', () => {
-    const val = writable('before');
-    const textContent = () => val.get();
-
-    const Button = component(() => h('button', { textContent }));
-
-    const button = Button();
-
-    expect(button.textContent).toBe('before');
-
-    val.set('after');
-    expect(button.textContent).toBe('after');
-  });
-
   it('can set element attrs', () => {
     const Button = component(() =>
       h('button', {
+        onclick() {},
         attrs: {
           class: 'test',
           'data-foo': 'bar',
@@ -107,7 +92,16 @@ describe('h function', () => {
       }),
     );
 
-    const button = Button();
+    let button = Button();
+
+    expect(button.getAttribute('class')).toBe('test');
+    expect(button.getAttribute('data-foo')).toBe('bar');
+    expect(button.getAttribute('data-bar')).toBe('');
+    expect(button.getAttribute('false')).toBe(null);
+    expect(button.getAttribute('null')).toBe(null);
+    expect(button.getAttribute('undefined')).toBe(null);
+
+    button = Button(); // second render test
 
     expect(button.getAttribute('class')).toBe('test');
     expect(button.getAttribute('data-foo')).toBe('bar');
@@ -117,17 +111,20 @@ describe('h function', () => {
     expect(button.getAttribute('undefined')).toBe(null);
   });
 
-  it('can use fn as element attr value', () => {
-    const Button = component(() =>
+  it('can use fn as dynamic element attr value', () => {
+    const Button = component((value: string) =>
       h('button', {
         attrs: {
-          class: () => 'test',
+          class: () => value,
         },
       }),
     );
 
-    const button = Button();
-    expect(button.getAttribute('class')).toBe('test');
+    const button = Button('foo');
+    expect(button.getAttribute('class')).toBe('foo');
+
+    const button2 = Button('bar');
+    expect(button2.getAttribute('class')).toBe('bar');
   });
 
   it('can use signal as element attr value', () => {
@@ -143,37 +140,6 @@ describe('h function', () => {
 
     const button = Button();
     expect(button.getAttribute('class')).toBe('foo');
-
-    value.set(null);
-    expect(button.getAttribute('class')).toBe(null);
-
-    value.set('bar');
-    expect(button.getAttribute('class')).toBe('bar');
-
-    value.set(false);
-    expect(button.getAttribute('class')).toBe(null);
-
-    value.set(true);
-    expect(button.getAttribute('class')).toBe('');
-  });
-
-  it('turns the fn attr value into a signal', () => {
-    const value = writable<any>('foo');
-
-    const Button = component(() =>
-      h('button', {
-        attrs: {
-          class: () => value.get(),
-          'data-foo': 'bar',
-        },
-      }),
-    );
-
-    Button();
-    const button = Button(); // second render test
-
-    expect(button.getAttribute('class')).toBe('foo');
-    expect(button.getAttribute('data-foo')).toBe('bar');
 
     value.set(null);
     expect(button.getAttribute('class')).toBe(null);
