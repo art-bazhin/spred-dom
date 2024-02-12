@@ -17,15 +17,9 @@ export const state: State = {
 export const FIRST_CHILD = 'F';
 export const NEXT_SIBLING = 'N';
 export const PARENT_NODE = 'P';
-export const BINDING = 'B';
-export const START_CHILDREN = '>';
-export const END_CHILDREN = '<';
 
-export function next(fn?: () => any) {
-  const current = state.path[state.i];
-  const nextValue = state.path[++state.i];
-
-  switch (current) {
+export function next() {
+  switch (state.path[state.i++]) {
     case FIRST_CHILD:
       state.node = state.node!.firstChild;
       break;
@@ -33,15 +27,5 @@ export function next(fn?: () => any) {
     case NEXT_SIBLING:
       state.node = state.node!.nextSibling;
       break;
-
-    case PARENT_NODE:
-      state.node = state.node!.parentNode;
-      next(fn);
-      break;
-  }
-
-  if (nextValue === START_CHILDREN) {
-    ++state.i;
-    fn!();
   }
 }

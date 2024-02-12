@@ -1,8 +1,6 @@
 import { writable } from '@spred/core';
 import { component } from '../component/component';
 import { h } from '../h/h';
-import { node } from '../node/node';
-import { text } from '../text/text';
 import { getLIS, list } from './list';
 
 describe('getLIS function', () => {
@@ -18,28 +16,38 @@ describe('getLIS function', () => {
 });
 
 describe('list function', () => {
-  const Item = component((_id: string) => {
-    const id = () => _id;
-    return h('span', { id, textContent: id });
+  const Item = component((id: string) => {
+    return h('span', (span) => {
+      span.id = id;
+      span.textContent = id;
+    });
   });
 
-  const ItemWithChildren = component((_id: string) => {
-    const id = () => _id;
+  const ItemWithChildren = component((id: string) => {
     return h('span', () => {
       h('span', () => {
-        h('span', { text: id });
+        h('span', (span) => {
+          span.textContent = id;
+        });
       });
       h('span', () => {
-        h('span', { text: id });
+        h('span', (span) => {
+          span.textContent = id;
+        });
       });
     });
   });
 
-  const FragmentItem = component((_id: string) => {
-    const id = () => _id;
-    return h(() => {
-      h('span', { id, textContent: id });
-      h('span', { id, textContent: id });
+  const FragmentItem = component((id: string) => {
+    return h(null, () => {
+      h('span', (span) => {
+        span.id = id;
+        span.textContent = id;
+      });
+      h('span', (span) => {
+        span.id = id;
+        span.textContent = id;
+      });
     });
   });
 
@@ -82,19 +90,21 @@ describe('list function', () => {
       counter.subscribe(() => spy());
 
       return h('span', () => {
-        h('span', { textContent: () => str });
+        h('span', (span) => {
+          span.textContent = str;
+        });
       });
     });
 
     const List = component(() =>
-      h(() => {
+      h(null, () => {
         list(arr, Item);
       }),
     );
 
     const App = component(() =>
-      h(() => {
-        node(() => toggle.get() && List());
+      h(null, () => {
+        h(() => toggle.get() && List());
       }),
     );
 
@@ -137,21 +147,21 @@ describe('list function', () => {
 
       const Div = component(() =>
         h('div', () => {
-          text(''); // test rendering with previous node
+          h('span'); // test rendering with previous node
           list(arr, Item);
         }),
       );
 
       const div = Div();
       expect(div.textContent).toBe('abcd');
-      expect(div.children.length).toBe(4);
+      expect(div.children.length).toBe(5);
 
       const first = div.firstElementChild;
       const last = div.lastElementChild;
 
       arr.set(['a', 'b', 'x', 'y', 'c', 'd']);
       expect(div.textContent).toBe('abxycd');
-      expect(div.children.length).toBe(6);
+      expect(div.children.length).toBe(7);
       expect(first).toBe(div.firstElementChild);
       expect(last).toBe(div.lastElementChild);
     });
@@ -341,7 +351,7 @@ describe('list function', () => {
     it('can render empty items', () => {
       const arr = writable<string[]>(['a', 'b', 'c', 'd', 'e', 'f', 'g']);
 
-      const Item = component(() => h(() => {}));
+      const Item = component(() => h(null, () => {}));
 
       const Div = component(() =>
         h('div', () => {
@@ -389,14 +399,14 @@ describe('list function', () => {
 
       const Div = component(() =>
         h('div', () => {
-          text(''); // test rendering with previous node
+          h('span'); // test rendering with previous node
           list(arr, Item);
         }),
       );
 
       const div = Div();
       expect(div.textContent).toBe('abcd');
-      expect(div.children.length).toBe(4);
+      expect(div.children.length).toBe(5);
 
       const first = div.firstElementChild;
       const last = div.lastElementChild;
@@ -405,7 +415,7 @@ describe('list function', () => {
       arr.update();
 
       expect(div.textContent).toBe('abxycd');
-      expect(div.children.length).toBe(6);
+      expect(div.children.length).toBe(7);
       expect(first).toBe(div.firstElementChild);
       expect(last).toBe(div.lastElementChild);
     });
@@ -644,7 +654,7 @@ describe('list function', () => {
     it('can render empty items', () => {
       const arr = writable<string[]>(['a', 'b', 'c', 'd', 'e', 'f', 'g']);
 
-      const Item = component(() => h(() => {}));
+      const Item = component(() => h(null, () => {}));
 
       const Div = component(() =>
         h('div', () => {

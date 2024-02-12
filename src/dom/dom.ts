@@ -1,7 +1,7 @@
 import { computed, Signal } from '@spred/core';
 import { state } from '../state/state';
 
-export type Falsy = null | undefined | false | 0 | '';
+export type Falsy = null | undefined | false;
 export type AttrValue = string | true | Falsy;
 
 export function insertBefore(child: Node, mark: Node, parentNode?: Node) {
@@ -20,10 +20,6 @@ export function removeNodes(start: Node, end: Node, parentNode?: Node) {
     parent.removeChild(current);
     current = next;
   }
-}
-
-export function isFragment(node: Node): node is DocumentFragment {
-  return node.nodeType === Node.DOCUMENT_FRAGMENT_NODE;
 }
 
 export function setupSignalProp(node: Node, key: string, signal: Signal<any>) {

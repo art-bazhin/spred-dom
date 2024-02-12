@@ -18,12 +18,20 @@ describe('classes function', () => {
   });
 
   it('(change: ignore non string values) joins arrays of class names and ignore falsy values', () => {
-    const out = classes('a', 0, null, undefined, true as any, 1 as any, 'b');
+    const out = classes(
+      'a',
+      0 as any,
+      null,
+      undefined,
+      true as any,
+      1 as any,
+      'b',
+    );
     expect(out).toBe('a b');
   });
 
   it('(compat) supports heterogenous arguments', () => {
-    expect(classes({ a: true }, 'b', 0)).toBe('a b');
+    expect(classes({ a: true }, 'b', 0 as any)).toBe('a b');
   });
 
   it('(compat) should be trimmed', () => {

@@ -1,14 +1,5 @@
 import { isolate } from '@spred/core';
-import { node } from '../node/node';
-import {
-  BINDING,
-  START_CHILDREN,
-  END_CHILDREN,
-  FIRST_CHILD,
-  NEXT_SIBLING,
-  PARENT_NODE,
-  state,
-} from '../state/state';
+import { FIRST_CHILD, NEXT_SIBLING, PARENT_NODE, state } from '../state/state';
 import { TemplateResult } from '../template-result/template-result';
 
 export function component<A extends unknown[], N extends Node>(
@@ -39,10 +30,6 @@ export function component<A extends unknown[], N extends Node>(
 
     return rootNode;
   };
-}
-
-export function template<A extends unknown[]>(component: (...args: A) => Node) {
-  return (...args: A) => node(component(...args));
 }
 
 function setupComponent<A extends unknown[]>(
@@ -85,7 +72,9 @@ function createComponentData<A extends unknown[]>(
 
   isolate(fn, args);
 
-  let path = getPathString(state.path);
+  let path = state.path
+    .replace(NEXT_SIBLING_REGEX, NEXT_SIBLING)
+    .replace(PARENT_NODE_REGEX, '');
 
   state.creating = prevIsCreating;
   state.path = prevPath;
@@ -96,35 +85,11 @@ function createComponentData<A extends unknown[]>(
     root.firstChild!.nodeType !== Node.COMMENT_NODE
   ) {
     root = root.firstChild!;
-    if (path[0] === FIRST_CHILD) path = '_' + path.substring(1);
+    path = '_' + path.substring(1);
   }
 
   return { root, path };
 }
 
 const NEXT_SIBLING_REGEX = new RegExp(PARENT_NODE + FIRST_CHILD, 'g');
-const EMPTY_NESTING_REGEX = new RegExp(
-  `${START_CHILDREN}[^${BINDING}${START_CHILDREN}${END_CHILDREN}]*${END_CHILDREN}`,
-  'g',
-);
-const END_CHILDREN_REGEX = new RegExp(END_CHILDREN, 'g');
-const EMPTY_TAIL = new RegExp(`[^${BINDING}]+$`, 'g');
-const PARENT_NODE_REGEX = new RegExp(`${NEXT_SIBLING}+${PARENT_NODE}`, 'g');
-
-function getPathString(str: string) {
-  str = str.replace(NEXT_SIBLING_REGEX, NEXT_SIBLING);
-
-  let prev = '';
-
-  while (prev !== str) {
-    prev = str;
-    str = str.replace(EMPTY_NESTING_REGEX, '');
-  }
-
-  str = str
-    .replace(EMPTY_TAIL, '')
-    .replace(END_CHILDREN_REGEX, '')
-    .replace(PARENT_NODE_REGEX, PARENT_NODE);
-
-  return str;
-}
+const PARENT_NODE_REGEX = new RegExp(PARENT_NODE, 'g');

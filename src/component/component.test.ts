@@ -1,11 +1,10 @@
 import { h } from '../h/h';
-import { text } from '../text/text';
-import { component, template } from './component';
+import { component } from './component';
 
 describe('component', () => {
   it('creates a function which returns DOM node', () => {
     const Test = component(() => {
-      return h(() => {});
+      return h(null, () => {});
     });
 
     expect(typeof Test).toBe('function');
@@ -15,13 +14,13 @@ describe('component', () => {
   it('returns correct DOM structure on the first run', () => {
     const Test = component(() => {
       return h('div', { className: 'test' }, () => {
-        text('Test text');
+        h('span');
         h('ul', () => {
           h('li', { textContent: '1' });
-          h('li', { textContent: () => '2' });
+          h('li', (li) => (li.textContent = '2'));
           h('li', { textContent: '3' });
         });
-        h('div', { textContent: () => 'test' });
+        h('div', (div) => (div.textContent = 'test'));
       });
     });
 
@@ -29,10 +28,11 @@ describe('component', () => {
     expect(root.tagName).toBe('DIV');
     expect(root.className).toBe('test');
 
-    const textNode = root.firstChild as Text;
-    expect(textNode.nodeType).toBe(Node.TEXT_NODE);
+    const span = root.firstChild as HTMLSpanElement;
+    expect(span.nodeType).toBe(Node.ELEMENT_NODE);
+    expect(span.tagName).toBe('SPAN');
 
-    const ul = root.firstElementChild as HTMLUListElement;
+    const ul = root.children[1] as HTMLUListElement;
     expect(ul.tagName).toBe('UL');
 
     const div = root.lastElementChild as HTMLDivElement;
@@ -54,13 +54,13 @@ describe('component', () => {
   it('returns correct DOM structure on the second run', () => {
     const Test = component(() => {
       return h('div', { className: 'test' }, () => {
-        text('Test text');
+        h('span');
         h('ul', () => {
           h('li', { textContent: '1' });
-          h('li', { textContent: () => '2' });
+          h('li', (li) => (li.textContent = '2'));
           h('li', { textContent: '3' });
         });
-        h('div', { textContent: () => 'test' });
+        h('div', (div) => (div.textContent = 'test'));
       });
     });
 
@@ -70,10 +70,11 @@ describe('component', () => {
     expect(root.tagName).toBe('DIV');
     expect(root.className).toBe('test');
 
-    const textNode = root.firstChild as Text;
-    expect(textNode.nodeType).toBe(Node.TEXT_NODE);
+    const span = root.firstChild as HTMLSpanElement;
+    expect(span.nodeType).toBe(Node.ELEMENT_NODE);
+    expect(span.tagName).toBe('SPAN');
 
-    const ul = root.firstElementChild as HTMLUListElement;
+    const ul = root.children[1] as HTMLUListElement;
     expect(ul.tagName).toBe('UL');
 
     const div = root.lastElementChild as HTMLDivElement;
@@ -94,9 +95,9 @@ describe('component', () => {
 
   it('can render document fragments', () => {
     const Test = component(() => {
-      return h(() => {
+      return h(null, () => {
         h('span', { textContent: '1' });
-        h('span', { textContent: () => '2' });
+        h('span', (span) => (span.textContent = '2'));
         h('span', { textContent: '3' });
       });
     });
@@ -116,27 +117,5 @@ describe('component', () => {
 
     expect(span3.tagName).toBe('SPAN');
     expect(span3.textContent).toBe('3');
-  });
-});
-
-describe('templateFn', () => {
-  it('creates template function from component', () => {
-    const Test = component(() => {
-      return h('div', { textContent: 'test' });
-    });
-
-    const test = template(Test);
-    expect(typeof test).toBe('function');
-
-    const Wrap = component(() => {
-      return h(() => {
-        test();
-      });
-    });
-
-    const inner = Test() as HTMLDivElement;
-    const outer = Wrap() as DocumentFragment;
-
-    expect(inner.outerHTML).toBe((outer.firstElementChild as any).outerHTML);
   });
 });

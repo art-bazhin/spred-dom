@@ -4,6 +4,8 @@ import { h } from './h';
 import { fireEvent } from '@testing-library/dom';
 
 describe('h function', () => {
+  it('TODO', () => {});
+
   it('creates element node inside component template', () => {
     const Span = component(() => h('span'));
 
@@ -36,51 +38,31 @@ describe('h function', () => {
     expect(Span().outerHTML).toBe('<span class="test"><span></span></span>');
   });
 
-  it('can set element event handlers', () => {
-    const onclick = jest.fn();
+  it('gets DOM node as an argument of setup fn', () => {
+    const spy = jest.fn();
+    let ref: any;
 
-    const Button = component(() => h('button', { onclick }));
-
-    const button = Button();
-
-    button.click();
-    expect(onclick).toBeCalledTimes(1);
-
-    button.click();
-    expect(onclick).toBeCalledTimes(2);
-  });
-
-  it('can use functions as dynamic element props', () => {
-    const Button = component((value: string) =>
-      h('button', { textContent: () => value, type: 'button' }),
+    const Button = component(() =>
+      h('button', (el) => {
+        ref = el;
+        el.onclick = spy;
+      }),
     );
 
-    let button = Button('text');
-    expect(button.textContent).toBe('text');
-    expect(button.type).toBe('button');
+    expect(Button()).toBe(ref);
 
-    button = Button('another text'); // second render test
-    expect(button.textContent).toBe('another text');
-    expect(button.type).toBe('button');
-  });
+    ref.click();
+    expect(spy).toHaveBeenCalledTimes(1);
 
-  it('can use signals as element props', () => {
-    const textContent = writable('before');
+    expect(Button()).toBe(ref); // second render test
 
-    const Button = component(() => h('button', { textContent }));
-
-    const button = Button();
-
-    expect(button.textContent).toBe('before');
-
-    textContent.set('after');
-    expect(button.textContent).toBe('after');
+    ref.click();
+    expect(spy).toHaveBeenCalledTimes(2);
   });
 
   it('can set element attrs', () => {
     const Button = component(() =>
       h('button', {
-        onclick() {},
         attrs: {
           class: 'test',
           'data-foo': 'bar',
@@ -111,144 +93,143 @@ describe('h function', () => {
     expect(button.getAttribute('undefined')).toBe(null);
   });
 
-  it('can use fn as dynamic element attr value', () => {
-    const Button = component((value: string) =>
-      h('button', {
-        attrs: {
-          class: () => value,
-        },
-      }),
-    );
-
-    const button = Button('foo');
-    expect(button.getAttribute('class')).toBe('foo');
-
-    const button2 = Button('bar');
-    expect(button2.getAttribute('class')).toBe('bar');
-  });
-
-  it('can use signal as element attr value', () => {
-    const value = writable<any>('foo');
-
-    const Button = component(() =>
-      h('button', {
-        attrs: {
-          class: value,
-        },
-      }),
-    );
-
-    const button = Button();
-    expect(button.getAttribute('class')).toBe('foo');
-
-    value.set(null);
-    expect(button.getAttribute('class')).toBe(null);
-
-    value.set('bar');
-    expect(button.getAttribute('class')).toBe('bar');
-
-    value.set(false);
-    expect(button.getAttribute('class')).toBe(null);
-
-    value.set(true);
-    expect(button.getAttribute('class')).toBe('');
-  });
-
-  it('sets binded values on second render', () => {
-    const Div = component((str: () => string) =>
+  it('correctly renders nested elements', () => {
+    const Div = component(() =>
       h('div', () => {
         h('div', () => {
-          h('button', { text: str });
+          h('button', { textContent: 'foo' });
         });
         h('input', {
-          id: str,
-          value: str,
+          id: 'foo',
+          value: 'foo',
         });
       }),
     );
 
-    const div1 = Div(() => 'a');
+    const div1 = Div();
+    const inp1 = div1.querySelector('#foo') as any;
+
+    expect(inp1).toBeTruthy();
+    expect(inp1.value).toBe('foo');
+
+    const div2 = Div(); // second render test
+    const inp2 = div2.querySelector('#foo') as any;
+
+    expect(inp2).toBeTruthy();
+    expect(inp2.value).toBe('foo');
+  });
+
+  it('correctly renders nested elements (case 2)', () => {
+    const Div = component((id: string) =>
+      h('div', { className: '1' }, () => {
+        h('div', { className: '2' }, () => {
+          h('button', { textContent: 'foo' }, (el) => {
+            el.textContent = id;
+          });
+        });
+        h('div', () => {
+          h('div');
+          h('div', () => {
+            h('div');
+            h('div');
+          });
+          h('div');
+        });
+        h(
+          'input',
+          {
+            id: 'foo',
+            value: 'foo',
+          },
+          (el) => {
+            el.id = id;
+            el.value = id;
+          },
+        );
+      }),
+    );
+
+    const div1 = Div('a');
+    const btn1 = div1.querySelector('button') as any;
     const inp1 = div1.querySelector('#a') as any;
 
+    expect(btn1).toBeTruthy();
+    expect(btn1.textContent).toBe('a');
     expect(inp1).toBeTruthy();
     expect(inp1.value).toBe('a');
 
-    const div2 = Div(() => 'b');
+    const div2 = Div('b');
+    const btn2 = div2.querySelector('button') as any;
     const inp2 = div2.querySelector('#b') as any;
 
+    expect(btn2).toBeTruthy();
+    expect(btn2.textContent).toBe('b');
     expect(inp2).toBeTruthy();
     expect(inp2.value).toBe('b');
   });
 
-  it('sets binded values on second render (case 2)', () => {
-    const Div = component((str: () => string) =>
-      h('div', () => {
-        h('div', () => {
-          h('button', { text: str });
-        });
-        h('div');
-        h('input', {
-          id: str,
-          value: str,
-        });
-      }),
-    );
-
-    const div1 = Div(() => 'a');
-    const inp1 = div1.querySelector('#a') as any;
-
-    expect(inp1).toBeTruthy();
-    expect(inp1.value).toBe('a');
-
-    const div2 = Div(() => 'b');
-    const inp2 = div2.querySelector('#b') as any;
-
-    expect(inp2).toBeTruthy();
-    expect(inp2.value).toBe('b');
-  });
-
-  it('sets binded values on second render (case 3)', () => {
-    const Div = component((str: () => string) =>
+  it('correctly renders nested elements (case 3)', () => {
+    const Div = component((str: string) =>
       h('div', () => {
         h('div', () => {
           h('div', () => {
-            h('button', { text: str });
+            h('button', { textContent: 'foo' }, (el) => {
+              el.textContent = str;
+            });
           });
         });
-        h('input', {
-          id: str,
-          value: str,
-        });
+        h(
+          'input',
+          {
+            id: 'foo',
+            value: 'foo',
+          },
+          (el) => {
+            el.id = str;
+            el.value = str;
+          },
+        );
       }),
     );
 
-    const div1 = Div(() => 'a');
+    const div1 = Div('a');
     const inp1 = div1.querySelector('#a') as any;
 
     expect(inp1).toBeTruthy();
     expect(inp1.value).toBe('a');
 
-    const div2 = Div(() => 'b');
+    const div2 = Div('b');
     const inp2 = div2.querySelector('#b') as any;
 
     expect(inp2).toBeTruthy();
     expect(inp2.value).toBe('b');
   });
 
-  it('sets binded values on second render (case 4)', () => {
-    const Div = component((str: () => string) =>
+  it('correctly renders nested elements (case 4)', () => {
+    const Div = component((str: string) =>
       h('div', () => {
-        h('div', { id: () => 'test-id' }, () => {
-          h('button', { id: 'btn', text: str });
+        h('div', (el) => {
+          el.id = 'test-id';
+
+          h('button', { id: 'btn' }, (el) => {
+            el.textContent = str;
+          });
         });
-        h('input', {
-          id: str,
-          value: str,
-        });
+        h(
+          'input',
+          {
+            id: 'foo',
+            value: 'foo',
+          },
+          (el) => {
+            el.id = str;
+            el.value = str;
+          },
+        );
       }),
     );
 
-    const div1 = Div(() => 'a');
+    const div1 = Div('a');
     const inp1 = div1.querySelector('#a') as any;
     const btn1 = div1.querySelector('#btn') as any;
 
@@ -256,7 +237,7 @@ describe('h function', () => {
     expect(inp1.value).toBe('a');
     expect(btn1.textContent).toBe('a');
 
-    const div2 = Div(() => 'b');
+    const div2 = Div('b');
     const inp2 = div2.querySelector('#b') as any;
     const btn2 = div2.querySelector('#btn') as any;
 
@@ -265,144 +246,116 @@ describe('h function', () => {
     expect(btn2.textContent).toBe('b');
   });
 
-  it('correctly handles prop aliases', () => {
-    const Button = component(() =>
-      h('button', {
-        class: 'foo',
-        text: 'bar',
-      }),
-    );
+  it('can create dom node binding inside component template', () => {
+    const a = document.createTextNode('a');
 
-    const button = Button();
+    const Div = component(() => {
+      return h('div', () => h(a));
+    });
 
-    expect(button.className).toBe('foo');
-    expect(button.textContent).toBe('bar');
+    expect(Div().firstChild).toBe(a);
+    expect(Div().firstChild).toBe(a); // second render test
   });
 
-  it('correctly handles class prop with signal value', () => {
-    const Button = component(() =>
-      h('button', {
-        class: writable('foo bar'),
-      }),
-    );
+  it('can use dom node binding as component template', () => {
+    const a = document.createTextNode('a');
 
-    expect(Button().className).toBe('foo bar');
+    const Fragment = component(() => {
+      return h(a);
+    });
+
+    expect(Fragment().firstChild).toBe(a);
+    expect(Fragment().firstChild).toBe(a); // second render test
+    expect(Fragment().nodeType).toBe(Node.DOCUMENT_FRAGMENT_NODE);
   });
 
-  it('correctly handles class prop with object value', () => {
-    const Button = component(() =>
-      h('button', {
-        class: {
-          foo: 'true',
-          bar: () => true,
-        },
-      }),
-    );
+  it('can use signal as node binding', () => {
+    const a = document.createElement('span');
+    const b = document.createElement('span');
 
-    expect(Button().className).toBe('foo bar');
+    const value = writable(a);
+
+    const Div = component(() => {
+      return h('div', () => h(value));
+    });
+
+    const div = Div() as HTMLDivElement;
+    expect(div.firstElementChild).toBe(a);
+
+    value.set(b);
+    expect(div.firstElementChild).toBe(b);
   });
 
-  it('correctly handles class prop with array value', () => {
-    const Button = component(() =>
-      h('button', {
-        class: ['foo', () => 'bar'],
-      }),
-    );
+  it('turns fn values into signal node bindings', () => {
+    const a = document.createElement('span');
+    const b = document.createElement('span');
 
-    expect(Button().className).toBe('foo bar');
-  });
+    const value = writable(a);
 
-  it('removes class attribute if all object props become falsy', () => {
-    const foo = writable(true);
-
-    const Button = component(() =>
-      h('button', {
-        class: { foo },
-      }),
-    );
-
-    const button = Button();
-    expect(button.className).toBe('foo');
-
-    foo.set(false);
-    expect(button.className).toBe('');
-    expect(button.hasAttribute('class')).toBe(false);
-  });
-
-  it('correctly handles one way binding of text input value prop', () => {
-    const source = writable('foo');
-    const value = computed(() => source.get());
-
-    const Input = component(() =>
-      h('input', {
-        value,
-      }),
-    );
-
-    const input = Input();
-
-    expect(input.value).toBe('foo');
-
-    source.set('bar');
-    expect(input.value).toBe('bar');
-  });
-
-  it('correctly handles two way binding of text input value prop', () => {
-    const value = writable('foo');
-    const Input = component(() => h('input', { value }));
-
-    const input = Input();
-
-    expect(input.value).toBe('foo');
-
-    fireEvent.input(input, { target: { value: 'bar' } });
-    expect(input.value).toBe('bar');
-    expect(value.get()).toBe('bar');
-  });
-
-  it('correctly handles string input value', () => {
-    const Input = component((value: string) =>
-      h('input', {
-        type: () => 'text',
-        value,
-      }),
-    );
-
-    expect(Input('foo').value).toBe('foo');
-    expect(Input('bar').value).toBe('foo'); // second run test
-  });
-
-  it('correctly handles ref prop', () => {
-    let button: any;
-
-    const Div = component((id: () => string) =>
-      h('div', () => {
-        h('div', () => {
-          h('div', { text: id });
-        });
-        h('button', {
-          id,
-          text: id,
-          ref: (n) => (button = n),
-        });
+    const Div = component(() => {
+      return h('div', () => {
         h('span');
-      }),
-    );
+        h(() => value.get());
+      });
+    });
 
-    Div(() => 'foo');
-    expect(button.id).toBe('foo');
-    expect(button.textContent).toBe('foo');
+    const div = Div() as HTMLDivElement;
+    expect(div.children[1]).toBe(a);
 
-    // second render test
-    Div(() => 'bar');
-    expect(button.id).toBe('bar');
-    expect(button.textContent).toBe('bar');
+    value.set(b);
+    expect(div.children[1]).toBe(b);
   });
 
-  it('correctly handles fragments', () => {
-    const Fragment = component(() => h(() => {}));
-    const fragment = Fragment();
+  it('renders falsy bindings as nothing', () => {
+    const a = document.createElement('span');
+    const value = writable<any>(a);
 
-    expect(fragment.nodeType).toBe(Node.DOCUMENT_FRAGMENT_NODE);
+    const Div = component(() => {
+      return h('div', () => {
+        h(null);
+        h('span');
+        h(() => value.get());
+      });
+    });
+
+    const div = Div() as HTMLDivElement;
+    expect(div.children[1]).toBe(a);
+
+    value.set(null);
+    expect(div.children[1]).toBeUndefined();
+
+    value.set(false);
+    expect(div.children[1]).toBeUndefined();
   });
+
+  // it('correctly handles one way binding of text input value prop', () => {
+  //   const source = writable('foo');
+  //   const value = computed(() => source.get());
+
+  //   const Input = component(() =>
+  //     h('input', {
+  //       value,
+  //     }),
+  //   );
+
+  //   const input = Input();
+
+  //   expect(input.value).toBe('foo');
+
+  //   source.set('bar');
+  //   expect(input.value).toBe('bar');
+  // });
+
+  // it('correctly handles two way binding of text input value prop', () => {
+  //   const value = writable('foo');
+  //   const Input = component(() => h('input', { value }));
+
+  //   const input = Input();
+
+  //   expect(input.value).toBe('foo');
+
+  //   fireEvent.input(input, { target: { value: 'bar' } });
+  //   expect(input.value).toBe('bar');
+  //   expect(value.get()).toBe('bar');
+  // });
 });
