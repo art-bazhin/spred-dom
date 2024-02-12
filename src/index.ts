@@ -1,6 +1,6 @@
 import { component } from './component/component';
 import { h } from './h/h';
 import { list } from './list/list';
-import { classes } from './classes/classes';
+import { bind } from './bind/bind';
 
-export { h, component, list, classes };
+export { h, component, list, bind };

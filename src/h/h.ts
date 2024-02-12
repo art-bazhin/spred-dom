@@ -8,21 +8,10 @@ import {
   Falsy,
   insertBefore,
   removeNodes,
-  setupBaseAttr,
+  setAttribute,
 } from '../dom/dom';
 import { Signal, computed, isSignal } from '@spred/core';
-
-type IfEquals<X, Y, A = X, B = never> =
-  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? A : B;
-
-type WritableKeys<T> = {
-  [P in keyof T]-?: IfEquals<
-    { [Q in P]: T[P] },
-    { -readonly [Q in P]: T[P] },
-    P,
-    never
-  >;
-}[keyof T];
+import { WritableKeys } from '../common/types';
 
 interface Attrs {
   [attr: string]: AttrValue;
@@ -121,7 +110,7 @@ export function h(first: any, second?: any, third?: any) {
     if (props && state.creating) {
       if (props.attrs) {
         for (let attr in props.attrs)
-          setupBaseAttr(element, attr, props.attrs[attr]);
+          setAttribute(element, attr, props.attrs[attr]);
         delete props.attrs;
       }
 

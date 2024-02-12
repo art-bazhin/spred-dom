@@ -1,4 +1,4 @@
-import { computed, isSignal, writable } from '@spred/core';
+import { computed, writable } from '@spred/core';
 import { classes } from './classes';
 
 // (compat) tests are copied from clsx package tests
@@ -113,33 +113,29 @@ describe('classes function', () => {
     expect(typeof classes('foo', { bar: () => true })).toBe('function');
   });
 
-  it('returns signal if signal arguments passed', () => {
-    expect(isSignal(classes(computed(() => 'test')))).toBeTruthy();
+  it('returns function if signal arguments passed', () => {
+    expect(typeof classes(computed(() => 'test'))).toBe('function');
 
     expect(
-      isSignal(
-        classes(
-          'foo',
-          computed(() => 'test'),
-        ),
+      typeof classes(
+        'foo',
+        computed(() => 'test'),
       ),
-    ).toBeTruthy();
+    ).toBe('function');
 
     expect(
-      isSignal(
-        classes(
-          'foo',
-          () => 'test',
-          computed(() => 'test'),
-        ),
+      typeof classes(
+        'foo',
+        () => 'test',
+        computed(() => 'test'),
       ),
-    ).toBeTruthy();
+    ).toBe('function');
 
-    expect(isSignal(classes('foo', { bar: writable(true) }))).toBeTruthy();
+    expect(typeof classes('foo', { bar: writable(true) })).toBe('function');
 
     expect(
-      isSignal(classes('foo', { foo: () => true, bar: writable(true) })),
-    ).toBeTruthy();
+      typeof classes('foo', { foo: () => true, bar: writable(true) }),
+    ).toBe('function');
   });
 
   it('handles fn and signal args', () => {
@@ -152,10 +148,10 @@ describe('classes function', () => {
       () => false,
     );
 
-    expect(s.get()).toBe('foo bar');
+    expect(s()).toBe('foo bar');
 
     value.set(true);
-    expect(s.get()).toBe('foo bar test');
+    expect(s()).toBe('foo test bar');
   });
 
   it('handles fn object props', () => {
@@ -173,7 +169,7 @@ describe('classes function', () => {
       bar: computed(() => false),
     });
 
-    expect(result.get()).toBe('foo');
+    expect(result()).toBe('foo');
   });
 
   it('returns null if all fn results are falsy and there is no static classes', () => {
@@ -187,10 +183,10 @@ describe('classes function', () => {
       computed(() => value.get() && 'bar'),
     );
 
-    expect(s.get()).toBe(null);
+    expect(s()).toBe(null);
 
     value.set(true);
-    expect(s.get()).toBe('test bar');
+    expect(s()).toBe('test bar');
   });
 
   it('returns null if all fn results are falsy and there is no static classes (case 2)', () => {
@@ -204,10 +200,10 @@ describe('classes function', () => {
       computed(() => value.get() && 'bar'),
     );
 
-    expect(s.get()).toBe(null);
+    expect(s()).toBe(null);
 
     value.set(true);
-    expect(s.get()).toBe('bar');
+    expect(s()).toBe('bar');
   });
 
   it('handles fn and signal keys', () => {
@@ -219,10 +215,10 @@ describe('classes function', () => {
       qwe: () => false,
     });
 
-    expect(s.get()).toBe('bar');
+    expect(s()).toBe('bar');
 
     value.set(true);
-    expect(s.get()).toBe('bar test');
+    expect(s()).toBe('test bar');
   });
 
   it('handles fn and signal keys mixed with static classes', () => {
@@ -235,10 +231,10 @@ describe('classes function', () => {
       qwe: () => false,
     });
 
-    expect(s.get()).toBe('static class string foo bar');
+    expect(s()).toBe('static class string foo bar');
 
     value.set(true);
-    expect(s.get()).toBe('static class string foo bar test');
+    expect(s()).toBe('static class string foo test bar');
   });
 
   it('handles fn and signal elements of arrays', () => {
@@ -259,10 +255,10 @@ describe('classes function', () => {
       () => false,
     );
 
-    expect(s.get()).toBe('foo a bar c');
+    expect(s()).toBe('foo a bar c');
 
     value.set(true);
-    expect(s.get()).toBe('foo a bar signal test b c d');
+    expect(s()).toBe('foo signal test a bar b c d');
   });
 
   it('returns null if all object props become falsy', () => {
@@ -271,9 +267,9 @@ describe('classes function', () => {
       foo: value,
     });
 
-    expect((s as any).get()).toBe('foo');
+    expect((s as any)()).toBe('foo');
 
     value.set(false);
-    expect((s as any).get()).toBe(null);
+    expect((s as any)()).toBe(null);
   });
 });

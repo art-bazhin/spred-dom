@@ -1,6 +1,3 @@
-import { computed, Signal } from '@spred/core';
-import { state } from '../state/state';
-
 export type Falsy = null | undefined | false;
 export type AttrValue = string | true | Falsy;
 
@@ -22,45 +19,13 @@ export function removeNodes(start: Node, end: Node, parentNode?: Node) {
   }
 }
 
-export function setupSignalProp(node: Node, key: string, signal: Signal<any>) {
-  signal.subscribe((value) => ((node as any)[key] = value));
-}
-
-export function setupAttr(
-  node: Node,
-  key: string,
-  value: AttrValue | (() => AttrValue) | Signal<AttrValue>,
-) {
-  if (typeof value === 'function') {
-    setupBaseAttr(node, key, value());
-    return true;
-  }
-
-  if (typeof value === 'object' && value !== null) {
-    setupSignalAttr(node, key, value);
-    return true;
-  }
-
-  if (state.creating) setupBaseAttr(node, key, value);
-
-  return false;
-}
-
-export function setupBaseAttr(node: Node, key: string, value: AttrValue) {
+export function setAttribute(element: Element, key: string, value: AttrValue) {
   if (value === true || value === '') {
     value = '';
   } else if (!value) {
-    (node as Element).removeAttribute(key);
+    element.removeAttribute(key);
     return;
   }
 
-  (node as Element).setAttribute(key, value);
-}
-
-export function setupSignalAttr(
-  node: Node,
-  key: string,
-  value: Signal<AttrValue>,
-) {
-  value.subscribe((v) => setupBaseAttr(node, key, v));
+  element.setAttribute(key, value);
 }

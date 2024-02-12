@@ -1,7 +1,6 @@
-import { computed, writable } from '@spred/core';
+import { writable } from '@spred/core';
 import { component } from '../component/component';
 import { h } from './h';
-import { fireEvent } from '@testing-library/dom';
 
 describe('h function', () => {
   it('TODO', () => {});
