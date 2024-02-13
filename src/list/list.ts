@@ -1,20 +1,21 @@
 import { collect, computed, isSignal, Signal } from '@spred/core';
-import { insertBefore, removeNodes } from '../dom/dom';
+import { removeNodes } from '../dom/dom';
 import { FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
 
 export function list<T>(binding: Signal<T[]> | T[], mapFn: (el: T) => Node) {
   if (state.creating) {
     const mark = document.createComment('');
+    const parent = state.node!;
 
     state.path += FIRST_CHILD + PARENT_NODE;
-    state.setupQueue.push(() => setupList(binding, mapFn, mark));
+    state.setupQueue.push(() => setupList(binding, mapFn, mark, parent));
     state.node!.appendChild(mark);
 
     return;
   }
 
   next();
-  setupList(binding, mapFn, state.node!);
+  setupList(binding, mapFn, state.node!, state.node!.parentNode!);
   next();
 }
 
@@ -22,13 +23,14 @@ function setupList<T>(
   binding: Signal<T[]> | T[],
   mapFn: (el: T) => Node,
   mark: Node,
+  parent: Node,
 ) {
   if (isSignal(binding)) {
     let start = mark.previousSibling;
 
     if (!start) {
       start = document.createComment('');
-      insertBefore(start, mark);
+      parent.insertBefore(start, mark);
     }
 
     let oldArr: T[] = [];
@@ -41,7 +43,6 @@ function setupList<T>(
     const arrSignal = computed(
       () => {
         const newArr = binding.get();
-        const parent = mark.parentNode!;
 
         let oldLength = oldArr.length;
         let newLength = newArr.length;
@@ -76,10 +77,9 @@ function setupList<T>(
             index === newLength ? mark : nodeMap.get(newArr[index])!;
 
           while (s <= b) {
-            insertBefore(
+            parent.insertBefore(
               createListNode(newArr[s], mapFn, nodeMap, cleanupMap),
               endNode,
-              parent,
             );
             ++s;
           }
@@ -175,10 +175,9 @@ function setupList<T>(
                 : nodeMap.get(nextEl)!;
 
             if (position < 0) {
-              insertBefore(
+              parent.insertBefore(
                 createListNode(el, mapFn, nodeMap, cleanupMap),
                 nextNode,
-                parent,
               );
             } else {
               const node = nodeMap.get(el)!;
@@ -190,12 +189,12 @@ function setupList<T>(
 
                 while (1) {
                   next = current.nextSibling!;
-                  insertBefore(current, nextNode, parent);
+                  parent.insertBefore(current, nextNode);
                   if (current === lastChild) break;
                   current = next;
                 }
               } else {
-                insertBefore(node, nextNode, parent);
+                parent.insertBefore(node, nextNode);
               }
             }
           }
@@ -211,10 +210,9 @@ function setupList<T>(
                 ? mark
                 : nodeMap.get(nextEl)!;
 
-            insertBefore(
+            parent.insertBefore(
               createListNode(el, mapFn, nodeMap, cleanupMap),
               nextNode,
-              parent,
             );
           }
         }
@@ -235,10 +233,8 @@ function setupList<T>(
     return;
   }
 
-  const parent = mark.parentNode!;
-
   for (let el of binding) {
-    insertBefore(mapFn(el), mark, parent);
+    parent.insertBefore(mapFn(el), mark);
   }
 }
 

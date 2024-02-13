@@ -1,11 +1,6 @@
 export type Falsy = null | undefined | false;
 export type AttrValue = string | true | Falsy;
 
-export function insertBefore(child: Node, mark: Node, parentNode?: Node) {
-  const parent = parentNode || mark.parentNode;
-  parent!.insertBefore(child, mark);
-}
-
 export function removeNodes(start: Node, end: Node, parentNode?: Node) {
   const parent = parentNode || start.parentNode!;
 

@@ -3,13 +3,7 @@ import {
   TemplateResult,
   TEMPLATE_RESULT,
 } from '../template-result/template-result';
-import {
-  AttrValue,
-  Falsy,
-  insertBefore,
-  removeNodes,
-  setAttribute,
-} from '../dom/dom';
+import { AttrValue, Falsy, removeNodes, setAttribute } from '../dom/dom';
 import { Signal, computed, isSignal } from '@spred/core';
 import { WritableKeys } from '../common/types';
 
@@ -67,16 +61,17 @@ export function h(first: any, second?: any, third?: any) {
       else {
         if (state.creating) {
           const mark = document.createComment('');
+          const parent = state.node;
 
           state.path += FIRST_CHILD + PARENT_NODE;
           state.node!.appendChild(mark);
-          state.setupQueue.push(() => setupNode(first, mark));
+          state.setupQueue.push(() => setupNode(first, mark, parent!));
 
           return TEMPLATE_RESULT;
         }
 
         next();
-        setupNode(first, state.node);
+        setupNode(first, state.node!, state.node!.parentNode!);
 
         return TEMPLATE_RESULT;
       }
@@ -140,33 +135,38 @@ export function h(first: any, second?: any, third?: any) {
 
 function setupNode(
   binding: Node | Falsy | Signal<Node | Falsy> | (() => Node | Falsy),
-  mark: Node | null,
+  mark: Node,
+  parent: Node,
 ) {
-  if (!mark || !binding) return;
+  if (!binding) return;
 
   if (typeof binding === 'function') {
-    setupSignalNode(computed(binding), mark);
+    setupSignalNode(computed(binding), mark, parent);
     return;
   }
 
   if (typeof binding === 'object' && isSignal(binding)) {
-    setupSignalNode(binding, mark);
+    setupSignalNode(binding, mark, parent);
     return;
   }
 
-  insertBefore(binding, mark);
+  parent.insertBefore(binding, mark);
 }
 
-function setupSignalNode(binding: Signal<Node | Falsy>, mark: Node) {
+function setupSignalNode(
+  binding: Signal<Node | Falsy>,
+  mark: Node,
+  parent: Node,
+) {
   let start = mark.previousSibling;
 
   if (!start) {
     start = document.createComment('');
-    insertBefore(start, mark);
+    parent.insertBefore(start, mark);
   }
 
   binding.subscribe((node) => {
     removeNodes(start!.nextSibling!, mark);
-    if (node) insertBefore(node, mark);
+    if (node) parent.insertBefore(node, mark);
   });
 }

@@ -256,6 +256,32 @@ describe('h function', () => {
     expect(Div().firstChild).toBe(a); // second render test
   });
 
+  it('can create multiple dom node binding inside component template', () => {
+    const span1 = document.createElement('span');
+    const span2 = document.createElement('span');
+    const span3 = document.createElement('span');
+
+    const Div = component(() => {
+      return h('div', () => {
+        h(span1);
+        h(span2);
+        h(span3);
+      });
+    });
+
+    let div = Div();
+
+    expect(div.children[0]).toBe(span1);
+    expect(div.children[1]).toBe(span2);
+    expect(div.children[2]).toBe(span3);
+
+    div = Div();
+
+    expect(div.children[0]).toBe(span1);
+    expect(div.children[1]).toBe(span2);
+    expect(div.children[2]).toBe(span3);
+  });
+
   it('can use dom node binding as component template', () => {
     const a = document.createTextNode('a');
 
