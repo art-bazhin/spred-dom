@@ -40,14 +40,18 @@ export function bindProp(node: any, key: any, value: any) {
       break;
   }
 
-  if (typeof value === 'function' && !(key[0] === 'o' && key[1] === 'n')) {
+  if (attr) {
+    bindAttribute(node, attr, value);
+    return;
+  }
+
+  if (typeof value === 'function' && key.substring(0, 2) !== 'on') {
     signal = computed(value);
   } else if (typeof value === 'object' && isSignal(value)) {
     signal = value;
   }
 
-  if (attr) bindAttribute(node, attr, value);
-  else if (signal) signal.subscribe((v: any) => (node[key] = v));
+  if (signal) signal.subscribe((v: any) => (node[key] = v));
   else node[key] = value;
 }
 
