@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.10.0](https://github.com/art-bazhin/spred-dom/compare/v0.9.0...v0.10.0) (2024-02-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* bump version
+
+### Features
+
+* add basic two way binding ([1b77cc7](https://github.com/art-bazhin/spred-dom/commit/1b77cc77431a10e2792dcb1644b3844896ed162b))
+* add bind function ([9ba8bdf](https://github.com/art-bazhin/spred-dom/commit/9ba8bdfbe713728f1679d9a96a58db8b5ce00e8a))
+
+
+### Code Refactoring
+
+* minor refactoring ([8d33732](https://github.com/art-bazhin/spred-dom/commit/8d337322fdafc0d784a4d2538c9c5aaf7b75263d))
+* refactor dom node insertion ([8d6d2af](https://github.com/art-bazhin/spred-dom/commit/8d6d2afad4b959c20d395bda43fecf27883fe538))
+* use new low level api ([ef79123](https://github.com/art-bazhin/spred-dom/commit/ef791231e5c48ef340846d4a21e1afdd5ab4d26d))
+
 ## [0.9.0](https://github.com/art-bazhin/spred-dom/compare/v0.8.4...v0.9.0) (2024-02-10)
 
 
