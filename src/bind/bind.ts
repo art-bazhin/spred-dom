@@ -1,4 +1,4 @@
-import { Signal, computed, isSignal } from '@spred/core';
+import { Signal, computed, isSignal, isWritableSignal } from '@spred/core';
 import { WritableKeys } from '../common/types';
 import { AttrValue, setAttribute } from '../dom/dom';
 import { ClassName, fromArray, fromObject } from '../classes/classes';
@@ -35,6 +35,13 @@ export function bindProp(node: any, key: any, value: any) {
       if (typeof value === 'object') {
         if (Array.isArray(value)) value = fromArray(value);
         else if (!isSignal(value)) value = fromObject(value);
+      }
+
+      break;
+
+    case 'value':
+      if (typeof value === 'object' && isWritableSignal(value)) {
+        node.addEventListener('input', (e: any) => value.set(e.target.value));
       }
 
       break;

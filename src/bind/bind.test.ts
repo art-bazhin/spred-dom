@@ -1,5 +1,6 @@
 import { signal } from '@spred/core';
 import { bind } from './bind';
+import { fireEvent } from '@testing-library/dom';
 
 describe('bind function', () => {
   it('sets node property by key', () => {
@@ -179,5 +180,29 @@ describe('bind function', () => {
 
     bind(button, { class: ['foo', 'bar'] });
     expect(button.getAttribute('class')).toBe('foo bar');
+  });
+
+  it('correctly handles one way binding of text input value prop', () => {
+    const source = signal('foo');
+    const value = signal(() => source.get());
+    const input = document.createElement('input');
+
+    bind(input, { value });
+    expect(input.value).toBe('foo');
+
+    source.set('bar');
+    expect(input.value).toBe('bar');
+  });
+
+  it('correctly handles two way binding of text input value prop', () => {
+    const value = signal('foo');
+    const input = document.createElement('input');
+
+    bind(input, { value });
+    expect(input.value).toBe('foo');
+
+    fireEvent.input(input, { target: { value: 'bar' } });
+    expect(input.value).toBe('bar');
+    expect(value.get()).toBe('bar');
   });
 });

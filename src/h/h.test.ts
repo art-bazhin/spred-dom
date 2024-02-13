@@ -3,8 +3,6 @@ import { component } from '../component/component';
 import { h } from './h';
 
 describe('h function', () => {
-  it('TODO', () => {});
-
   it('creates element node inside component template', () => {
     const Span = component(() => h('span'));
 
@@ -352,35 +350,4 @@ describe('h function', () => {
     value.set(false);
     expect(div.children[1]).toBeUndefined();
   });
-
-  // it('correctly handles one way binding of text input value prop', () => {
-  //   const source = writable('foo');
-  //   const value = computed(() => source.get());
-
-  //   const Input = component(() =>
-  //     h('input', {
-  //       value,
-  //     }),
-  //   );
-
-  //   const input = Input();
-
-  //   expect(input.value).toBe('foo');
-
-  //   source.set('bar');
-  //   expect(input.value).toBe('bar');
-  // });
-
-  // it('correctly handles two way binding of text input value prop', () => {
-  //   const value = writable('foo');
-  //   const Input = component(() => h('input', { value }));
-
-  //   const input = Input();
-
-  //   expect(input.value).toBe('foo');
-
-  //   fireEvent.input(input, { target: { value: 'bar' } });
-  //   expect(input.value).toBe('bar');
-  //   expect(value.get()).toBe('bar');
-  // });
 });
