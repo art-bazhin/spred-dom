@@ -1,12 +1,12 @@
 import { Signal, computed, isSignal, isWritableSignal } from '@spred/core';
-import { WritableKeys } from '../common/types';
+import { Binding, WritableKeys } from '../common/types';
 import { AttrValue, setAttribute } from '../dom/dom';
 import { ClassName, fromArray, fromObject } from '../classes/classes';
 
 type Bindings<N extends Node> = {
   [key in WritableKeys<N>]?: (() => any) extends N[key]
     ? N[key]
-    : N[key] | (() => N[key]) | Signal<N[key]>;
+    : Binding<N[key]>;
 } & {
   attrs?: N extends Element
     ? {

@@ -5,21 +5,21 @@ import {
 } from '../template-result/template-result';
 import { AttrValue, Falsy, removeNodes, setAttribute } from '../dom/dom';
 import { Signal, computed, isSignal } from '@spred/core';
-import { WritableKeys } from '../common/types';
+import { Binding, WritableNonFnKeys } from '../common/types';
 
 interface Attrs {
   [attr: string]: AttrValue;
 }
 
-type ElProps<Element extends HTMLElement> = {
-  [key in WritableKeys<Element>]?: (() => any) extends Element[key]
-    ? never
-    : Element[key];
+type NodeProps<N extends Node> = {
+  [key in WritableNonFnKeys<N>]?: (() => any) extends N[key] ? never : N[key];
 };
 
-type Props<Element extends HTMLElement> = ElProps<Element> & {
-  attrs?: Attrs;
+type Props<N extends Node> = NodeProps<N> & {
+  attrs?: N extends HTMLElement ? Attrs : never;
 };
+
+const test: NodeProps<HTMLAnchorElement> = {};
 
 export function h<TagName extends keyof HTMLElementTagNameMap>(
   tag: TagName,
@@ -35,13 +35,13 @@ export function h<TagName extends keyof HTMLElementTagNameMap>(
   setup: (element: HTMLElementTagNameMap[TagName]) => void,
 ): TemplateResult<HTMLElementTagNameMap[TagName]>;
 
-export function h(
-  tag: null,
+export function h<TagName extends null>(
+  tag: TagName,
   setup: () => void,
 ): TemplateResult<DocumentFragment>;
 
 export function h(
-  node: Node | Falsy | Signal<Node | Falsy> | (() => Node | Falsy),
+  node: Binding<Node | Falsy>,
 ): TemplateResult<DocumentFragment>;
 
 export function h<TagName extends keyof HTMLElementTagNameMap>(
@@ -109,7 +109,7 @@ export function h(first: any, second?: any, third?: any) {
         delete props.attrs;
       }
 
-      for (let key in props) (element as any)[key] = props[key];
+      for (let key in props) (element as any)[key] = (props as any)[key];
     }
 
     state.node = element;
