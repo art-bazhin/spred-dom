@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.10.1](https://github.com/art-bazhin/spred-dom/compare/v0.10.0...v0.10.1) (2024-02-15)
+
+
+### Features
+
+* improve types ([1310d61](https://github.com/art-bazhin/spred-dom/commit/1310d61db9471c98500259df093a0d4fedfe14bd))
+
 ## [0.10.0](https://github.com/art-bazhin/spred-dom/compare/v0.9.0...v0.10.0) (2024-02-13)
 
 
