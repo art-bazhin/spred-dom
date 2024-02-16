@@ -17,6 +17,9 @@ export const state: State = {
 export const FIRST_CHILD = 'F';
 export const NEXT_SIBLING = 'N';
 export const PARENT_NODE = 'P';
+export const START_FN = '>';
+export const END_FN = '<';
+export const BINDING = 'B';
 
 export function next() {
   switch (state.path[state.i++]) {
@@ -27,5 +30,10 @@ export function next() {
     case NEXT_SIBLING:
       state.node = state.node!.nextSibling;
       break;
+  }
+
+  if (state.path[state.i] === START_FN) {
+    ++state.i;
+    return true;
   }
 }

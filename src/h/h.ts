@@ -1,4 +1,12 @@
-import { next, state, PARENT_NODE, FIRST_CHILD } from '../state/state';
+import {
+  next,
+  state,
+  PARENT_NODE,
+  FIRST_CHILD,
+  BINDING,
+  START_FN,
+  END_FN,
+} from '../state/state';
 import {
   TemplateResult,
   TEMPLATE_RESULT,
@@ -63,7 +71,7 @@ export function h(first: any, second?: any, third?: any) {
           const mark = document.createComment('');
           const parent = state.node;
 
-          state.path += FIRST_CHILD + PARENT_NODE;
+          state.path += FIRST_CHILD + BINDING + PARENT_NODE;
           state.node!.appendChild(mark);
           state.setupQueue.push(() => setupNode(first, mark, parent!));
 
@@ -102,7 +110,7 @@ export function h(first: any, second?: any, third?: any) {
 
     state.node!.appendChild(element);
 
-    if (props && state.creating) {
+    if (props) {
       if (props.attrs) {
         for (let attr in props.attrs)
           setAttribute(element, attr, props.attrs[attr]);
@@ -115,7 +123,12 @@ export function h(first: any, second?: any, third?: any) {
     state.node = element;
     state.path += FIRST_CHILD;
 
-    if (setup) setup(element);
+    if (setup) {
+      state.path += START_FN;
+      if (setup.length) state.path += BINDING;
+      setup(element);
+      state.path += END_FN;
+    }
 
     state.path += PARENT_NODE;
     state.node = prevNode;
@@ -123,10 +136,10 @@ export function h(first: any, second?: any, third?: any) {
     return TEMPLATE_RESULT;
   }
 
-  next();
+  const dive = next();
   const prevNode = state.node;
 
-  if (setup) setup(prevNode!);
+  if (dive && setup) setup(prevNode!);
 
   state.node = prevNode;
 

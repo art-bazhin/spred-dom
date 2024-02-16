@@ -1,5 +1,13 @@
 import { isolate } from '@spred/core';
-import { FIRST_CHILD, NEXT_SIBLING, PARENT_NODE, state } from '../state/state';
+import {
+  BINDING,
+  END_FN,
+  FIRST_CHILD,
+  NEXT_SIBLING,
+  PARENT_NODE,
+  START_FN,
+  state,
+} from '../state/state';
 import { TemplateResult } from '../template-result/template-result';
 
 export function component<A extends unknown[], N extends Node>(
@@ -72,9 +80,7 @@ function createComponentData<A extends unknown[]>(
 
   isolate(fn, args);
 
-  let path = state.path
-    .replace(NEXT_SIBLING_REGEX, NEXT_SIBLING)
-    .replace(PARENT_NODE_REGEX, '');
+  let path = getPathString(state.path);
 
   state.creating = prevIsCreating;
   state.path = prevPath;
@@ -92,4 +98,22 @@ function createComponentData<A extends unknown[]>(
 }
 
 const NEXT_SIBLING_REGEX = new RegExp(PARENT_NODE + FIRST_CHILD, 'g');
-const PARENT_NODE_REGEX = new RegExp(PARENT_NODE, 'g');
+const CLEANUP_REGEX = new RegExp(`[${BINDING}${PARENT_NODE}${END_FN}]`, 'g');
+const EMPTY_TAIL_REGEX = new RegExp(`[^${BINDING}]+$`, 'g');
+const EMPTY_NESTING_REGEX = new RegExp(
+  `${START_FN}[^${BINDING}${START_FN}${END_FN}]*${END_FN}`,
+  'g',
+);
+
+function getPathString(str: string) {
+  str = str.replace(NEXT_SIBLING_REGEX, NEXT_SIBLING);
+
+  let prev = '';
+
+  while (prev !== str) {
+    prev = str;
+    str = str.replace(EMPTY_NESTING_REGEX, '');
+  }
+
+  return str.replace(EMPTY_TAIL_REGEX, '').replace(CLEANUP_REGEX, '');
+}

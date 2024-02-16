@@ -1,13 +1,13 @@
 import { collect, computed, isSignal, Signal } from '@spred/core';
 import { removeNodes } from '../dom/dom';
-import { FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
+import { BINDING, FIRST_CHILD, next, PARENT_NODE, state } from '../state/state';
 
 export function list<T>(binding: Signal<T[]> | T[], mapFn: (el: T) => Node) {
   if (state.creating) {
     const mark = document.createComment('');
     const parent = state.node!;
 
-    state.path += FIRST_CHILD + PARENT_NODE;
+    state.path += FIRST_CHILD + BINDING + PARENT_NODE;
     state.setupQueue.push(() => setupList(binding, mapFn, mark, parent));
     state.node!.appendChild(mark);
 

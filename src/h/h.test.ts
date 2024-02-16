@@ -330,24 +330,48 @@ describe('h function', () => {
   });
 
   it('renders falsy bindings as nothing', () => {
-    const a = document.createElement('span');
-    const value = writable<any>(a);
+    const span = document.createElement('span');
+    const button = document.createElement('button');
+    const value = writable<any>(span);
 
     const Div = component(() => {
       return h('div', () => {
         h(null);
+        h(button);
         h('span');
         h(() => value.get());
       });
     });
 
     const div = Div() as HTMLDivElement;
-    expect(div.children[1]).toBe(a);
+    expect(div.children[2]).toBe(span);
 
     value.set(null);
-    expect(div.children[1]).toBeUndefined();
+    expect(div.children[2]).toBeUndefined();
 
     value.set(false);
-    expect(div.children[1]).toBeUndefined();
+    expect(div.children[2]).toBeUndefined();
+  });
+
+  it('correctly renders template and bindings with common parent', () => {
+    const span = document.createElement('span');
+    const button = document.createElement('button');
+    const value = writable<any>(span);
+
+    const Div = component((text: string) => {
+      return h('div', () => {
+        h(null);
+        h(button);
+        h('span');
+        h(() => value.get());
+        h('span', (span) => (span.textContent = text));
+      });
+    });
+
+    let div = Div('foo');
+    expect(div.lastChild!.textContent).toBe('foo');
+
+    div = Div('bar');
+    expect(div.lastChild!.textContent).toBe('bar');
   });
 });
