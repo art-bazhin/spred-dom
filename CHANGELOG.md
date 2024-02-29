@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.10.2](https://github.com/art-bazhin/spred-dom/compare/v0.10.1...v0.10.2) (2024-02-29)
+
+
+### Performance Improvements
+
+* do not apply bindings to template elements ([415fbe8](https://github.com/art-bazhin/spred-dom/commit/415fbe8f5c0ef2b9451b1d3c1a304ce25e05150d))
+* improve component path building ([b9a553a](https://github.com/art-bazhin/spred-dom/commit/b9a553a3bbac1751c8d6c44d72e24ef10e3e02ec))
+
+
+### Code Refactoring
+
+* minor refactoring of bind fn ([056b784](https://github.com/art-bazhin/spred-dom/commit/056b78423e029ddd90339347f5a19d49194259b2))
+
 ### [0.10.1](https://github.com/art-bazhin/spred-dom/compare/v0.10.0...v0.10.1) (2024-02-15)
 
 
