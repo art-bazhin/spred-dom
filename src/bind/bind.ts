@@ -2,6 +2,7 @@ import { Signal, computed, isSignal, isWritableSignal } from '@spred/core';
 import { Binding, WritableKeys } from '../common/types';
 import { AttrValue, setAttribute } from '../dom/dom';
 import { ClassName, fromArray, fromObject } from '../classes/classes';
+import { state } from '../state/state';
 
 type Bindings<N extends Node> = {
   [key in WritableKeys<N>]?: (() => any) extends N[key]
@@ -17,6 +18,12 @@ type Bindings<N extends Node> = {
 };
 
 export function bind<N extends Node>(node: N, bindings: Bindings<N>) {
+  if (state.creating) {
+    for (let key in bindings)
+      state.setupQueue.push(() => bindProp(node, key, (bindings as any)[key]));
+    return;
+  }
+
   for (let key in bindings) bindProp(node, key, (bindings as any)[key]);
 }
 

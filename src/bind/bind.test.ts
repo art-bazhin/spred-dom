@@ -1,6 +1,8 @@
 import { signal } from '@spred/core';
 import { bind } from './bind';
 import { fireEvent } from '@testing-library/dom';
+import { component } from '../component/component';
+import { h } from '../h/h';
 
 describe('bind function', () => {
   it('sets node property by key', () => {
@@ -91,6 +93,19 @@ describe('bind function', () => {
 
     text.set('qwe');
     expect(button.textContent).toBe('qwe');
+  });
+
+  it('can be used in components', () => {
+    const Button = component(() => {
+      return h('button', (button) => {
+        bind(button, {
+          textContent: 'foo',
+        });
+      });
+    });
+
+    expect(Button().textContent).toBe('foo');
+    expect(Button().textContent).toBe('foo');
   });
 
   it('binds string and falsy class values', () => {
