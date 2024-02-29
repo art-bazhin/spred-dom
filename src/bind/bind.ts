@@ -59,9 +59,9 @@ export function bindProp(node: any, key: any, value: any) {
     return;
   }
 
-  if (typeof value === 'function' && key.substring(0, 2) !== 'on') {
-    signal = computed(value);
-  } else if (typeof value === 'object' && isSignal(value)) {
+  if (typeof value === 'function') {
+    if (key[0] !== 'o' || key[1] !== 'n') signal = computed(value);
+  } else if (typeof value === 'object' && value !== null) {
     signal = value;
   }
 
@@ -73,7 +73,7 @@ function bindAttribute(element: any, key: string, value: any) {
   let signal: any = null;
 
   if (typeof value === 'function') signal = computed(value);
-  else if (typeof value === 'object' && isSignal(value)) signal = value;
+  else if (typeof value === 'object' && value !== null) signal = value;
 
   if (signal) signal.subscribe((v: any) => setAttribute(element, key, v));
   else setAttribute(element, key, value);
