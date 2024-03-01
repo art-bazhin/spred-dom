@@ -19,12 +19,12 @@ type Bindings<N extends Node> = {
 
 export function bind<N extends Node>(node: N, bindings: Bindings<N>) {
   if (state.creating) {
-    for (let key in bindings)
-      state.setupQueue.push(() => bindProp(node, key, (bindings as any)[key]));
-    return;
+    state.setupQueue.push(() => {
+      for (let key in bindings) bindProp(node, key, (bindings as any)[key]);
+    });
+  } else {
+    for (let key in bindings) bindProp(node, key, (bindings as any)[key]);
   }
-
-  for (let key in bindings) bindProp(node, key, (bindings as any)[key]);
 }
 
 export function bindProp(node: any, key: any, value: any) {
